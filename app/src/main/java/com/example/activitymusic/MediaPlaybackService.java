@@ -50,7 +50,7 @@ public class MediaPlaybackService extends Service {
             manager.createNotificationChannel(musicServiceChannel);
         }
         mAllSongsProvider = new AllSongsProvider(getApplicationContext());
-        mPreferences = getSharedPreferences(sharePrefFile,MODE_PRIVATE);
+        mPreferences = getSharedPreferences(sharePrefFile, MODE_PRIVATE);
     }
 
     @Override
@@ -110,7 +110,7 @@ public class MediaPlaybackService extends Service {
                 .setSmallIcon(R.drawable.icon_notification)
                 .setContentTitle(getNameSong())
                 .setContentText(getArtist())
-                .setLargeIcon(bitmap==null? BitmapFactory.decodeResource(getResources(),R.drawable.icon_default_song):bitmap)
+                .setLargeIcon(bitmap == null ? BitmapFactory.decodeResource(getResources(), R.drawable.icon_default_song) : bitmap)
                 .setPriority(2)
                 .addAction(R.drawable.ic_skip_previous_black_24dp, "previous", previousPendingIntent)
                 .addAction(isPlaying() ? R.drawable.ic_pause_black_24dp : R.drawable.ic_play_circle_filled_yellow_24dp, "play", playPendingIntent)
@@ -148,7 +148,7 @@ public class MediaPlaybackService extends Service {
         return mListSong.get(mPosition).getSinger();
     }
 
-    public String getAlbumID(){
+    public String getAlbumID() {
         return mListSong.get(mPosition).getAlbumID();
     }
 
@@ -210,7 +210,7 @@ public class MediaPlaybackService extends Service {
             public void onCompletion(MediaPlayer mediaPlayer) {
                 if (mStatusLoop == 0) {
                     stop();
-                    playSong(mListSong,mPosition);
+                    playSong(mListSong, mPosition);
                     pause();
                 } else if (mStatusLoop == 1) {
                     nextSong();
@@ -233,7 +233,7 @@ public class MediaPlaybackService extends Service {
 
     public void nextSong() {
         if (isMusicPlay()) {
-            if (mShuffle == 0){
+            if (mShuffle == 0) {
                 if (mPosition == mListSong.size() - 1) {
                     mPosition = 0;
                 } else {
@@ -249,7 +249,7 @@ public class MediaPlaybackService extends Service {
 
     public void previousSong() {
         if (isMusicPlay()) {
-            if (mShuffle == 0){
+            if (mShuffle == 0) {
                 if (mPosition == 0) {
                     mPosition = mListSong.size() - 1;
                 } else {
@@ -310,7 +310,7 @@ public class MediaPlaybackService extends Service {
         this.listenner = listenner;
     }
 
-    void showToast(String message){
+    void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
