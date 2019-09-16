@@ -8,6 +8,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
@@ -31,6 +32,7 @@ public class MediaPlaybackService extends Service {
     private IListenner listenner;
     private int mStatusLoop = 0;
     private int mShuffle = 0;
+    private AllSongsProvider mAllSongsProvider;
     private SharedPreferences mPreferences;
     private String sharePrefFile = "SongSharedPreferences";
 
@@ -47,6 +49,7 @@ public class MediaPlaybackService extends Service {
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(musicServiceChannel);
         }
+        mAllSongsProvider = new AllSongsProvider(getApplicationContext());
         mPreferences = getSharedPreferences(sharePrefFile,MODE_PRIVATE);
     }
 
@@ -102,11 +105,12 @@ public class MediaPlaybackService extends Service {
             nextPendingIntent = PendingIntent.getForegroundService(this, 0, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         }
 
+        Bitmap bitmap = mAllSongsProvider.getBitmapAlbumArt(getAlbumID());
         Notification notification = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                 .setSmallIcon(R.drawable.icon_notification)
                 .setContentTitle(getNameSong())
                 .setContentText(getArtist())
-                .setLargeIcon(getBitmapImage())
+                .setLargeIcon(bitmap==null? BitmapFactory.decodeResource(getResources(),R.drawable.icon_default_song):bitmap)
                 .setPriority(2)
                 .addAction(R.drawable.ic_skip_previous_black_24dp, "previous", previousPendingIntent)
                 .addAction(isPlaying() ? R.drawable.ic_pause_black_24dp : R.drawable.ic_play_circle_filled_yellow_24dp, "play", playPendingIntent)
@@ -144,9 +148,13 @@ public class MediaPlaybackService extends Service {
         return mListSong.get(mPosition).getSinger();
     }
 
-    public Bitmap getBitmapImage(){
-        return mListSong.get(mPosition).getBmImageSong();
+    public String getAlbumID(){
+        return mListSong.get(mPosition).getAlbumID();
     }
+
+//    public Bitmap getBitmapImage(){
+//        return mListSong.get(mPosition).getBmImageSong();
+//    }
 
     public int getmStatusLoop() {
         return mStatusLoop;

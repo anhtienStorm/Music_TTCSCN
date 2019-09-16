@@ -13,6 +13,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,12 +25,14 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
     private ArrayList<Song> mListSong;
     private ArrayList<Song> mListFullSong;
     private Context mContext;
+    private AllSongsProvider mAllSongsProvider;
     private IListSongAdapter listenner;
 
     public ListSongAdapter(ArrayList<Song> mListSong, Context mContext) {
         this.mListSong = mListSong;
         mListFullSong =  new ArrayList<>(mListSong);
         this.mContext = mContext;
+        mAllSongsProvider = new AllSongsProvider(mContext);
     }
 
     @NonNull
@@ -40,13 +44,11 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
     @Override
     public void onBindViewHolder(@NonNull SongViewHolder holder, int position) {
         Song song = mListSong.get(position);
-        Bitmap imgSong = song.getBmImageSong();
-        if (imgSong != null){
-            holder.imgSong.setImageBitmap(imgSong);
-        }
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//            holder.imgSong.setImageDrawable(mContext.getDrawable(R.drawable.icon_default_song));
+//        Bitmap imgSong = song.getBmImageSong();
+//        if (imgSong != null){
+//            holder.imgSong.setImageBitmap(imgSong);
 //        }
+        Glide.with(mContext).load(mAllSongsProvider.getUriAlbumArt(song.getAlbumID())).error(R.drawable.icon_default_song).into(holder.imgSong);
         holder.tvTitleSong.setText(song.getNameSong());
         holder.tvArtist.setText(song.getSinger());
     }
