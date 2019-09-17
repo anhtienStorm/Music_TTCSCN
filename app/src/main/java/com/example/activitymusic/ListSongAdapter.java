@@ -23,14 +23,12 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
     private List<Song> mListSong = new ArrayList<>();
     private List<Song> mListFullSong = new ArrayList<>();
     private Context mContext;
-//    private AllSongsProvider mAllSongsProvider;
     private IListSongAdapter listenner;
     private SongViewHolder lastHolder;
 
     public ListSongAdapter(ArrayList<Song> mListSong, Context mContext) {
         this.mListSong = mListSong;
         this.mContext = mContext;
-//        mAllSongsProvider = new AllSongsProvider(mContext);
     }
 
     public void updateList(List<Song> songs) {

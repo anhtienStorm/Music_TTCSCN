@@ -18,17 +18,12 @@ import java.util.ArrayList;
 
 public class AllSongsFragment extends BaseSongListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    AllSongsProvider mAllSongsProvider;
-    ArrayList<Song> mListSong;
     private static final int LOADER_ID = 1;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-//        mAllSongsProvider = new AllSongsProvider(getActivity());
-//        mListSong = mAllSongsProvider.getListSong();
         getLoaderManager().initLoader(LOADER_ID, null, this);
-        setListSong(mListSong);
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -41,7 +36,8 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
         ArrayList<Song> listSong = new ArrayList<>();
-        if (data != null && data.moveToFirst()) {
+        if (data != null && data.getCount() > 0) {
+            data.moveToFirst();
             int i = 0;
             int indexTitleColumn = data.getColumnIndex(MediaStore.Audio.Media.TITLE);
             int indexDataColumn = data.getColumnIndex(MediaStore.Audio.Media.DATA);
@@ -60,10 +56,9 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
                 listSong.add(song);
                 i++;
             } while (data.moveToNext());
-            data.close();
         }
         mAdapter.updateList(listSong);
-//        mListSong = listSong;
+        setListSong(listSong);
     }
 
     @Override

@@ -58,7 +58,6 @@ public class ActivityMusic extends AppCompatActivity
 //                    update();
 //                }
 //            });
-            Toast.makeText(ActivityMusic.this, "ok", Toast.LENGTH_SHORT).show();
             mCheckService = true;
         }
 
@@ -100,7 +99,7 @@ public class ActivityMusic extends AppCompatActivity
 
         createFragment();
         getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment, mAllSongsFragment).commit();
-        findViewById(R.id.layoutPlayMusic).setVisibility(View.INVISIBLE);
+        findViewById(R.id.layoutPlayMusic).setVisibility(View.GONE);
     }
 
     @Override

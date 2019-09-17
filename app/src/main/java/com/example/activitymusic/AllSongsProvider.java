@@ -29,39 +29,39 @@ public class AllSongsProvider {
         this.mContext = context;
     }
 
-    public ArrayList<Song> getListSong() {
-        ArrayList<Song> listSong = new ArrayList<>();
-        ContentResolver contentResolver = mContext.getContentResolver();
-        Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        Cursor musicCursor = null;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            musicCursor = contentResolver.query(musicUri, null, null, null, null, null);
-        }
-
-        if (musicCursor != null && musicCursor.moveToFirst()) {
-            int i = 0;
-            int indexTitleColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
-            int indexDataColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
-            int indexArtistColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-            int indexAlbumIDColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
-            int indexDurationColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
-            do {
-                String title = musicCursor.getString(indexTitleColumn);
-                String data = musicCursor.getString(indexDataColumn);
-                String artist = musicCursor.getString(indexArtistColumn);
-                String albumID = musicCursor.getString(indexAlbumIDColumn);
-                int duration = Integer.parseInt(musicCursor.getString(indexDurationColumn));
-                SimpleDateFormat formatTimeSong = new SimpleDateFormat("mm:ss");
-                String timeSong = formatTimeSong.format(duration);
-                Song song = new Song(i, title, data, artist, albumID, timeSong);
-                listSong.add(song);
-                i++;
-            } while (musicCursor.moveToNext());
-            musicCursor.close();
-        }
-        return listSong;
-    }
+//    public ArrayList<Song> getListSong() {
+//        ArrayList<Song> listSong = new ArrayList<>();
+//        ContentResolver contentResolver = mContext.getContentResolver();
+//        Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+//        Cursor musicCursor = null;
+//
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+//            musicCursor = contentResolver.query(musicUri, null, null, null, null, null);
+//        }
+//
+//        if (musicCursor != null && musicCursor.moveToFirst()) {
+//            int i = 0;
+//            int indexTitleColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
+//            int indexDataColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
+//            int indexArtistColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+//            int indexAlbumIDColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
+//            int indexDurationColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
+//            do {
+//                String title = musicCursor.getString(indexTitleColumn);
+//                String data = musicCursor.getString(indexDataColumn);
+//                String artist = musicCursor.getString(indexArtistColumn);
+//                String albumID = musicCursor.getString(indexAlbumIDColumn);
+//                int duration = Integer.parseInt(musicCursor.getString(indexDurationColumn));
+//                SimpleDateFormat formatTimeSong = new SimpleDateFormat("mm:ss");
+//                String timeSong = formatTimeSong.format(duration);
+//                Song song = new Song(i, title, data, artist, albumID, timeSong);
+//                listSong.add(song);
+//                i++;
+//            } while (musicCursor.moveToNext());
+//            musicCursor.close();
+//        }
+//        return listSong;
+//    }
 
 //    public byte[] getAlbumArt(String path) {
 //        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();

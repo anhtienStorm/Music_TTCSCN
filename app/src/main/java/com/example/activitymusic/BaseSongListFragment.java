@@ -3,14 +3,11 @@ package com.example.activitymusic;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -64,6 +61,7 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IL
     @Override
     public void onItemClick(int position) {
         mMediaPlaybackService.playSong(mListSong, position);
+        getActivity().findViewById(R.id.layoutPlayMusic).setVisibility(View.VISIBLE);
     }
 
     public void connectService() {
