@@ -3,11 +3,13 @@ package com.example.activitymusic;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,7 +24,7 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IL
 
     private MediaPlaybackService mMediaPlaybackService;
     private RecyclerView mRecyclerView;
-    private ListSongAdapter mAdapter;
+    protected ListSongAdapter mAdapter;
     private ArrayList<Song> mListSong;
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override

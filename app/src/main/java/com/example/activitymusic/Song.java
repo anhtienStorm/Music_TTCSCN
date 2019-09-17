@@ -1,13 +1,12 @@
 package com.example.activitymusic;
 
-import android.graphics.Bitmap;
-
 public class Song {
     private int id;
     private String nameSong;
     private String pathSong;
     private String singer;
     private String albumID;
+    private String duration;
 //    private Bitmap bmImageSong;
 
 //    public Song(int id, String nameSong, String dataSong, String singer, Bitmap bmImageSong) {
@@ -19,12 +18,13 @@ public class Song {
 //    }
 
 
-    public Song(int id, String nameSong, String pathSong, String singer, String albumID) {
+    public Song(int id, String nameSong, String pathSong, String singer, String albumID, String duration) {
         this.id = id;
         this.nameSong = nameSong;
         this.pathSong = pathSong;
         this.singer = singer;
         this.albumID = albumID;
+        this.duration = duration;
     }
 
     public int getId() {
@@ -47,6 +47,9 @@ public class Song {
 //        return bmImageSong;
 //    }
 
+    public String getDuration() {
+        return duration;
+    }
 
     public String getAlbumID() {
         return albumID;

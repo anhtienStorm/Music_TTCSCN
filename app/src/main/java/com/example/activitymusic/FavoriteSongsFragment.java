@@ -19,7 +19,7 @@ public class FavoriteSongsFragment extends BaseSongListFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ArrayList<Song> list = new ArrayList<>();
-        Song song = new Song(2,"a","b","c",null);
+        Song song = new Song(2,"a","b","c",null,"aa");
         list.add(song);
         setListSong(list);
         return super.onCreateView(inflater, container, savedInstanceState);

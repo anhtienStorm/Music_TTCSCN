@@ -3,10 +3,12 @@ package com.example.activitymusic;
 import android.Manifest;
 import android.app.ActivityManager;
 import android.content.ComponentName;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -17,6 +19,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import android.os.IBinder;
 import android.view.MenuItem;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -26,6 +29,10 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 import android.view.Menu;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -34,6 +41,9 @@ public class ActivityMusic extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     MediaPlaybackService mMediaPlaybackService;
+    Button btPlay, btNext, btPrevious;
+    TextView tvNameSong, tvArtist;
+    ImageView imgMainSong;
     Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment;
     Boolean mCheckService = false;
     ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -76,6 +86,7 @@ public class ActivityMusic extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         initPermission();   //xin cap quyen doc bo nho
+        initView();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -88,6 +99,8 @@ public class ActivityMusic extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         createFragment();
+        getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment, mAllSongsFragment).commit();
+        findViewById(R.id.layoutPlayMusic).setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -176,6 +189,31 @@ public class ActivityMusic extends AppCompatActivity
         bindService(it, mServiceConnection, 0);
     }
 
+    public void initView() {
+        btPlay = findViewById(R.id.btMainPlay);
+        btNext = findViewById(R.id.btMainNext);
+        btPrevious = findViewById(R.id.btMainPrevious);
+        tvNameSong = findViewById(R.id.tvMainNameSong);
+        tvArtist = findViewById(R.id.tvMainArtist);
+        imgMainSong = findViewById(R.id.imgMainSong);
+    }
+
+    public void update() {
+        if (mMediaPlaybackService.isMusicPlay()) {
+//            imgMainSong.setImageBitmap(mMusicService.getBitmapImage());
+            Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
+            Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mMediaPlaybackService.getAlbumID()));
+            Glide.with(this).load(uri).error(R.drawable.icon_default_song).into(imgMainSong);
+
+            tvNameSong.setText(mMediaPlaybackService.getNameSong());
+            tvArtist.setText(mMediaPlaybackService.getArtist());
+            if (mMediaPlaybackService.isPlaying()) {
+                btPlay.setBackgroundResource(R.drawable.ic_pause_black_24dp);
+            } else {
+                btPlay.setBackgroundResource(R.drawable.ic_play_circle_filled_yellow_24dp);
+            }
+        }
+    }
 
     // cap quyen doc bo nho
     public void initPermission() {
@@ -205,7 +243,6 @@ public class ActivityMusic extends AppCompatActivity
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(ActivityMusic.this, "Quyền đọc file: được phép", Toast.LENGTH_SHORT).show();
             } else {
-
                 Toast.makeText(ActivityMusic.this, "Quyền đọc file: không được phép", Toast.LENGTH_SHORT).show();
 
             }

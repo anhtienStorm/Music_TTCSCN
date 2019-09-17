@@ -5,10 +5,12 @@
     android:orientation="horizontal"
     android:padding="8dp">
 
-    <ImageView
-        android:id="@+id/imgItemSong"
+    <TextView
+        android:id="@+id/tvStt"
         android:layout_width="60dp"
         android:layout_height="60dp"
+        android:textColor="#525252"
+        android:gravity="center"
         android:padding="4dp" />
 
     <LinearLayout
@@ -19,16 +21,19 @@
         <TextView
             android:id="@+id/tvItemNameSong"
             android:layout_width="match_parent"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:layout_height="30dp"
             android:layout_marginLeft="4dp"
             android:padding="4dp"
             android:textSize="15dp"
-            android:textStyle="bold" />
+            android:textColor="#222222" />
 
         <TextView
-            android:id="@+id/tvItemArtist"
+            android:id="@+id/tvItemDuration"
             android:layout_width="match_parent"
             android:layout_height="30dp"
+            android:textColor="#505050"
             android:layout_marginLeft="4dp"
             android:padding="4dp" />
     </LinearLayout>

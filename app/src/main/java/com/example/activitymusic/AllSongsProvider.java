@@ -19,6 +19,7 @@ import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class AllSongsProvider {
@@ -44,16 +45,16 @@ public class AllSongsProvider {
             int indexDataColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
             int indexArtistColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
             int indexAlbumIDColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
+            int indexDurationColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
             do {
                 String title = musicCursor.getString(indexTitleColumn);
                 String data = musicCursor.getString(indexDataColumn);
                 String artist = musicCursor.getString(indexArtistColumn);
                 String albumID = musicCursor.getString(indexAlbumIDColumn);
-//                Bitmap bmImage = getAlbumArt(data);
-//                if (bmImage == null) {
-//                    bmImage = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.icon_default_song);
-//                }
-                Song song = new Song(i, title, data, artist, albumID);
+                int duration = Integer.parseInt(musicCursor.getString(indexDurationColumn));
+                SimpleDateFormat formatTimeSong = new SimpleDateFormat("mm:ss");
+                String timeSong = formatTimeSong.format(duration);
+                Song song = new Song(i, title, data, artist, albumID, timeSong);
                 listSong.add(song);
                 i++;
             } while (musicCursor.moveToNext());
