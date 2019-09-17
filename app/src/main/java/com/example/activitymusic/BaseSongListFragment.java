@@ -3,11 +3,14 @@ package com.example.activitymusic;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -43,7 +46,7 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IL
         connectService();
 
         mRecyclerView = view.findViewById(R.id.recycler_view);
-        mAdapter = new ListSongAdapter(mListSong, getActivity());
+        mAdapter = new ListSongAdapter(mListSong, getActivity(), mMediaPlaybackService);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(mRecyclerView.getContext(), DividerItemDecoration.VERTICAL));
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));

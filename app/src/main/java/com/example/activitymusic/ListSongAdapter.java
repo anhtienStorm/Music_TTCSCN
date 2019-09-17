@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,15 +21,16 @@ import java.util.regex.Pattern;
 
 public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongViewHolder> implements Filterable {
 
-    private List<Song> mListSong = new ArrayList<>();
+    private List<Song> mListSong; //= new ArrayList<>();
     private List<Song> mListFullSong = new ArrayList<>();
     private Context mContext;
     private IListSongAdapter listenner;
-    private SongViewHolder lastHolder;
+    private MediaPlaybackService mMediaPlaybackService;
 
-    public ListSongAdapter(ArrayList<Song> mListSong, Context mContext) {
-        this.mListSong = mListSong;
-        this.mContext = mContext;
+    public ListSongAdapter(ArrayList<Song> listSong, Context context, MediaPlaybackService mediaPlaybackService) {
+        this.mListSong = listSong;
+        this.mContext = context;
+        this.mMediaPlaybackService = mediaPlaybackService;
     }
 
     public void updateList(List<Song> songs) {
@@ -46,6 +48,8 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
     public void onBindViewHolder(@NonNull SongViewHolder holder, int position) {
         Song song = mListSong.get(position);
         holder.bind(song,position);
+//        Toast.makeText(mContext, mMediaPlaybackService.getNameSong(), Toast.LENGTH_SHORT).show();
+//        notifyDataSetChanged();
     }
 
     @Override
@@ -130,6 +134,5 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
             tvDuration.setText(song.getDuration());
         }
     }
-
 
 }
