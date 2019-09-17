@@ -27,9 +27,11 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.Menu;
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -46,6 +48,9 @@ public class ActivityMusic extends AppCompatActivity
     ImageView imgMainSong;
     Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment;
     Boolean mCheckService = false;
+    ICallbackFragmentServiceConnection mCallbackFragmentServiceConnection;
+    ICallbackAdapterServiceConnection mCallbackAdapterServiceConnection;
+
     ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
@@ -59,6 +64,9 @@ public class ActivityMusic extends AppCompatActivity
 //                }
 //            });
             mCheckService = true;
+
+            mCallbackFragmentServiceConnection.service(mMediaPlaybackService);
+            mCallbackAdapterServiceConnection.service(mMediaPlaybackService);
         }
 
         @Override
@@ -134,7 +142,6 @@ public class ActivityMusic extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -158,6 +165,7 @@ public class ActivityMusic extends AppCompatActivity
         super.onDestroy();
         unbindService(mServiceConnection);
     }
+
 
     //method
     private boolean isMyServiceRunning(Class<?> serviceClass) {
@@ -214,6 +222,15 @@ public class ActivityMusic extends AppCompatActivity
         }
     }
 
+    public void registerClientFragment(Fragment fragment){
+        this.mCallbackFragmentServiceConnection = (ICallbackFragmentServiceConnection) fragment;
+    }
+
+    public void registerClientAdapter(RecyclerView.Adapter<ListSongAdapter.SongViewHolder> adapter){
+        this.mCallbackAdapterServiceConnection = (ICallbackAdapterServiceConnection) adapter;
+    }
+
+
     // cap quyen doc bo nho
     public void initPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -248,5 +265,15 @@ public class ActivityMusic extends AppCompatActivity
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+    }
+
+
+    // interface
+    interface ICallbackFragmentServiceConnection {
+        void service(MediaPlaybackService service);
+    }
+
+    interface ICallbackAdapterServiceConnection{
+        void service(MediaPlaybackService service);
     }
 }
