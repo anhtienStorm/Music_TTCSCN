@@ -1,22 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/layoutPlayMusic"
         android:layout_width="match_parent"
         android:layout_height="62dp"
         android:layout_alignParentBottom="true"
         android:background="#aaf8f7f6"
-        android:onClick="onClickLayoutPlayMusic"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/imgMainSong"
+            android:id="@+id/imgSongSmall"
             android:layout_width="46dp"
             android:layout_height="46dp"
             android:layout_margin="7dp"
@@ -25,7 +22,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/tvMainNameSong"
+            android:id="@+id/tvNameSong"
             android:layout_width="250dp"
             android:layout_height="20dp"
             android:layout_marginLeft="12dp"
@@ -35,12 +32,12 @@
             android:maxLines="1"
             android:textSize="14sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@+id/tvMainArtist"
-            app:layout_constraintLeft_toRightOf="@+id/imgMainSong"
+            app:layout_constraintBottom_toTopOf="@+id/tvArtist"
+            app:layout_constraintLeft_toRightOf="@+id/imgSongSmall"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/tvMainArtist"
+            android:id="@+id/tvArtist"
             android:layout_width="250dp"
             android:layout_height="20dp"
             android:layout_marginLeft="12dp"
@@ -48,9 +45,8 @@
             android:gravity="top"
             android:maxLines="1"
             android:textSize="12sp"
-
-            app:layout_constraintLeft_toRightOf="@+id/imgMainSong"
-            app:layout_constraintTop_toBottomOf="@+id/tvMainNameSong" />
+            app:layout_constraintLeft_toRightOf="@+id/imgSongSmall"
+            app:layout_constraintTop_toBottomOf="@+id/tvNameSong" />
 
 
         <ImageView
@@ -82,7 +78,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
-        android:id="@+id/btImgShuffe"
+        android:id="@+id/btImgShuffle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="31dp"

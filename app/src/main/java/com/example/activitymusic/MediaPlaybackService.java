@@ -30,7 +30,7 @@ public class MediaPlaybackService extends Service {
     private final Binder mBinder = new MediaPlaybackServiceBinder();
     private ArrayList<Song> mListSong;
     private int mPosition;
-    private IListenner listenner;
+    private ICallbackService mCallbackService;
     private int mStatusLoop = 0;
     private int mShuffle = 0;
     private AllSongsProvider mAllSongsProvider;
@@ -175,13 +175,13 @@ public class MediaPlaybackService extends Service {
     public void play() {
         mMediaPlayer.start();
         showNotification();
-        listenner.onSelect();
+        mCallbackService.onSelect();
     }
 
     public void pause() {
         mMediaPlayer.pause();
         showNotification();
-        listenner.onSelect();
+        mCallbackService.onSelect();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             stopForeground(STOP_FOREGROUND_DETACH);
         }
@@ -190,7 +190,7 @@ public class MediaPlaybackService extends Service {
     public void stop() {
         mMediaPlayer.stop();
         showNotification();
-        listenner.onSelect();
+        mCallbackService.onSelect();
     }
 
     private void preparePlay() {
@@ -204,15 +204,13 @@ public class MediaPlaybackService extends Service {
         mMediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
         mMediaPlayer.start();
         showNotification();
-        listenner.onSelect();
+        mCallbackService.onSelect();
 
         mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
                 if (mStatusLoop == 0) {
-                    stop();
-                    playSong(mListSong, mPosition);
-                    pause();
+                    nextSong();
                 } else if (mStatusLoop == 1) {
                     nextSong();
                 } else {
@@ -272,7 +270,7 @@ public class MediaPlaybackService extends Service {
             mShuffle = 0;
             showToast("Shuffle Off");
         }
-        listenner.onSelect();
+        mCallbackService.onSelect();
     }
 
     public void loopSong() {
@@ -286,7 +284,7 @@ public class MediaPlaybackService extends Service {
             mStatusLoop = 0;
             showToast("No Loop");
         }
-        listenner.onSelect();
+        mCallbackService.onSelect();
 
     }
 
@@ -308,8 +306,8 @@ public class MediaPlaybackService extends Service {
         return mMediaPlayer.getCurrentPosition();
     }
 
-    void onChangeStatus(IListenner listenner) {
-        this.listenner = listenner;
+    void onChangeStatus(ICallbackService callbackService) {
+        this.mCallbackService = callbackService;
     }
 
     void showToast(String message) {
@@ -325,7 +323,7 @@ public class MediaPlaybackService extends Service {
     }
 
     //interface
-    interface IListenner {
+    interface ICallbackService {
         void onSelect();
     }
 }

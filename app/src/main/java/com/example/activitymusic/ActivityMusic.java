@@ -51,7 +51,7 @@ public class ActivityMusic extends AppCompatActivity
             MediaPlaybackService.MediaPlaybackServiceBinder mediaPlaybackServiceBinder = (MediaPlaybackService.MediaPlaybackServiceBinder) iBinder;
             mMediaPlaybackService = mediaPlaybackServiceBinder.getService();
             update();
-            mMediaPlaybackService.onChangeStatus(new MediaPlaybackService.IListenner() {
+            mMediaPlaybackService.onChangeStatus(new MediaPlaybackService.ICallbackService() {
                 @Override
                 public void onSelect() {
                     update();
