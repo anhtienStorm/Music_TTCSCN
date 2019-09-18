@@ -1,16 +1,21 @@
 package com.example.activitymusic;
 
+import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.graphics.Typeface;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.Normalizer;
@@ -19,18 +24,20 @@ import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongViewHolder> implements Filterable {
+public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongViewHolder> implements Filterable, ActivityMusic.ICallbackAdapterServiceConnection {
 
     private List<Song> mListSong = new ArrayList<>();
     private List<Song> mListFullSong = new ArrayList<>();
     private Context mContext;
     private IListSongAdapter listenner;
     private MediaPlaybackService mMediaPlaybackService;
+    private ActivityMusic mActivityMusic;
 
-    public ListSongAdapter(ArrayList<Song> listSong, Context context, MediaPlaybackService mediaPlaybackService) {
+    public ListSongAdapter(ArrayList<Song> listSong, Context context) {
         this.mListSong = listSong;
         this.mContext = context;
-        this.mMediaPlaybackService = mediaPlaybackService;
+        this.mActivityMusic = (ActivityMusic) context;
+        mActivityMusic.registerClientAdapter(this);
     }
 
     public void updateList(List<Song> songs) {
@@ -42,6 +49,7 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
     @NonNull
     @Override
     public SongViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        //Toast.makeText(mContext,  String.valueOf(mMediaPlaybackService), Toast.LENGTH_SHORT).show();
         return new SongViewHolder(LayoutInflater.from(mContext).inflate(R.layout.recyclerview_items, parent, false));
     }
 
@@ -49,7 +57,6 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
     public void onBindViewHolder(@NonNull SongViewHolder holder, int position) {
         Song song = mListSong.get(position);
         holder.bind(song,position);
-//        Toast.makeText(mContext, mMediaPlaybackService.getNameSong(), Toast.LENGTH_SHORT).show();
 //        notifyDataSetChanged();
     }
 
@@ -103,6 +110,12 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
         Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
         return pattern.matcher(temp).replaceAll("").replaceAll("Đ", "D").replace("đ", "d");
     }
+
+    @Override
+    public void service(MediaPlaybackService service) {
+        mMediaPlaybackService = service;
+    }
+
 
     //interface
     interface IListSongAdapter {
