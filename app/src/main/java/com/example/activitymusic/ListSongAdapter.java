@@ -24,7 +24,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongViewHolder> implements Filterable, ActivityMusic.ICallbackAdapterServiceConnection {
+public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongViewHolder> implements Filterable{
 
     private List<Song> mListSong = new ArrayList<>();
     private List<Song> mListFullSong = new ArrayList<>();
@@ -37,7 +37,6 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
         this.mListSong = listSong;
         this.mContext = context;
         this.mActivityMusic = (ActivityMusic) context;
-        mActivityMusic.registerClientAdapter(this);
     }
 
     public void updateList(List<Song> songs) {
@@ -109,11 +108,6 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
         String temp = Normalizer.normalize(s, Normalizer.Form.NFD);
         Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
         return pattern.matcher(temp).replaceAll("").replaceAll("Đ", "D").replace("đ", "d");
-    }
-
-    @Override
-    public void service(MediaPlaybackService service) {
-        mMediaPlaybackService = service;
     }
 
 

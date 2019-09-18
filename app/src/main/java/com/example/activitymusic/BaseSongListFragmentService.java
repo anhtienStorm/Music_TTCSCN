@@ -36,7 +36,7 @@ public class BaseSongListFragmentService extends Fragment implements ListSongAda
         View view = inflater.inflate(R.layout.base_song_list_fragment, container, false);
 
         mRecyclerView = view.findViewById(R.id.recycler_view);
-        mAdapter = new ListSongAdapter(mListSong, getActivity(), mMediaPlaybackService);
+        mAdapter = new ListSongAdapter(mListSong, getActivity());
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(mRecyclerView.getContext(), DividerItemDecoration.VERTICAL));
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
