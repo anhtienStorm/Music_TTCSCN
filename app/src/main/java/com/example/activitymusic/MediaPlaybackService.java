@@ -113,7 +113,7 @@ public class MediaPlaybackService extends Service {
                 .setLargeIcon(bitmap == null ? BitmapFactory.decodeResource(getResources(), R.drawable.icon_default_song) : bitmap)
                 .setPriority(2)
                 .addAction(R.drawable.ic_skip_previous_black_24dp, "previous", previousPendingIntent)
-                .addAction(isPlaying() ? R.drawable.ic_pause_black_24dp : R.drawable.ic_play_circle_filled_yellow_24dp, "play", playPendingIntent)
+                .addAction(isPlaying() ? R.drawable.ic_pause_circle_filled_orange_24dp : R.drawable.ic_play_circle_filled_orange_24dp, "play", playPendingIntent)
                 .addAction(R.drawable.ic_skip_next_black_24dp, "next", nextPendingIntent)
                 .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
                         .setShowActionsInCompactView(0, 1, 2))
@@ -174,13 +174,13 @@ public class MediaPlaybackService extends Service {
     public void play() {
         mMediaPlayer.start();
         showNotification();
-        //listenner.onSelect();
+        listenner.onSelect();
     }
 
     public void pause() {
         mMediaPlayer.pause();
         showNotification();
-        //listenner.onSelect();
+        listenner.onSelect();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             stopForeground(STOP_FOREGROUND_DETACH);
         }
@@ -189,7 +189,7 @@ public class MediaPlaybackService extends Service {
     public void stop() {
         mMediaPlayer.stop();
         showNotification();
-        //listenner.onSelect();
+        listenner.onSelect();
     }
 
     private void preparePlay() {
@@ -203,7 +203,7 @@ public class MediaPlaybackService extends Service {
         mMediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
         mMediaPlayer.start();
         showNotification();
-        //listenner.onSelect();
+        listenner.onSelect();
 
         mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override

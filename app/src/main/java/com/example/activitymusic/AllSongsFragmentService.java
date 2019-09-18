@@ -16,7 +16,7 @@ import androidx.loader.content.Loader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-public class AllSongsFragment extends BaseSongListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class AllSongsFragmentService extends BaseSongListFragmentService implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int LOADER_ID = 1;
 

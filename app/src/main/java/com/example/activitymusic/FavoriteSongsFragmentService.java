@@ -7,12 +7,10 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.ListFragment;
 
 import java.util.ArrayList;
 
-public class FavoriteSongsFragment extends BaseSongListFragment {
+public class FavoriteSongsFragmentService extends BaseSongListFragmentService {
 
 
     @Nullable

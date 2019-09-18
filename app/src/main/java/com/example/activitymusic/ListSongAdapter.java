@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 
 public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongViewHolder> implements Filterable {
 
-    private List<Song> mListSong; //= new ArrayList<>();
+    private List<Song> mListSong = new ArrayList<>();
     private List<Song> mListFullSong = new ArrayList<>();
     private Context mContext;
     private IListSongAdapter listenner;
@@ -36,6 +36,7 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
     public void updateList(List<Song> songs) {
         mListSong = songs;
         mListFullSong = new ArrayList<>(mListSong);
+        notifyDataSetChanged();
     }
 
     @NonNull
