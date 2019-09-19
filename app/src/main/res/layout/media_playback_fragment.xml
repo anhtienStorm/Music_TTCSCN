@@ -9,6 +9,7 @@
         android:layout_height="62dp"
         android:layout_alignParentBottom="true"
         android:background="#aaf8f7f6"
+        android:elevation="12dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -90,8 +91,8 @@
     <SeekBar
         android:id="@+id/seekBarSong"
         android:layout_width="match_parent"
-        android:layout_height="3dp"
-        android:orientation="vertical"
+        android:layout_height="wrap_content"
+        android:elevation="12dp"
         app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -100,6 +101,7 @@
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="80dp"
+        android:elevation="12dp"
         android:background="#aaf8f7f6"
         app:layout_constraintBottom_toBottomOf="@+id/imgSong"
         app:layout_constraintEnd_toEndOf="parent">

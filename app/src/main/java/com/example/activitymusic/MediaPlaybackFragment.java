@@ -198,8 +198,9 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICa
             Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
             Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mMediaPlaybackService.getAlbumID()));
             Glide.with(this).load(uri).error(R.drawable.icon_default_song).into(imgSong);
-
+            Glide.with(this).load(uri).error(R.drawable.icon_default_song).into(imgSongSmall);
             tvNameSong.setText(mMediaPlaybackService.getNameSong());
+            tvArtist.setText(mMediaPlaybackService.getArtist());
             tvTotalTimeSong.setText(mMediaPlaybackService.getTotalTime());
             seekBarSong.setMax(mMediaPlaybackService.getDuration());
             updateTimeSong();

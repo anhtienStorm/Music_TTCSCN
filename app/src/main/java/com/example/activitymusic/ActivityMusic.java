@@ -71,7 +71,7 @@ public class ActivityMusic extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
-        //Toast.makeText(this, String.valueOf(isMyServiceRunning(MediaPlaybackService.class)), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, String.valueOf(isMyServiceRunning(MediaPlaybackService.class)), Toast.LENGTH_SHORT).show();
         if (isMyServiceRunning(MediaPlaybackService.class)) {
             connectService();
         } else {
@@ -100,7 +100,9 @@ public class ActivityMusic extends AppCompatActivity
 
         createFragment();
         getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment, mAllSongsFragment).commit();
-        findViewById(R.id.layoutPlayMusic).setVisibility(View.GONE);
+        if (!isMyServiceRunning(MediaPlaybackService.class) && !mCheckService){
+            findViewById(R.id.layoutPlayMusic).setVisibility(View.GONE);
+        }
 
         imgPlay.setOnClickListener(new Button.OnClickListener() {
             @Override

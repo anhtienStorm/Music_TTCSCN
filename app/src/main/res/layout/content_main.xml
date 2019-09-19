@@ -19,6 +19,7 @@
         android:id="@+id/layoutPlayMusic"
         android:layout_width="match_parent"
         android:layout_height="62dp"
+        android:elevation="12dp"
         android:layout_alignParentBottom="true"
         android:background="@color/cardview_light_background"
         android:onClick="onClickLayoutPlayMusic">
