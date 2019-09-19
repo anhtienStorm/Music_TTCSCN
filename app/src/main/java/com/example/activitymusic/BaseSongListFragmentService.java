@@ -2,8 +2,12 @@ package com.example.activitymusic;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -59,4 +63,30 @@ public class BaseSongListFragmentService extends Fragment implements ListSongAda
     public void service(MediaPlaybackService service) {
         mMediaPlaybackService = service;
     }
+
+//    @Override
+//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+//        super.onCreateOptionsMenu(menu, inflater);
+//        inflater = getActivity().getMenuInflater();
+//        inflater.inflate(R.menu.search_menu,menu);
+//
+//        MenuItem searchItem = menu.findItem(R.id.action_search);
+//
+//        androidx.appcompat.widget.SearchView searchView = (androidx.appcompat.widget.SearchView) searchItem.getActionView();
+//
+//        searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
+//
+//        searchView.setOnQueryTextListener(new androidx.appcompat.widget.SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextSubmit(String s) {
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean onQueryTextChange(String s) {
+//                mAdapter.getFilter().filter(s);
+//                return false;
+//            }
+//        });
+//    }
 }
