@@ -1,21 +1,18 @@
 package com.example.activitymusic;
 
-import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
-import android.graphics.Typeface;
-import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.Normalizer;
@@ -24,19 +21,20 @@ import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongViewHolder> implements Filterable{
+public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongViewHolder> implements Filterable {
 
     private List<Song> mListSong = new ArrayList<>();
     private List<Song> mListFullSong = new ArrayList<>();
     private Context mContext;
     private IListSongAdapter listenner;
+    private String mTypeSongList;
     private MediaPlaybackService mMediaPlaybackService;
     private ActivityMusic mActivityMusic;
 
     public ListSongAdapter(ArrayList<Song> listSong, Context context) {
         this.mListSong = listSong;
         this.mContext = context;
-        this.mActivityMusic = (ActivityMusic) context;
+//        this.mActivityMusic = (ActivityMusic) context;
     }
 
     public void updateList(List<Song> songs) {
@@ -45,17 +43,20 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
         notifyDataSetChanged();
     }
 
+    public void setTypeSongList(String typeSongList) {
+        this.mTypeSongList = typeSongList;
+    }
+
     @NonNull
     @Override
     public SongViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        //Toast.makeText(mContext,  String.valueOf(mMediaPlaybackService), Toast.LENGTH_SHORT).show();
         return new SongViewHolder(LayoutInflater.from(mContext).inflate(R.layout.recyclerview_items, parent, false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull SongViewHolder holder, int position) {
         Song song = mListSong.get(position);
-        holder.bind(song,position);
+        holder.bind(song, position);
 //        notifyDataSetChanged();
     }
 
@@ -122,12 +123,14 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
         private TextView tvTitleSong;
         private TextView tvDuration;
         private TextView tvStt;
+        private ImageView btImgMore;
 
         public SongViewHolder(@NonNull View itemView) {
             super(itemView);
             tvStt = itemView.findViewById(R.id.tvStt);
             tvTitleSong = itemView.findViewById(R.id.tvItemNameSong);
             tvDuration = itemView.findViewById(R.id.tvItemDuration);
+            btImgMore = itemView.findViewById(R.id.tvOptionsItemRecyclerView);
             itemView.setOnClickListener(this);
         }
 
@@ -140,6 +143,35 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
             tvStt.setText((position + 1) + "");
             tvTitleSong.setText(song.getNameSong());
             tvDuration.setText(song.getDuration());
+            if (mTypeSongList != null){
+                btImgMore.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        PopupMenu popupMenu = new PopupMenu(mContext, btImgMore);
+                        if (mTypeSongList.equals("AllSongs")) {
+                            popupMenu.inflate(R.menu.item_recyclerview_more_all_song_menu);
+                        } else {
+                            popupMenu.inflate(R.menu.item_recyclerview_more_favorite_song_menu);
+                        }
+                        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                            @Override
+                            public boolean onMenuItemClick(MenuItem item) {
+                                switch (item.getItemId()) {
+                                    case R.id.more_all_song:
+                                        Toast.makeText(mContext, "Added Favorite SongList", Toast.LENGTH_SHORT).show();
+                                        return true;
+                                    case R.id.more_favorite_song:
+                                        Toast.makeText(mContext, "Remove Favorite SongList", Toast.LENGTH_SHORT).show();
+                                        return true;
+                                    default:
+                                        return false;
+                                }
+                            }
+                        });
+                        popupMenu.show();
+                    }
+                });
+            }
         }
     }
 

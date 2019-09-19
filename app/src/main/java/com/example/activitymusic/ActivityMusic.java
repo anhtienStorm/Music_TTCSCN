@@ -17,6 +17,8 @@ import androidx.core.view.GravityCompat;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 
 import android.os.IBinder;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.bumptech.glide.Glide;
@@ -28,7 +30,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
-import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -164,8 +165,8 @@ public class ActivityMusic extends AppCompatActivity
     }
 
     public void createFragment(){
-        mAllSongsFragment = new AllSongsFragmentService();
-        mFravoriteSongsFragment = new FavoriteSongsFragmentService();
+        mAllSongsFragment = new AllSongsFragment();
+        mFravoriteSongsFragment = new FavoriteSongsFragment();
         mMediaPlaybackFragment = new MediaPlaybackFragment();
     }
 

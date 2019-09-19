@@ -210,7 +210,7 @@ public class MediaPlaybackService extends Service {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
                 if (mStatusLoop == 0) {
-                    nextSong();
+                    nextSongNoloop();
                 } else if (mStatusLoop == 1) {
                     nextSong();
                 } else {
@@ -243,6 +243,24 @@ public class MediaPlaybackService extends Service {
                 mPosition = rd.nextInt(mListSong.size());
             }
             preparePlay();
+        }
+    }
+
+    public void nextSongNoloop(){
+        if (isMusicPlay()) {
+            if (mShuffle == 0) {
+                if (mPosition == mListSong.size() - 1) {
+                    stop();
+                    playSong(mListSong,mPosition);
+                } else {
+                    mPosition += 1;
+                }
+            } else {
+                Random rd = new Random();
+                mPosition = rd.nextInt(mListSong.size());
+            }
+            preparePlay();
+            pause();
         }
     }
 

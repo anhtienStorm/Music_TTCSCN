@@ -20,7 +20,7 @@ import androidx.loader.content.Loader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-public class AllSongsFragmentService extends BaseSongListFragmentService implements LoaderManager.LoaderCallbacks<Cursor> {
+public class AllSongsFragment extends BaseSongListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int LOADER_ID = 1;
 
@@ -63,6 +63,7 @@ public class AllSongsFragmentService extends BaseSongListFragmentService impleme
         }
         mAdapter.updateList(listSong);
         setListSong(listSong);
+        mAdapter.setTypeSongList("AllSongs");
     }
 
     @Override
@@ -72,29 +73,29 @@ public class AllSongsFragmentService extends BaseSongListFragmentService impleme
         }
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater = getActivity().getMenuInflater();
-        inflater.inflate(R.menu.search_menu,menu);
-
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-
-        androidx.appcompat.widget.SearchView searchView = (androidx.appcompat.widget.SearchView) searchItem.getActionView();
-
-        searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
-
-        searchView.setOnQueryTextListener(new androidx.appcompat.widget.SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String s) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String s) {
-                mAdapter.getFilter().filter(s);
-                return false;
-            }
-        });
-    }
+//    @Override
+//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+//        super.onCreateOptionsMenu(menu, inflater);
+//        inflater = getActivity().getMenuInflater();
+//        inflater.inflate(R.menu.search_menu,menu);
+//
+//        MenuItem searchItem = menu.findItem(R.id.action_search);
+//
+//        androidx.appcompat.widget.SearchView searchView = (androidx.appcompat.widget.SearchView) searchItem.getActionView();
+//
+//        searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
+//
+//        searchView.setOnQueryTextListener(new androidx.appcompat.widget.SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextSubmit(String s) {
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean onQueryTextChange(String s) {
+//                mAdapter.getFilter().filter(s);
+//                return false;
+//            }
+//        });
+//    }
 }

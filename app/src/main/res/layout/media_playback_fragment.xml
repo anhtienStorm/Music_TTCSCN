@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/media_playback_fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -54,6 +55,7 @@
             android:id="@+id/btImgListSong"
             android:layout_width="46dp"
             android:layout_height="46dp"
+            android:padding="8dp"
             android:layout_marginRight="26dp"
             android:src="@drawable/ic_queue_music_black_24dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -62,16 +64,12 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <ImageView
-        android:id="@+id/imgSong"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
+
 
     <ImageView
         android:id="@+id/btImgLoop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_marginStart="31dp"
         android:layout_marginLeft="31dp"
         android:layout_marginBottom="31dp"
@@ -80,8 +78,8 @@
 
     <ImageView
         android:id="@+id/btImgShuffle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_marginEnd="31dp"
         android:layout_marginRight="31dp"
         android:layout_marginBottom="31dp"
@@ -101,9 +99,9 @@
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="80dp"
-        android:elevation="12dp"
         android:background="#aaf8f7f6"
-        app:layout_constraintBottom_toBottomOf="@+id/imgSong"
+        android:elevation="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
         <TextView
@@ -123,7 +121,7 @@
             android:layout_marginStart="14dp"
             android:layout_marginLeft="14dp"
             android:padding="6dp"
-            android:src="@drawable/ic_liked_black_24dp"
+            android:src="@drawable/ic_like"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -167,7 +165,7 @@
             android:layout_marginEnd="14dp"
             android:layout_marginRight="14dp"
             android:padding="6dp"
-            android:src="@drawable/ic_disliked_black_24dp"
+            android:src="@drawable/ic_dislike"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

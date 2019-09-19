@@ -2,10 +2,11 @@ package com.example.activitymusic;
 
 import android.content.ComponentName;
 import android.content.ContentUris;
-import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -19,19 +20,20 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
-
-import com.bumptech.glide.Glide;
 
 import java.text.SimpleDateFormat;
 
 public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICallbackFragmentServiceConnection{
 
-    ImageView btImgLike, btImgPrevious, btImgPlay, btImgNext, btImgDislike, btImgLoop, btImgShuffle, imgSong, imgSongSmall, btImgListSong;
+    ConstraintLayout layoutMediaPlaybackFragment;
+    ImageView btImgLike, btImgPrevious, btImgPlay, btImgNext, btImgDislike, btImgLoop, btImgShuffle, imgSongSmall, btImgListSong;
     SeekBar seekBarSong;
     TextView tvNameSong, tvArtist, tvTotalTimeSong, tvTimeSong;
     MediaPlaybackService mMediaPlaybackService;
     boolean mCheckService = false;
+    AllSongsProvider mAllSongsProvider;
 //    ActivityMusic mActivityMusic;
 
     ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -77,6 +79,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICa
                 }
             });
         }
+        mAllSongsProvider = new AllSongsProvider(getContext());
     }
 
     @Nullable
@@ -170,9 +173,9 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICa
         tvArtist = view.findViewById(R.id.tvArtist);
         tvTimeSong = view.findViewById(R.id.tvTime);
         tvTotalTimeSong = view.findViewById(R.id.tvTotalTime);
-        imgSong = view.findViewById(R.id.imgSong);
         imgSongSmall = view.findViewById(R.id.imgSongSmall);
         btImgListSong = view.findViewById(R.id.btImgListSong);
+        layoutMediaPlaybackFragment = view.findViewById(R.id.media_playback_fragment);
     }
 
     @Override
@@ -197,8 +200,17 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICa
         if (mMediaPlaybackService.isMusicPlay()) {
             Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
             Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mMediaPlaybackService.getAlbumID()));
-            Glide.with(this).load(uri).error(R.drawable.icon_default_song).into(imgSong);
-            Glide.with(this).load(uri).error(R.drawable.icon_default_song).into(imgSongSmall);
+//            Glide.with(this).load(uri).error(R.drawable.icon_default_song).into(imgSong);
+//            Glide.with(this).load(uri).error(R.drawable.icon_default_song).into(imgSongSmall);
+            if (String.valueOf(uri).equals("content://media/external/audio/albumart/16")){
+                layoutMediaPlaybackFragment.setBackgroundResource(R.drawable.icon_default_song);
+                imgSongSmall.setImageResource(R.drawable.icon_default_song);
+            } else {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    layoutMediaPlaybackFragment.setBackground(new BitmapDrawable(getResources(),mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID())));
+                }
+                imgSongSmall.setImageURI(uri);
+            }
             tvNameSong.setText(mMediaPlaybackService.getNameSong());
             tvArtist.setText(mMediaPlaybackService.getArtist());
             tvTotalTimeSong.setText(mMediaPlaybackService.getTotalTime());
@@ -213,17 +225,17 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICa
         int loop = mMediaPlaybackService.getmStatusLoop();
         int shuffle = mMediaPlaybackService.getmShuffle();
         if (loop==0){
-            btImgLoop.setImageResource(R.drawable.ic_repeat_black_24dp);
+            btImgLoop.setImageResource(R.drawable.ic_repeat_white_24dp);
         } else if (loop==1){
-            btImgLoop.setImageResource(R.drawable.ic_repeat_violet_24dp);
+            btImgLoop.setImageResource(R.drawable.ic_repeat_orange_24dp);
         } else {
-            btImgLoop.setImageResource(R.drawable.ic_repeat_one_violet_24dp);
+            btImgLoop.setImageResource(R.drawable.ic_repeat_one_orange_24dp);
         }
         if (shuffle==0){
-            btImgShuffle.setImageResource(R.drawable.ic_shuffle_black_24dp);
+            btImgShuffle.setImageResource(R.drawable.ic_shuffle_white_24dp);
         } else {
             btImgShuffle.setImageResource
-                    (R.drawable.ic_shuffle_violet_24dp);
+                    (R.drawable.ic_shuffle_orange_24dp);
         }
     }
 }
