@@ -45,6 +45,7 @@ public class ActivityMusic extends AppCompatActivity
     ImageView imgMainSong;
     Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment;
     Boolean mCheckService = false;
+    AllSongsProvider mAllSongsProvider;
     ICallbackFragmentServiceConnection mCallbackFragmentConnection;
     ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
@@ -88,6 +89,7 @@ public class ActivityMusic extends AppCompatActivity
 
         initPermission();   //xin cap quyen doc bo nho
         initView();
+        mAllSongsProvider = new AllSongsProvider(this);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -133,10 +135,10 @@ public class ActivityMusic extends AppCompatActivity
 
         if (id == R.id.nav_list_music) {
             mSelectedFragment = mAllSongsFragment;
-            getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment, mSelectedFragment).commit();
+            getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.main_fragment, mSelectedFragment).commit();
         } else if (id == R.id.nav_favorite) {
             mSelectedFragment = mFravoriteSongsFragment;
-            getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment, mSelectedFragment).commit();
+            getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.main_fragment, mSelectedFragment).commit();
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -188,11 +190,15 @@ public class ActivityMusic extends AppCompatActivity
 
     public void update() {
         if (mMediaPlaybackService.isMusicPlay()) {
-            Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
-            Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mMediaPlaybackService.getAlbumID()));
+//            Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
+//            Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mMediaPlaybackService.getAlbumID()));
 //            Glide.with(this).load(uri).error(R.drawable.icon_default_song).into(imgMainSong);
-            imgMainSong.setImageURI(uri);
-
+            //imgMainSong.setImageURI(uri);
+            if (mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID())==null){
+                imgMainSong.setImageResource(R.drawable.icon_default_song);
+            } else {
+                imgMainSong.setImageBitmap(mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()));
+            }
             tvNameSong.setText(mMediaPlaybackService.getNameSong());
             tvArtist.setText(mMediaPlaybackService.getArtist());
             if (mMediaPlaybackService.isPlaying()) {

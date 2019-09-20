@@ -4,7 +4,11 @@ import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.graphics.BitmapRegionDecoder;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,10 +28,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
+
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 
 public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICallbackFragmentServiceConnection{
 
+    ConstraintLayout layoutMediaPlaybackFragment;
     ImageView btImgLike, btImgPrevious, btImgPlay, btImgNext, btImgDislike, btImgLoop, btImgShuffle, imgSongSmall, imgSong, btImgListSong;
     SeekBar seekBarSong;
     TextView tvNameSong, tvArtist, tvTotalTimeSong, tvTimeSong;
@@ -158,6 +166,13 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICa
             }
         });
 
+        btImgListSong.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getFragmentManager().popBackStack();
+            }
+        });
+
         return view;
     }
 
@@ -177,6 +192,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICa
         imgSongSmall = view.findViewById(R.id.imgSongSmall);
         btImgListSong = view.findViewById(R.id.btImgListSong);
         imgSong = view.findViewById(R.id.imgSong);
+        layoutMediaPlaybackFragment = view.findViewById(R.id.media_playback_fragment);
     }
 
     @Override
@@ -199,17 +215,31 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICa
 
     public void update(){
         if (mMediaPlaybackService.isMusicPlay()) {
-            Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
-            Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mMediaPlaybackService.getAlbumID()));
-//            Glide.with(this).load(uri).error(R.drawable.icon_default_song).into(imgSong);
+//            Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
+//            Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mMediaPlaybackService.getAlbumID()));
+//            Glide.with(this).load(uri).error(R.drawable.ic_default_error_song).into(imgSong);
 //            Glide.with(this).load(uri).error(R.drawable.icon_default_song).into(imgSongSmall);
-            if (String.valueOf(uri).equals("content://media/external/audio/albumart/16")){
-                imgSong.setImageResource(R.drawable.icon_default_song);
+
+            if (mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID())==null){
                 imgSongSmall.setImageResource(R.drawable.icon_default_song);
+                imgSong.setImageResource(R.drawable.ic_default_error_song);
             } else {
-                imgSong.setImageURI(uri);
-                imgSongSmall.setImageURI(uri);
+                imgSong.setImageBitmap(mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()));
+                imgSongSmall.setImageBitmap(mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()));
             }
+
+//            if (String.valueOf(uri).equals("content://media/external/audio/albumart/16")){
+//                layoutMediaPlaybackFragment.setBackgroundResource(R.drawable.ic_default_error_song);
+//                imgSongSmall.setImageResource(R.drawable.ic_default_error_song);
+//            } else {
+//                Bitmap imgBitmap = mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID());
+//                Drawable imgDrawable = new BitmapDrawable(imgBitmap);
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+//                    layoutMediaPlaybackFragment.setBackground(imgDrawable);
+//                }
+//                imgSongSmall.setImageURI(uri);
+//            }
+
             tvNameSong.setText(mMediaPlaybackService.getNameSong());
             tvArtist.setText(mMediaPlaybackService.getArtist());
             tvTotalTimeSong.setText(mMediaPlaybackService.getTotalTime());

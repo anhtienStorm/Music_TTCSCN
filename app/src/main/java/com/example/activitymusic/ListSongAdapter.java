@@ -1,5 +1,6 @@
 package com.example.activitymusic;
 
+import android.app.Service;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -29,12 +30,11 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
     private IListSongAdapter listenner;
     private String mTypeSongList;
     private MediaPlaybackService mMediaPlaybackService;
-    private ActivityMusic mActivityMusic;
+
 
     public ListSongAdapter(ArrayList<Song> listSong, Context context) {
         this.mListSong = listSong;
         this.mContext = context;
-//        this.mActivityMusic = (ActivityMusic) context;
     }
 
     public void updateList(List<Song> songs) {
@@ -109,6 +109,10 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
         String temp = Normalizer.normalize(s, Normalizer.Form.NFD);
         Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
         return pattern.matcher(temp).replaceAll("").replaceAll("Đ", "D").replace("đ", "d");
+    }
+
+    public void setService(Service service){
+        mMediaPlaybackService = (MediaPlaybackService) service;
     }
 
 
