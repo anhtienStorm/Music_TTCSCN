@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/media_playback_fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -29,9 +28,9 @@
             android:layout_height="20dp"
             android:layout_marginLeft="12dp"
             android:layout_marginTop="10dp"
-            android:ellipsize="end"
+            android:ellipsize="marquee"
             android:gravity="bottom"
-            android:maxLines="1"
+            android:singleLine="true"
             android:textSize="14sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@+id/tvArtist"
@@ -55,8 +54,8 @@
             android:id="@+id/btImgListSong"
             android:layout_width="46dp"
             android:layout_height="46dp"
-            android:padding="8dp"
             android:layout_marginRight="26dp"
+            android:padding="8dp"
             android:src="@drawable/ic_queue_music_black_24dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -64,7 +63,10 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
+    <ImageView
+        android:id="@+id/imgSong"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <ImageView
         android:id="@+id/btImgLoop"
@@ -73,7 +75,7 @@
         android:layout_marginStart="31dp"
         android:layout_marginLeft="31dp"
         android:layout_marginBottom="31dp"
-        app:layout_constraintBottom_toTopOf="@+id/seekBarSong"
+        app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
         app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
@@ -83,26 +85,26 @@
         android:layout_marginEnd="31dp"
         android:layout_marginRight="31dp"
         android:layout_marginBottom="31dp"
-        app:layout_constraintBottom_toTopOf="@+id/seekBarSong"
+        app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <SeekBar
-        android:id="@+id/seekBarSong"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:elevation="12dp"
-        app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="90dp"
         android:background="#aaf8f7f6"
         android:elevation="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
+
+        <SeekBar
+            android:id="@+id/seekBarSong"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="12dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/tvTime"
@@ -110,9 +112,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="17dp"
             android:layout_marginLeft="17dp"
-            android:layout_marginTop="7dp"
+            android:layout_marginTop="1dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/seekBarSong" />
 
         <ImageView
             android:id="@+id/btImgLike"
@@ -120,11 +122,11 @@
             android:layout_height="44dp"
             android:layout_marginStart="14dp"
             android:layout_marginLeft="14dp"
-            android:padding="6dp"
+            android:padding="7dp"
             android:src="@drawable/ic_like"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/seekBarSong" />
 
         <ImageView
             android:id="@+id/btImgPrevious"
@@ -135,17 +137,17 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toRightOf="@+id/btImgLike"
             app:layout_constraintRight_toLeftOf="@+id/btIngPlay"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/seekBarSong" />
 
         <ImageView
             android:id="@+id/btIngPlay"
-            android:layout_width="46dp"
-            android:layout_height="46dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:src="@drawable/ic_play_circle_filled_orange_24dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toRightOf="@+id/btImgPrevious"
             app:layout_constraintRight_toLeftOf="@+id/btImgNext"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/seekBarSong" />
 
         <ImageView
             android:id="@+id/btImgNext"
@@ -156,7 +158,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toRightOf="@+id/btIngPlay"
             app:layout_constraintRight_toLeftOf="@+id/btImgDislike"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/seekBarSong" />
 
         <ImageView
             android:id="@+id/btImgDislike"
@@ -164,21 +166,21 @@
             android:layout_height="44dp"
             android:layout_marginEnd="14dp"
             android:layout_marginRight="14dp"
-            android:padding="6dp"
+            android:padding="7dp"
             android:src="@drawable/ic_dislike"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/seekBarSong" />
 
         <TextView
             android:id="@+id/tvTotalTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="7dp"
+            android:layout_marginTop="1dp"
             android:layout_marginEnd="17dp"
             android:layout_marginRight="17dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/seekBarSong" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

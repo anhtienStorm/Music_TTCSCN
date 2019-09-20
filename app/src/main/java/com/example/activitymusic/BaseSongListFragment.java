@@ -11,6 +11,7 @@ import android.view.inputmethod.EditorInfo;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -44,7 +45,17 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IL
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.base_song_list_fragment, container, false);
-
+        ((AppCompatActivity)getActivity()).getSupportActionBar().show();
+        getActivity().findViewById(R.id.layoutPlayMusic).setVisibility(View.VISIBLE);
+        if (mMediaPlaybackService != null){
+            mActivityMusic.update();
+            mMediaPlaybackService.onChangeStatus(new MediaPlaybackService.ICallbackService() {
+                @Override
+                public void onSelect() {
+                    mActivityMusic.update();
+                }
+            });
+        }
         mRecyclerView = view.findViewById(R.id.recycler_view);
         mAdapter = new ListSongAdapter(mListSong, getActivity());
         mRecyclerView.setAdapter(mAdapter);
@@ -59,13 +70,18 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IL
     public void onItemClick(int position) {
         mMediaPlaybackService.playSong(mListSong, position);
         getActivity().findViewById(R.id.layoutPlayMusic).setVisibility(View.VISIBLE);
+        mActivityMusic.update();
+        mMediaPlaybackService.onChangeStatus(new MediaPlaybackService.ICallbackService() {
+            @Override
+            public void onSelect() {
+                mActivityMusic.update();
+            }
+        });
     }
 
     public void setListSong(ArrayList<Song> listSong){
         mListSong = listSong;
     }
-
-
 
     @Override
     public void service(MediaPlaybackService service) {

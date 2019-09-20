@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
@@ -27,8 +28,7 @@ import java.text.SimpleDateFormat;
 
 public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICallbackFragmentServiceConnection{
 
-    ConstraintLayout layoutMediaPlaybackFragment;
-    ImageView btImgLike, btImgPrevious, btImgPlay, btImgNext, btImgDislike, btImgLoop, btImgShuffle, imgSongSmall, btImgListSong;
+    ImageView btImgLike, btImgPrevious, btImgPlay, btImgNext, btImgDislike, btImgLoop, btImgShuffle, imgSongSmall, imgSong, btImgListSong;
     SeekBar seekBarSong;
     TextView tvNameSong, tvArtist, tvTotalTimeSong, tvTimeSong;
     MediaPlaybackService mMediaPlaybackService;
@@ -86,6 +86,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICa
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.media_playback_fragment,container, false);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
         initView(view);
         //update();
 //        mMediaPlaybackService.onChangeStatus(new MediaPlaybackService.ICallbackService() {
@@ -175,7 +176,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICa
         tvTotalTimeSong = view.findViewById(R.id.tvTotalTime);
         imgSongSmall = view.findViewById(R.id.imgSongSmall);
         btImgListSong = view.findViewById(R.id.btImgListSong);
-        layoutMediaPlaybackFragment = view.findViewById(R.id.media_playback_fragment);
+        imgSong = view.findViewById(R.id.imgSong);
     }
 
     @Override
@@ -203,12 +204,10 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICa
 //            Glide.with(this).load(uri).error(R.drawable.icon_default_song).into(imgSong);
 //            Glide.with(this).load(uri).error(R.drawable.icon_default_song).into(imgSongSmall);
             if (String.valueOf(uri).equals("content://media/external/audio/albumart/16")){
-                layoutMediaPlaybackFragment.setBackgroundResource(R.drawable.icon_default_song);
+                imgSong.setImageResource(R.drawable.icon_default_song);
                 imgSongSmall.setImageResource(R.drawable.icon_default_song);
             } else {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    layoutMediaPlaybackFragment.setBackground(new BitmapDrawable(getResources(),mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID())));
-                }
+                imgSong.setImageURI(uri);
                 imgSongSmall.setImageURI(uri);
             }
             tvNameSong.setText(mMediaPlaybackService.getNameSong());

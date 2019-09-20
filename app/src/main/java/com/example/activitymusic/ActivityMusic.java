@@ -101,9 +101,6 @@ public class ActivityMusic extends AppCompatActivity
 
         createFragment();
         getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment, mAllSongsFragment).commit();
-        if (!isMyServiceRunning(MediaPlaybackService.class) && !mCheckService){
-            findViewById(R.id.layoutPlayMusic).setVisibility(View.GONE);
-        }
 
         imgPlay.setOnClickListener(new Button.OnClickListener() {
             @Override
@@ -193,7 +190,8 @@ public class ActivityMusic extends AppCompatActivity
         if (mMediaPlaybackService.isMusicPlay()) {
             Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
             Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mMediaPlaybackService.getAlbumID()));
-            Glide.with(this).load(uri).error(R.drawable.icon_default_song).into(imgMainSong);
+//            Glide.with(this).load(uri).error(R.drawable.icon_default_song).into(imgMainSong);
+            imgMainSong.setImageURI(uri);
 
             tvNameSong.setText(mMediaPlaybackService.getNameSong());
             tvArtist.setText(mMediaPlaybackService.getArtist());
@@ -247,7 +245,7 @@ public class ActivityMusic extends AppCompatActivity
     }
 
     public void onClickLayoutPlayMusic(View view) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment, mMediaPlaybackFragment).commit();
+        getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.main_fragment, mMediaPlaybackFragment).commit();
         findViewById(R.id.layoutPlayMusic).setVisibility(View.GONE);
     }
 
