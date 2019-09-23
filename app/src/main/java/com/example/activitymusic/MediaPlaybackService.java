@@ -29,8 +29,9 @@ public class MediaPlaybackService extends Service {
     public static final String CHANNEL_ID = "MusicServiceChannel";
     private MediaPlayer mMediaPlayer = null;
     private final Binder mBinder = new MediaPlaybackServiceBinder();
-    private ArrayList<Song> mListSong;
-    private int mPosition;
+    private ArrayList<Song> mPlayingSongList;
+    private Song mPLayingSong;
+    private int mIndexofPlayingSong;
     private ICallbackService mCallbackService;
     private int mStatusLoop = 0;
     private int mShuffle = 0;
@@ -163,19 +164,27 @@ public class MediaPlaybackService extends Service {
     }
 
     public String getNameSong() {
-        return mListSong.get(mPosition).getNameSong();
+        return mPLayingSong.getNameSong();
     }
 
     public String getArtist() {
-        return mListSong.get(mPosition).getSinger();
+        return mPLayingSong.getSinger();
     }
 
     public String getAlbumID() {
-        return mListSong.get(mPosition).getAlbumID();
+        return mPLayingSong.getAlbumID();
+    }
+
+    public int getId() {
+        return mPLayingSong.getId();
+    }
+
+    public Song getPlayingSong(){
+        return mPLayingSong;
     }
 
 //    public Bitmap getBitmapImage(){
-//        return mListSong.get(mPosition).getBmImageSong();
+//        return mPlayingSongList.get(mPosition).getBmImageSong();
 //    }
 
     public int getmStatusLoop() {
@@ -215,7 +224,8 @@ public class MediaPlaybackService extends Service {
     }
 
     private void preparePlay() {
-        Uri uri = Uri.parse(mListSong.get(mPosition).getPathSong());
+        //mIndexofPlayingSong = mPlayingSongList.indexOf(mPLayingSong);
+        Uri uri = Uri.parse(mPLayingSong.getPathSong());
         if (mMediaPlayer != null) {
             if (mMediaPlayer.isPlaying()) {
                 mMediaPlayer.stop();
@@ -226,6 +236,7 @@ public class MediaPlaybackService extends Service {
         mMediaPlayer.start();
         showNotification();
         mCallbackService.onSelect();
+        mIndexofPlayingSong = mPlayingSongList.indexOf(mPLayingSong);
 
         mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
@@ -235,33 +246,36 @@ public class MediaPlaybackService extends Service {
                 } else if (mStatusLoop == 1) {
                     nextSong();
                 } else {
-                    playSong(mListSong, mPosition);
+                    playSong(mPlayingSongList, mPLayingSong);
                 }
             }
         });
 
 //        SharedPreferences.Editor prefEditor = mPreferences.edit();
-//        prefEditor.putInt("ID_Song",mListSong.get(mPosition).getId());
+//        prefEditor.putInt("ID_Song",mPlayingSongList.get(mPosition).getId());
 //        prefEditor.apply();
     }
 
-    public void playSong(final ArrayList<Song> listSong, final int position) {
-        this.mListSong = listSong;
-        this.mPosition = position;
+    public void playSong(final ArrayList<Song> listSong, final Song song) {
+        this.mPlayingSongList = listSong;
+        this.mPLayingSong = song;
         preparePlay();
     }
 
     public void nextSong() {
         if (isMusicPlay()) {
             if (mShuffle == 0) {
-                if (mPosition == mListSong.size() - 1) {
-                    mPosition = 0;
+                if (mIndexofPlayingSong == mPlayingSongList.size() - 1) {
+                    mIndexofPlayingSong = 0;
+                    mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
                 } else {
-                    mPosition += 1;
+                    mIndexofPlayingSong += 1;
+                    mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
                 }
             } else {
                 Random rd = new Random();
-                mPosition = rd.nextInt(mListSong.size());
+                mIndexofPlayingSong = rd.nextInt(mPlayingSongList.size());
+                mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
             }
             preparePlay();
         }
@@ -270,32 +284,40 @@ public class MediaPlaybackService extends Service {
     public void nextSongNoloop() {
         if (isMusicPlay()) {
             if (mShuffle == 0) {
-                if (mPosition == mListSong.size() - 1) {
+                if (mIndexofPlayingSong == mPlayingSongList.size() - 1) {
                     stop();
-                    playSong(mListSong, mPosition);
+                    playSong(mPlayingSongList, mPLayingSong);
+                    preparePlay();
+                    pause();
                 } else {
-                    mPosition += 1;
+                    mIndexofPlayingSong += 1;
+                    mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
+                    preparePlay();
                 }
             } else {
                 Random rd = new Random();
-                mPosition = rd.nextInt(mListSong.size());
+                mIndexofPlayingSong = rd.nextInt(mPlayingSongList.size());
+                mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
+                preparePlay();
             }
-            preparePlay();
-            pause();
+
         }
     }
 
     public void previousSong() {
         if (isMusicPlay()) {
             if (mShuffle == 0) {
-                if (mPosition == 0) {
-                    mPosition = mListSong.size() - 1;
+                if (mIndexofPlayingSong == 0) {
+                    mIndexofPlayingSong = mPlayingSongList.size() - 1;
+                    mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
                 } else {
-                    mPosition -= 1;
+                    mIndexofPlayingSong -= 1;
+                    mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
                 }
             } else {
                 Random rd = new Random();
-                mPosition = rd.nextInt(mListSong.size());
+                mIndexofPlayingSong = rd.nextInt(mPlayingSongList.size());
+                mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
             }
             preparePlay();
         }

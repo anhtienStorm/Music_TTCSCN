@@ -193,12 +193,15 @@ public class ActivityMusic extends AppCompatActivity
 //            Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
 //            Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mMediaPlaybackService.getAlbumID()));
 //            Glide.with(this).load(uri).error(R.drawable.icon_default_song).into(imgMainSong);
+
             //imgMainSong.setImageURI(uri);
-            if (mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID())==null){
+
+            /*if (mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID())==null){
                 imgMainSong.setImageResource(R.drawable.icon_default_song);
             } else {
                 imgMainSong.setImageBitmap(mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()));
-            }
+            }*/
+
             tvNameSong.setText(mMediaPlaybackService.getNameSong());
             tvArtist.setText(mMediaPlaybackService.getArtist());
             if (mMediaPlaybackService.isPlaying()) {

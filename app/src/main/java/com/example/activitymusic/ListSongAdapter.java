@@ -2,6 +2,8 @@ package com.example.activitymusic;
 
 import android.app.Service;
 import android.content.Context;
+import android.graphics.Typeface;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,6 +32,7 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
     private IListSongAdapter listenner;
     private String mTypeSongList;
     private MediaPlaybackService mMediaPlaybackService;
+    private Song mPlayingSong;
 
 
     public ListSongAdapter(ArrayList<Song> listSong, Context context) {
@@ -57,6 +60,16 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
     public void onBindViewHolder(@NonNull SongViewHolder holder, int position) {
         Song song = mListSong.get(position);
         holder.bind(song, position);
+
+
+//        if (mMediaPlaybackService != null){
+//            mPlayingSong = mMediaPlaybackService.getPlayingSong();
+//            if (mPlayingSong != null){
+//                if (song.getId()==mPlayingSong.getId()){
+//                    holder.tvTitleSong.setTypeface(null, Typeface.BOLD);
+//                }
+//            }
+//        }
 //        notifyDataSetChanged();
     }
 

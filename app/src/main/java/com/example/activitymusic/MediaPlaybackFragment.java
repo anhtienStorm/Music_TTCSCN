@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +34,7 @@ import com.bumptech.glide.Glide;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 
-public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICallbackFragmentServiceConnection{
+public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICallbackFragmentServiceConnection {
 
     ConstraintLayout layoutMediaPlaybackFragment;
     ImageView btImgLike, btImgPrevious, btImgPlay, btImgNext, btImgDislike, btImgLoop, btImgShuffle, imgSongSmall, imgSong, btImgListSong;
@@ -78,7 +79,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICa
         super.onStart();
         Intent it = new Intent(getContext(), MediaPlaybackService.class);
         getActivity().bindService(it, mServiceConnection, 0);
-        if (mCheckService){
+        if (mCheckService) {
             update();
             mMediaPlaybackService.onChangeStatus(new MediaPlaybackService.ICallbackService() {
                 @Override
@@ -93,8 +94,8 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICa
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.media_playback_fragment,container, false);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
+        View view = inflater.inflate(R.layout.media_playback_fragment, container, false);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
         initView(view);
         //update();
 //        mMediaPlaybackService.onChangeStatus(new MediaPlaybackService.ICallbackService() {
@@ -176,7 +177,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICa
         return view;
     }
 
-    void initView(View view){
+    void initView(View view) {
         btImgLike = view.findViewById(R.id.btImgLike);
         btImgPrevious = view.findViewById(R.id.btImgPrevious);
         btImgPlay = view.findViewById(R.id.btIngPlay);
@@ -213,19 +214,19 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICa
         }, 100);
     }
 
-    public void update(){
+    public void update() {
         if (mMediaPlaybackService.isMusicPlay()) {
 //            Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
 //            Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mMediaPlaybackService.getAlbumID()));
 //            Glide.with(this).load(uri).error(R.drawable.ic_default_error_song).into(imgSong);
 //            Glide.with(this).load(uri).error(R.drawable.icon_default_song).into(imgSongSmall);
 
-            if (mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID())==null){
-                imgSongSmall.setImageResource(R.drawable.icon_default_song);
+            if (mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()) == null) {
+                //imgSongSmall.setImageResource(R.drawable.icon_default_song);
                 imgSong.setImageResource(R.drawable.ic_default_error_song);
             } else {
                 imgSong.setImageBitmap(mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()));
-                imgSongSmall.setImageBitmap(mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()));
+                //imgSongSmall.setImageBitmap(mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()));
             }
 
 //            if (String.valueOf(uri).equals("content://media/external/audio/albumart/16")){
@@ -253,14 +254,14 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICa
         }
         int loop = mMediaPlaybackService.getmStatusLoop();
         int shuffle = mMediaPlaybackService.getmShuffle();
-        if (loop==0){
+        if (loop == 0) {
             btImgLoop.setImageResource(R.drawable.ic_repeat_white_24dp);
-        } else if (loop==1){
+        } else if (loop == 1) {
             btImgLoop.setImageResource(R.drawable.ic_repeat_orange_24dp);
         } else {
             btImgLoop.setImageResource(R.drawable.ic_repeat_one_orange_24dp);
         }
-        if (shuffle==0){
+        if (shuffle == 0) {
             btImgShuffle.setImageResource(R.drawable.ic_shuffle_white_24dp);
         } else {
             btImgShuffle.setImageResource

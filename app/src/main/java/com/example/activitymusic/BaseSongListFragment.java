@@ -68,7 +68,7 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IL
 
     @Override
     public void onItemClick(int position) {
-        mMediaPlaybackService.playSong(mListSong, position);
+        mMediaPlaybackService.playSong(mListSong, mListSong.get(position));
         getActivity().findViewById(R.id.layoutPlayMusic).setVisibility(View.VISIBLE);
         mActivityMusic.update();
         mMediaPlaybackService.onChangeStatus(new MediaPlaybackService.ICallbackService() {
@@ -86,6 +86,7 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IL
     @Override
     public void service(MediaPlaybackService service) {
         mMediaPlaybackService = service;
+        mAdapter.setService(mMediaPlaybackService);
     }
 
     @Override
