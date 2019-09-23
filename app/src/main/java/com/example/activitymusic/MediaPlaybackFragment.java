@@ -187,6 +187,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICa
         btImgShuffle = view.findViewById(R.id.btImgShuffle);
         seekBarSong = view.findViewById(R.id.seekBarSong);
         tvNameSong = view.findViewById(R.id.tvNameSong);
+        tvNameSong.setSelected(true);
         tvArtist = view.findViewById(R.id.tvArtist);
         tvTimeSong = view.findViewById(R.id.tvTime);
         tvTotalTimeSong = view.findViewById(R.id.tvTotalTime);
@@ -222,11 +223,11 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICa
 //            Glide.with(this).load(uri).error(R.drawable.icon_default_song).into(imgSongSmall);
 
             if (mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()) == null) {
-                //imgSongSmall.setImageResource(R.drawable.icon_default_song);
+                imgSongSmall.setImageResource(R.drawable.icon_default_song);
                 imgSong.setImageResource(R.drawable.ic_default_error_song);
             } else {
                 imgSong.setImageBitmap(mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()));
-                //imgSongSmall.setImageBitmap(mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()));
+                imgSongSmall.setImageBitmap(mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()));
             }
 
 //            if (String.valueOf(uri).equals("content://media/external/audio/albumart/16")){

@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.RemoteViews;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
@@ -48,7 +49,7 @@ public class MediaPlaybackService extends Service {
                     "AllSongsProvider Service Channel",
                     NotificationManager.IMPORTANCE_HIGH
             );
-            musicServiceChannel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+            musicServiceChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(musicServiceChannel);
         }
@@ -225,6 +226,13 @@ public class MediaPlaybackService extends Service {
 
     private void preparePlay() {
         //mIndexofPlayingSong = mPlayingSongList.indexOf(mPLayingSong);
+        Log.d("aaa", getNameSong());
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putInt("SONG_ID",mPLayingSong.getId());
+        editor.putString("SONG_NAME",getNameSong());
+        editor.putString("SONGLIST_ID", "AllSong");
+        editor.apply();
+
         Uri uri = Uri.parse(mPLayingSong.getPathSong());
         if (mMediaPlayer != null) {
             if (mMediaPlayer.isPlaying()) {

@@ -39,9 +39,13 @@
             android:layout_height="20dp"
             android:layout_marginLeft="12dp"
             android:layout_marginTop="10dp"
-            android:ellipsize="end"
             android:gravity="bottom"
-            android:maxLines="1"
+
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="true"
+
             android:textSize="14sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@+id/tvMainArtist"

@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -129,6 +130,16 @@ public class ActivityMusic extends AppCompatActivity
     }
 
     @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+
+        } else {
+
+        }
+        super.onConfigurationChanged(newConfig);
+    }
+
+    @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
@@ -184,6 +195,7 @@ public class ActivityMusic extends AppCompatActivity
     public void initView() {
         imgPlay = findViewById(R.id.btMainPlay);
         tvNameSong = findViewById(R.id.tvMainNameSong);
+        tvNameSong.setSelected(true);
         tvArtist = findViewById(R.id.tvMainArtist);
         imgMainSong = findViewById(R.id.imgMainSong);
     }
@@ -196,11 +208,11 @@ public class ActivityMusic extends AppCompatActivity
 
             //imgMainSong.setImageURI(uri);
 
-            /*if (mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID())==null){
+            if (mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID())==null){
                 imgMainSong.setImageResource(R.drawable.icon_default_song);
             } else {
                 imgMainSong.setImageBitmap(mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()));
-            }*/
+            }
 
             tvNameSong.setText(mMediaPlaybackService.getNameSong());
             tvArtist.setText(mMediaPlaybackService.getArtist());
