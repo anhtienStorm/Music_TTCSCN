@@ -78,4 +78,8 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
     public ArrayList<Song> getSongList(){
         return mSongList;
     }
+
+    public ListSongAdapter getSongListAdapter(){
+        return mAdapter;
+    }
 }

@@ -59,6 +59,22 @@ public class ActivityMusic extends AppCompatActivity
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             MediaPlaybackService.MediaPlaybackServiceBinder mediaPlaybackServiceBinder = (MediaPlaybackService.MediaPlaybackServiceBinder) iBinder;
             mMediaPlaybackService = mediaPlaybackServiceBinder.getService();
+            mCheckService = true;
+
+            mCallbackFragmentConnection.service(mMediaPlaybackService);
+
+            if (!mMediaPlaybackService.isMusicPlay()){
+                mSharedPreferences = getSharedPreferences(sharePrefFile, MODE_PRIVATE);
+                if (mSharedPreferences.getString("SONGLIST_ID","no List").equals("AllSong")){
+                    mMediaPlaybackService.setPlayingSongList(((AllSongsFragment) mAllSongsFragment).getSongList());
+                    mMediaPlaybackService.setPreviousExitSong(mSharedPreferences.getInt("SONG_ID",0));
+                    Log.d("abc", String.valueOf(mMediaPlaybackService.getPlayingSongList().size()));
+                    Log.d("abc", String.valueOf(mMediaPlaybackService.getPlayingSong().getId()));
+                    mMediaPlaybackService.preparePlay();
+                    mMediaPlaybackService.pause();
+                }
+            }
+
             update();
             mMediaPlaybackService.onChangeStatus(new MediaPlaybackService.ICallbackService() {
                 @Override
@@ -66,19 +82,6 @@ public class ActivityMusic extends AppCompatActivity
                     update();
                 }
             });
-            mCheckService = true;
-
-            mCallbackFragmentConnection.service(mMediaPlaybackService);
-
-            mSharedPreferences = getSharedPreferences(sharePrefFile, MODE_PRIVATE);
-            if (mSharedPreferences.getString("SONGLIST_ID","no List").equals("AllSong")){
-                mMediaPlaybackService.setPlayingSongList(((AllSongsFragment) mAllSongsFragment).getSongList());
-                mMediaPlaybackService.setPreviousExitSong(mSharedPreferences.getInt("SONG_ID",0));
-                Log.d("abc", String.valueOf(mMediaPlaybackService.getPlayingSongList().size()));
-                Log.d("abc", String.valueOf(mMediaPlaybackService.getPlayingSong().getId()));
-                mMediaPlaybackService.preparePlay();
-                mMediaPlaybackService.pause();
-            }
         }
 
         @Override
@@ -90,7 +93,6 @@ public class ActivityMusic extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
-        Toast.makeText(this, String.valueOf(isMyServiceRunning(MediaPlaybackService.class)), Toast.LENGTH_SHORT).show();
         if (isMyServiceRunning(MediaPlaybackService.class)) {
             connectService();
         } else {
@@ -98,6 +100,22 @@ public class ActivityMusic extends AppCompatActivity
             connectService();
         }
     }
+
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        if (mMediaPlaybackService != null){
+//            if (mMediaPlaybackService.isMusicPlay()){
+//                update();
+//                mMediaPlaybackService.onChangeStatus(new MediaPlaybackService.ICallbackService() {
+//                    @Override
+//                    public void onSelect() {
+//                        update();
+//                    }
+//                });
+//            }
+//        }
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,7 +145,7 @@ public class ActivityMusic extends AppCompatActivity
                 if (mMediaPlaybackService.isMusicPlay()) {
                     if (mMediaPlaybackService.isPlaying()) {
                         mMediaPlaybackService.pause();
-                    } else if (!mMediaPlaybackService.isPlaying()) {
+                    } else {
                         mMediaPlaybackService.play();
                     }
                 }
@@ -143,16 +161,6 @@ public class ActivityMusic extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-
-        } else {
-
-        }
-        super.onConfigurationChanged(newConfig);
     }
 
     @Override
@@ -222,6 +230,16 @@ public class ActivityMusic extends AppCompatActivity
 //            Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mMediaPlaybackService.getAlbumID()));
 //            Glide.with(this).load(uri).error(R.drawable.icon_default_song).into(imgMainSong);
 
+//            ((AllSongsFragment) mAllSongsFragment).getSongListAdapter().notifyDataSetChanged();
+//            if (mMediaPlaybackService != null){
+//                mMediaPlaybackService.onChangeStatus(new MediaPlaybackService.ICallbackService() {
+//                    @Override
+//                    public void onSelect() {
+//                        ((AllSongsFragment) mAllSongsFragment).getSongListAdapter().notifyDataSetChanged();
+//                    }
+//                });
+//            }
+
             if (mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()) == null) {
                 imgMainSong.setImageResource(R.drawable.icon_default_song);
             } else {
@@ -242,6 +260,19 @@ public class ActivityMusic extends AppCompatActivity
         this.mCallbackFragmentConnection = (ICallbackFragmentServiceConnection) fragment;
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Toast.makeText(this, "Change", Toast.LENGTH_SHORT).show();
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.sub_fragment, mMediaPlaybackFragment).commit();
+            findViewById(R.id.layoutPlayMusic).setVisibility(View.GONE);
+            setContentView(R.layout.activity_main);
+            Toast.makeText(this, "Change", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Change", Toast.LENGTH_SHORT).show();
+        }
+    }
 
     // cap quyen doc bo nho
     public void initPermission() {

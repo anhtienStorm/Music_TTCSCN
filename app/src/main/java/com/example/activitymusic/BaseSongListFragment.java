@@ -1,6 +1,7 @@
 package com.example.activitymusic;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,6 +27,7 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IL
     protected ListSongAdapter mAdapter;
     private ArrayList<Song> mListSong = new ArrayList<>();
     private ActivityMusic mActivityMusic;
+    private static final String TAG = "abc";
 
     @Override
     public void onStart() {
@@ -47,12 +49,13 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IL
         View view = inflater.inflate(R.layout.base_song_list_fragment, container, false);
         ((AppCompatActivity)getActivity()).getSupportActionBar().show();
         getActivity().findViewById(R.id.layoutPlayMusic).setVisibility(View.VISIBLE);
+        Log.d(TAG, String.valueOf(mMediaPlaybackService));
         if (mMediaPlaybackService != null){
-            mActivityMusic.update();
+            mAdapter.notifyDataSetChanged();
             mMediaPlaybackService.onChangeStatus(new MediaPlaybackService.ICallbackService() {
                 @Override
                 public void onSelect() {
-                    mActivityMusic.update();
+                    mAdapter.notifyDataSetChanged();
                 }
             });
         }
@@ -71,10 +74,12 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IL
         mMediaPlaybackService.playSong(mListSong, mListSong.get(position));
         getActivity().findViewById(R.id.layoutPlayMusic).setVisibility(View.VISIBLE);
         mActivityMusic.update();
+        mAdapter.notifyDataSetChanged();
         mMediaPlaybackService.onChangeStatus(new MediaPlaybackService.ICallbackService() {
             @Override
             public void onSelect() {
                 mActivityMusic.update();
+                mAdapter.notifyDataSetChanged();
             }
         });
     }
@@ -87,6 +92,13 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IL
     public void service(MediaPlaybackService service) {
         mMediaPlaybackService = service;
         mAdapter.setService(mMediaPlaybackService);
+        mAdapter.notifyDataSetChanged();
+        mMediaPlaybackService.onChangeStatus(new MediaPlaybackService.ICallbackService() {
+            @Override
+            public void onSelect() {
+                mAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     @Override

@@ -269,4 +269,10 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICa
                     (R.drawable.ic_shuffle_orange_24dp);
         }
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        getActivity().unbindService(mServiceConnection);
+    }
 }

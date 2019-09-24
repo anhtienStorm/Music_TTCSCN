@@ -183,10 +183,6 @@ public class MediaPlaybackService extends Service {
         return mPLayingSong;
     }
 
-//    public Bitmap getBitmapImage(){
-//        return mPlayingSongList.get(mPosition).getBmImageSong();
-//    }
-
     public int getmStatusLoop() {
         return mStatusLoop;
     }
@@ -211,10 +207,10 @@ public class MediaPlaybackService extends Service {
     public void pause() {
         mMediaPlayer.pause();
         showNotification();
-        mCallbackService.onSelect();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             stopForeground(STOP_FOREGROUND_DETACH);
         }
+        mCallbackService.onSelect();
     }
 
     public void stop() {
@@ -224,8 +220,6 @@ public class MediaPlaybackService extends Service {
     }
 
     public void preparePlay() {
-        //mIndexofPlayingSong = mPlayingSongList.indexOf(mPLayingSong);
-        Log.d("aaa", getNameSong());
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putInt("SONG_ID",mPLayingSong.getId());
         editor.putString("SONG_NAME",getNameSong());
@@ -257,10 +251,6 @@ public class MediaPlaybackService extends Service {
                 }
             }
         });
-
-//        SharedPreferences.Editor prefEditor = mSharedPreferences.edit();
-//        prefEditor.putInt("ID_Song",mPlayingSongList.get(mPosition).getId());
-//        prefEditor.apply();
     }
 
     public void playSong(final ArrayList<Song> listSong, final Song song) {
@@ -285,6 +275,7 @@ public class MediaPlaybackService extends Service {
                 mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
             }
             preparePlay();
+            mCallbackService.onSelect();
         }
     }
 
@@ -307,7 +298,7 @@ public class MediaPlaybackService extends Service {
                 mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
                 preparePlay();
             }
-
+            mCallbackService.onSelect();
         }
     }
 
@@ -327,6 +318,7 @@ public class MediaPlaybackService extends Service {
                 mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
             }
             preparePlay();
+            mCallbackService.onSelect();
         }
     }
 

@@ -3,6 +3,7 @@ package com.example.activitymusic;
 import android.app.Service;
 import android.content.Context;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -59,18 +60,22 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
     @Override
     public void onBindViewHolder(@NonNull SongViewHolder holder, int position) {
         Song song = mListSong.get(position);
-        holder.bind(song, position);
-
-        if (mMediaPlaybackService != null){
+        if (mMediaPlaybackService != null) {
             mPlayingSong = mMediaPlaybackService.getPlayingSong();
-            if (mPlayingSong != null){
-                if (song.getId()==mPlayingSong.getId()){
+            if (mPlayingSong != null) {
+                if (song.getId() == mPlayingSong.getId()) {
                     holder.tvTitleSong.setTypeface(null, Typeface.BOLD);
+                    holder.tvStt.setBackgroundResource(R.drawable.ic_equalizer_black_24dp);
                 } else {
                     holder.tvTitleSong.setTypeface(null, Typeface.NORMAL);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        holder.tvStt.setBackground(null);
+                    }
                 }
             }
         }
+        holder.bind(song, position);
+
     }
 
     @Override
@@ -124,7 +129,7 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
         return pattern.matcher(temp).replaceAll("").replaceAll("Đ", "D").replace("đ", "d");
     }
 
-    public void setService(Service service){
+    public void setService(Service service) {
         mMediaPlaybackService = (MediaPlaybackService) service;
     }
 
@@ -160,7 +165,7 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
             tvStt.setText((position + 1) + "");
             tvTitleSong.setText(song.getNameSong());
             tvDuration.setText(song.getDuration());
-            if (mTypeSongList != null){
+            if (mTypeSongList != null) {
                 btImgMore.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
