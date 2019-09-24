@@ -23,6 +23,7 @@ import java.util.ArrayList;
 public class AllSongsFragment extends BaseSongListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int LOADER_ID = 1;
+    private ArrayList<Song> mSongList;
 
     @Nullable
     @Override
@@ -39,7 +40,7 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
-        ArrayList<Song> listSong = new ArrayList<>();
+        ArrayList<Song> songList = new ArrayList<>();
         if (data != null && data.getCount() > 0) {
             data.moveToFirst();
             int i = 0;
@@ -57,12 +58,13 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
                 SimpleDateFormat formatTimeSong = new SimpleDateFormat("mm:ss");
                 String timeSong = formatTimeSong.format(duration);
                 Song song = new Song(i, title, path, artist, albumID, timeSong);
-                listSong.add(song);
+                songList.add(song);
                 i++;
             } while (data.moveToNext());
         }
-        mAdapter.updateList(listSong);
-        setListSong(listSong);
+        mAdapter.updateList(songList);
+        setListSong(songList);
+        mSongList = songList;
         mAdapter.setTypeSongList("AllSongs");
     }
 
@@ -73,29 +75,7 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
         }
     }
 
-//    @Override
-//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-//        super.onCreateOptionsMenu(menu, inflater);
-//        inflater = getActivity().getMenuInflater();
-//        inflater.inflate(R.menu.search_menu,menu);
-//
-//        MenuItem searchItem = menu.findItem(R.id.action_search);
-//
-//        androidx.appcompat.widget.SearchView searchView = (androidx.appcompat.widget.SearchView) searchItem.getActionView();
-//
-//        searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
-//
-//        searchView.setOnQueryTextListener(new androidx.appcompat.widget.SearchView.OnQueryTextListener() {
-//            @Override
-//            public boolean onQueryTextSubmit(String s) {
-//                return false;
-//            }
-//
-//            @Override
-//            public boolean onQueryTextChange(String s) {
-//                mAdapter.getFilter().filter(s);
-//                return false;
-//            }
-//        });
-//    }
+    public ArrayList<Song> getSongList(){
+        return mSongList;
+    }
 }

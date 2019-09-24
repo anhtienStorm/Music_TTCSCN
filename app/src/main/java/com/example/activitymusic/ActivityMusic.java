@@ -7,6 +7,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.net.Uri;
@@ -18,6 +19,7 @@ import androidx.core.view.GravityCompat;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 
 import android.os.IBinder;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -37,6 +39,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 public class ActivityMusic extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -47,6 +51,8 @@ public class ActivityMusic extends AppCompatActivity
     Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment;
     Boolean mCheckService = false;
     AllSongsProvider mAllSongsProvider;
+    SharedPreferences mSharedPreferences;
+    String sharePrefFile = "SongSharedPreferences";
     ICallbackFragmentServiceConnection mCallbackFragmentConnection;
     ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
@@ -63,6 +69,16 @@ public class ActivityMusic extends AppCompatActivity
             mCheckService = true;
 
             mCallbackFragmentConnection.service(mMediaPlaybackService);
+
+            mSharedPreferences = getSharedPreferences(sharePrefFile, MODE_PRIVATE);
+            if (mSharedPreferences.getString("SONGLIST_ID","no List").equals("AllSong")){
+                mMediaPlaybackService.setPlayingSongList(((AllSongsFragment) mAllSongsFragment).getSongList());
+                mMediaPlaybackService.setPreviousExitSong(mSharedPreferences.getInt("SONG_ID",0));
+                Log.d("abc", String.valueOf(mMediaPlaybackService.getPlayingSongList().size()));
+                Log.d("abc", String.valueOf(mMediaPlaybackService.getPlayingSong().getId()));
+                mMediaPlaybackService.preparePlay();
+                mMediaPlaybackService.pause();
+            }
         }
 
         @Override
@@ -174,7 +190,7 @@ public class ActivityMusic extends AppCompatActivity
         return false;
     }
 
-    public void createFragment(){
+    public void createFragment() {
         mAllSongsFragment = new AllSongsFragment();
         mFravoriteSongsFragment = new FavoriteSongsFragment();
         mMediaPlaybackFragment = new MediaPlaybackFragment();
@@ -206,9 +222,7 @@ public class ActivityMusic extends AppCompatActivity
 //            Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mMediaPlaybackService.getAlbumID()));
 //            Glide.with(this).load(uri).error(R.drawable.icon_default_song).into(imgMainSong);
 
-            //imgMainSong.setImageURI(uri);
-
-            if (mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID())==null){
+            if (mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()) == null) {
                 imgMainSong.setImageResource(R.drawable.icon_default_song);
             } else {
                 imgMainSong.setImageBitmap(mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()));
@@ -224,7 +238,7 @@ public class ActivityMusic extends AppCompatActivity
         }
     }
 
-    public void registerClientFragment(Fragment fragment){
+    public void registerClientFragment(Fragment fragment) {
         this.mCallbackFragmentConnection = (ICallbackFragmentServiceConnection) fragment;
     }
 

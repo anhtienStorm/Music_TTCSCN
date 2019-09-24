@@ -61,16 +61,16 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
         Song song = mListSong.get(position);
         holder.bind(song, position);
 
-
-//        if (mMediaPlaybackService != null){
-//            mPlayingSong = mMediaPlaybackService.getPlayingSong();
-//            if (mPlayingSong != null){
-//                if (song.getId()==mPlayingSong.getId()){
-//                    holder.tvTitleSong.setTypeface(null, Typeface.BOLD);
-//                }
-//            }
-//        }
-//        notifyDataSetChanged();
+        if (mMediaPlaybackService != null){
+            mPlayingSong = mMediaPlaybackService.getPlayingSong();
+            if (mPlayingSong != null){
+                if (song.getId()==mPlayingSong.getId()){
+                    holder.tvTitleSong.setTypeface(null, Typeface.BOLD);
+                } else {
+                    holder.tvTitleSong.setTypeface(null, Typeface.NORMAL);
+                }
+            }
+        }
     }
 
     @Override

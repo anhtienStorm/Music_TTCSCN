@@ -16,7 +16,6 @@ import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.RemoteViews;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
@@ -37,7 +36,7 @@ public class MediaPlaybackService extends Service {
     private int mStatusLoop = 0;
     private int mShuffle = 0;
     private AllSongsProvider mAllSongsProvider;
-    private SharedPreferences mPreferences;
+    private SharedPreferences mSharedPreferences;
     private String sharePrefFile = "SongSharedPreferences";
 
     @Override
@@ -54,7 +53,7 @@ public class MediaPlaybackService extends Service {
             manager.createNotificationChannel(musicServiceChannel);
         }
         mAllSongsProvider = new AllSongsProvider(getApplicationContext());
-        mPreferences = getSharedPreferences(sharePrefFile, MODE_PRIVATE);
+        mSharedPreferences = getSharedPreferences(sharePrefFile, MODE_PRIVATE);
     }
 
     @Override
@@ -224,10 +223,10 @@ public class MediaPlaybackService extends Service {
         mCallbackService.onSelect();
     }
 
-    private void preparePlay() {
+    public void preparePlay() {
         //mIndexofPlayingSong = mPlayingSongList.indexOf(mPLayingSong);
         Log.d("aaa", getNameSong());
-        SharedPreferences.Editor editor = mPreferences.edit();
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putInt("SONG_ID",mPLayingSong.getId());
         editor.putString("SONG_NAME",getNameSong());
         editor.putString("SONGLIST_ID", "AllSong");
@@ -259,7 +258,7 @@ public class MediaPlaybackService extends Service {
             }
         });
 
-//        SharedPreferences.Editor prefEditor = mPreferences.edit();
+//        SharedPreferences.Editor prefEditor = mSharedPreferences.edit();
 //        prefEditor.putInt("ID_Song",mPlayingSongList.get(mPosition).getId());
 //        prefEditor.apply();
     }
@@ -373,6 +372,22 @@ public class MediaPlaybackService extends Service {
 
     public int getCurrentDuration() {
         return mMediaPlayer.getCurrentPosition();
+    }
+
+    public void setPreviousExitSong(int id){
+        for (int i = 0; i < mPlayingSongList.size(); i++) {
+            if (mPlayingSongList.get(i).getId() == id){
+                mPLayingSong = mPlayingSongList.get(i);
+            }
+        }
+    }
+
+    public void setPlayingSongList(ArrayList<Song> list){
+        mPlayingSongList = list;
+    }
+
+    public ArrayList<Song> getPlayingSongList(){
+        return mPlayingSongList;
     }
 
     void onChangeStatus(ICallbackService callbackService) {

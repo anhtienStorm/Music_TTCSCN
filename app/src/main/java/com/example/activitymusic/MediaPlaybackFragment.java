@@ -224,7 +224,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICa
 
             if (mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()) == null) {
                 imgSongSmall.setImageResource(R.drawable.icon_default_song);
-                imgSong.setImageResource(R.drawable.ic_default_error_song);
+                imgSong.setImageResource(R.drawable.icon_default_song);
             } else {
                 imgSong.setImageBitmap(mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()));
                 imgSongSmall.setImageBitmap(mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()));
