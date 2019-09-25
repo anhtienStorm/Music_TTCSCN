@@ -137,7 +137,7 @@ public class ActivityMusic extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         createFragment();
-        getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment, mAllSongsFragment).commit();
+        getSupportFragmentManager().beginTransaction().addToBackStack(null).add(R.id.main_fragment, mAllSongsFragment).commit();
 
         imgPlay.setOnClickListener(new Button.OnClickListener() {
             @Override
@@ -260,18 +260,22 @@ public class ActivityMusic extends AppCompatActivity
         this.mCallbackFragmentConnection = (ICallbackFragmentServiceConnection) fragment;
     }
 
-    @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        Toast.makeText(this, "Change", Toast.LENGTH_SHORT).show();
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.sub_fragment, mMediaPlaybackFragment).commit();
+
+        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            //getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.main_fragment, mAllSongsFragment).commit();
+            findViewById(R.id.layoutPlayMusic).setVisibility(View.VISIBLE);
+            //setContentView(R.layout.activity_main);
+        } else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            //getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.main_fragment, mAllSongsFragment).commit();
+            //getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.sub_fragment, mMediaPlaybackFragment).commit();
             findViewById(R.id.layoutPlayMusic).setVisibility(View.GONE);
-            setContentView(R.layout.activity_main);
-            Toast.makeText(this, "Change", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "Change", Toast.LENGTH_SHORT).show();
+            getSupportFragmentManager().beginTransaction().addToBackStack(null).add(R.id.main_fragment, mMediaPlaybackFragment).commit();
+
+            //setContentView(R.layout.activity_main);
         }
+
     }
 
     // cap quyen doc bo nho

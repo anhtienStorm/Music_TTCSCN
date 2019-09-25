@@ -9,11 +9,21 @@
     tools:context=".ActivityMusic"
     tools:showIn="@layout/app_bar_main">
 
-    <FrameLayout
-        android:id="@+id/main_fragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/layoutPlayMusic"></FrameLayout>
+    <!--<LinearLayout-->
+        <!--android:id="@+id/main_fragment"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:layout_above="@+id/layoutPlayMusic"></LinearLayout>-->
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/layoutPlayMusic">
+
+    </LinearLayout>
+
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutPlayMusic"
