@@ -17,76 +17,30 @@
         <!--android:layout_above="@+id/layoutPlayMusic"></LinearLayout>-->
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/main_fragment"
         android:orientation="horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_above="@+id/layoutPlayMusic">
+        android:layout_height="fill_parent">
+
+        <LinearLayout
+            android:id="@+id/sub_fragment_a"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:id="@+id/sub_fragment_b"
+            android:layout_weight="0"
+            android:layout_width="0dp"
+            android:layout_height="match_parent">
+
+        </LinearLayout>
 
     </LinearLayout>
 
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/layoutPlayMusic"
-        android:layout_width="match_parent"
-        android:layout_height="62dp"
-        android:elevation="12dp"
-        android:layout_alignParentBottom="true"
-        android:background="@color/cardview_light_background"
-        android:onClick="onClickLayoutPlayMusic">
-
-        <ImageView
-            android:id="@+id/imgMainSong"
-            android:layout_width="46dp"
-            android:layout_height="46dp"
-            android:layout_margin="7dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/tvMainNameSong"
-            android:layout_width="250dp"
-            android:layout_height="20dp"
-            android:layout_marginLeft="12dp"
-            android:layout_marginTop="10dp"
-            android:gravity="bottom"
-
-            android:singleLine="true"
-            android:ellipsize="marquee"
-            android:marqueeRepeatLimit="marquee_forever"
-            android:scrollHorizontally="true"
-
-            android:textSize="14sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@+id/tvMainArtist"
-            app:layout_constraintLeft_toRightOf="@+id/imgMainSong"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/tvMainArtist"
-            android:layout_width="250dp"
-            android:layout_height="20dp"
-            android:layout_marginLeft="12dp"
-            android:ellipsize="end"
-            android:gravity="top"
-            android:maxLines="1"
-            android:textSize="12sp"
-
-            app:layout_constraintLeft_toRightOf="@+id/imgMainSong"
-            app:layout_constraintTop_toBottomOf="@+id/tvMainNameSong" />
-
-
-        <ImageView
-            android:id="@+id/btMainPlay"
-            android:layout_width="46dp"
-            android:layout_height="46dp"
-            android:layout_marginRight="26dp"
-            android:src="@drawable/ic_play_black_24dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </RelativeLayout>

@@ -2,9 +2,11 @@ package com.example.activitymusic;
 
 import android.app.Service;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -66,11 +68,13 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
                 if (song.getId() == mPlayingSong.getId()) {
                     holder.tvTitleSong.setTypeface(null, Typeface.BOLD);
                     holder.tvStt.setBackgroundResource(R.drawable.ic_equalizer_black_24dp);
+                    holder.tvStt.setTextSize(TypedValue.COMPLEX_UNIT_SP, 0);
                 } else {
                     holder.tvTitleSong.setTypeface(null, Typeface.NORMAL);
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                         holder.tvStt.setBackground(null);
                     }
+                    holder.tvStt.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
                 }
             }
         }

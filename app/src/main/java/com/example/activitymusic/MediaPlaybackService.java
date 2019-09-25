@@ -42,6 +42,7 @@ public class MediaPlaybackService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel musicServiceChannel = new NotificationChannel(
                     CHANNEL_ID,
@@ -163,6 +164,14 @@ public class MediaPlaybackService extends Service {
         return false;
     }
 
+    public void loadPreviousExitSong(){
+        setPreviousExitSong(mSharedPreferences.getInt("SONG_ID", 0));
+        Log.d("abc", String.valueOf(getPlayingSongList().size()));
+        Log.d("abc", String.valueOf(getPlayingSong().getId()));
+//        preparePlay();
+//        pause();
+    }
+
     public String getNameSong() {
         return mPLayingSong.getNameSong();
     }
@@ -179,7 +188,7 @@ public class MediaPlaybackService extends Service {
         return mPLayingSong.getId();
     }
 
-    public Song getPlayingSong(){
+    public Song getPlayingSong() {
         return mPLayingSong;
     }
 
@@ -221,8 +230,8 @@ public class MediaPlaybackService extends Service {
 
     public void preparePlay() {
         SharedPreferences.Editor editor = mSharedPreferences.edit();
-        editor.putInt("SONG_ID",mPLayingSong.getId());
-        editor.putString("SONG_NAME",getNameSong());
+        editor.putInt("SONG_ID", mPLayingSong.getId());
+        editor.putString("SONG_NAME", getNameSong());
         editor.putString("SONGLIST_ID", "AllSong");
         editor.apply();
 
@@ -236,8 +245,8 @@ public class MediaPlaybackService extends Service {
         mMediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
         mMediaPlayer.start();
         showNotification();
-        mCallbackService.onSelect();
         mIndexofPlayingSong = mPlayingSongList.indexOf(mPLayingSong);
+        mCallbackService.onSelect();
 
         mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
@@ -366,19 +375,19 @@ public class MediaPlaybackService extends Service {
         return mMediaPlayer.getCurrentPosition();
     }
 
-    public void setPreviousExitSong(int id){
+    public void setPreviousExitSong(int id) {
         for (int i = 0; i < mPlayingSongList.size(); i++) {
-            if (mPlayingSongList.get(i).getId() == id){
+            if (mPlayingSongList.get(i).getId() == id) {
                 mPLayingSong = mPlayingSongList.get(i);
             }
         }
     }
 
-    public void setPlayingSongList(ArrayList<Song> list){
+    public void setPlayingSongList(ArrayList<Song> list) {
         mPlayingSongList = list;
     }
 
-    public ArrayList<Song> getPlayingSongList(){
+    public ArrayList<Song> getPlayingSongList() {
         return mPlayingSongList;
     }
 

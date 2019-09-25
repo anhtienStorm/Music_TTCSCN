@@ -34,7 +34,7 @@ import com.bumptech.glide.Glide;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 
-public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICallbackFragmentServiceConnection {
+public class MediaPlaybackFragment extends Fragment {
 
     ConstraintLayout layoutMediaPlaybackFragment;
     ImageView btImgLike, btImgPrevious, btImgPlay, btImgNext, btImgDislike, btImgLoop, btImgShuffle, imgSongSmall, imgSong, btImgListSong;
@@ -66,14 +66,6 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICa
         }
     };
 
-//    @Override
-//    public void onAttach(Context context) {
-//        super.onAttach(context);
-//        mActivityMusic = (ActivityMusic) getContext();
-//        mActivityMusic.registerClientFragment(this);
-//    }
-
-
     @Override
     public void onStart() {
         super.onStart();
@@ -91,19 +83,26 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICa
         mAllSongsProvider = new AllSongsProvider(getContext());
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mCheckService){
+            update();
+            mMediaPlaybackService.onChangeStatus(new MediaPlaybackService.ICallbackService() {
+                @Override
+                public void onSelect() {
+                    update();
+                }
+            });
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.media_playback_fragment, container, false);
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
         initView(view);
-        //update();
-//        mMediaPlaybackService.onChangeStatus(new MediaPlaybackService.ICallbackService() {
-//            @Override
-//            public void onSelect() {
-//                update();
-//            }
-//        });
 
         btImgPlay.setOnClickListener(new Button.OnClickListener() {
             @Override
@@ -197,11 +196,6 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICa
         layoutMediaPlaybackFragment = view.findViewById(R.id.media_playback_fragment);
     }
 
-    @Override
-    public void service(MediaPlaybackService service) {
-        mMediaPlaybackService = service;
-    }
-
     public void updateTimeSong() {
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -217,11 +211,6 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICa
 
     public void update() {
         if (mMediaPlaybackService.isMusicPlay()) {
-//            Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
-//            Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mMediaPlaybackService.getAlbumID()));
-//            Glide.with(this).load(uri).error(R.drawable.ic_default_error_song).into(imgSong);
-//            Glide.with(this).load(uri).error(R.drawable.icon_default_song).into(imgSongSmall);
-
             if (mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()) == null) {
                 imgSongSmall.setImageResource(R.drawable.icon_default_song);
                 imgSong.setImageResource(R.drawable.icon_default_song);
@@ -229,18 +218,6 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.ICa
                 imgSong.setImageBitmap(mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()));
                 imgSongSmall.setImageBitmap(mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()));
             }
-
-//            if (String.valueOf(uri).equals("content://media/external/audio/albumart/16")){
-//                layoutMediaPlaybackFragment.setBackgroundResource(R.drawable.ic_default_error_song);
-//                imgSongSmall.setImageResource(R.drawable.ic_default_error_song);
-//            } else {
-//                Bitmap imgBitmap = mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID());
-//                Drawable imgDrawable = new BitmapDrawable(imgBitmap);
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-//                    layoutMediaPlaybackFragment.setBackground(imgDrawable);
-//                }
-//                imgSongSmall.setImageURI(uri);
-//            }
 
             tvNameSong.setText(mMediaPlaybackService.getNameSong());
             tvArtist.setText(mMediaPlaybackService.getArtist());

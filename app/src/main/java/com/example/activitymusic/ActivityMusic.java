@@ -35,7 +35,9 @@ import androidx.fragment.app.Fragment;
 
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,15 +47,13 @@ public class ActivityMusic extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     MediaPlaybackService mMediaPlaybackService;
-    ImageView imgPlay;
-    TextView tvNameSong, tvArtist;
-    ImageView imgMainSong;
+
     Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment;
     Boolean mCheckService = false;
-    AllSongsProvider mAllSongsProvider;
     SharedPreferences mSharedPreferences;
+    LinearLayout mLayoutContainAllSongFragment, mLayoutContainMediaPlaybackFragment;
     String sharePrefFile = "SongSharedPreferences";
-    ICallbackFragmentServiceConnection mCallbackFragmentConnection;
+//    ICallbackFragmentServiceConnection mCallbackFragmentConnection;
     ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
@@ -61,27 +61,13 @@ public class ActivityMusic extends AppCompatActivity
             mMediaPlaybackService = mediaPlaybackServiceBinder.getService();
             mCheckService = true;
 
-            mCallbackFragmentConnection.service(mMediaPlaybackService);
-
-            if (!mMediaPlaybackService.isMusicPlay()){
+            if (!mMediaPlaybackService.isMusicPlay()) {
                 mSharedPreferences = getSharedPreferences(sharePrefFile, MODE_PRIVATE);
-                if (mSharedPreferences.getString("SONGLIST_ID","no List").equals("AllSong")){
+                if (mSharedPreferences.getString("SONGLIST_ID", "no List").equals("AllSong")) {
                     mMediaPlaybackService.setPlayingSongList(((AllSongsFragment) mAllSongsFragment).getSongList());
-                    mMediaPlaybackService.setPreviousExitSong(mSharedPreferences.getInt("SONG_ID",0));
-                    Log.d("abc", String.valueOf(mMediaPlaybackService.getPlayingSongList().size()));
-                    Log.d("abc", String.valueOf(mMediaPlaybackService.getPlayingSong().getId()));
-                    mMediaPlaybackService.preparePlay();
-                    mMediaPlaybackService.pause();
+                    mMediaPlaybackService.loadPreviousExitSong();
                 }
             }
-
-            update();
-            mMediaPlaybackService.onChangeStatus(new MediaPlaybackService.ICallbackService() {
-                @Override
-                public void onSelect() {
-                    update();
-                }
-            });
         }
 
         @Override
@@ -123,8 +109,6 @@ public class ActivityMusic extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         initPermission();   //xin cap quyen doc bo nho
-        initView();
-        mAllSongsProvider = new AllSongsProvider(this);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -137,20 +121,8 @@ public class ActivityMusic extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         createFragment();
-        getSupportFragmentManager().beginTransaction().addToBackStack(null).add(R.id.main_fragment, mAllSongsFragment).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mAllSongsFragment).commit();
 
-        imgPlay.setOnClickListener(new Button.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mMediaPlaybackService.isMusicPlay()) {
-                    if (mMediaPlaybackService.isPlaying()) {
-                        mMediaPlaybackService.pause();
-                    } else {
-                        mMediaPlaybackService.play();
-                    }
-                }
-            }
-        });
     }
 
     @Override
@@ -170,10 +142,10 @@ public class ActivityMusic extends AppCompatActivity
 
         if (id == R.id.nav_list_music) {
             mSelectedFragment = mAllSongsFragment;
-            getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.main_fragment, mSelectedFragment).commit();
+            getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.sub_fragment_a, mSelectedFragment).commit();
         } else if (id == R.id.nav_favorite) {
             mSelectedFragment = mFravoriteSongsFragment;
-            getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.main_fragment, mSelectedFragment).commit();
+            getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.sub_fragment_a, mSelectedFragment).commit();
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -216,64 +188,48 @@ public class ActivityMusic extends AppCompatActivity
         bindService(it, mServiceConnection, 0);
     }
 
-    public void initView() {
-        imgPlay = findViewById(R.id.btMainPlay);
-        tvNameSong = findViewById(R.id.tvMainNameSong);
-        tvNameSong.setSelected(true);
-        tvArtist = findViewById(R.id.tvMainArtist);
-        imgMainSong = findViewById(R.id.imgMainSong);
-    }
 
-    public void update() {
-        if (mMediaPlaybackService.isMusicPlay()) {
-//            Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
-//            Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mMediaPlaybackService.getAlbumID()));
-//            Glide.with(this).load(uri).error(R.drawable.icon_default_song).into(imgMainSong);
-
-//            ((AllSongsFragment) mAllSongsFragment).getSongListAdapter().notifyDataSetChanged();
-//            if (mMediaPlaybackService != null){
-//                mMediaPlaybackService.onChangeStatus(new MediaPlaybackService.ICallbackService() {
-//                    @Override
-//                    public void onSelect() {
-//                        ((AllSongsFragment) mAllSongsFragment).getSongListAdapter().notifyDataSetChanged();
-//                    }
-//                });
-//            }
-
-            if (mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()) == null) {
-                imgMainSong.setImageResource(R.drawable.icon_default_song);
-            } else {
-                imgMainSong.setImageBitmap(mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()));
-            }
-
-            tvNameSong.setText(mMediaPlaybackService.getNameSong());
-            tvArtist.setText(mMediaPlaybackService.getArtist());
-            if (mMediaPlaybackService.isPlaying()) {
-                imgPlay.setImageResource(R.drawable.ic_pause_black_24dp);
-            } else {
-                imgPlay.setImageResource(R.drawable.ic_play_black_24dp);
-            }
-        }
-    }
-
-    public void registerClientFragment(Fragment fragment) {
-        this.mCallbackFragmentConnection = (ICallbackFragmentServiceConnection) fragment;
-    }
+//    public void registerClientFragment(Fragment fragment) {
+//        this.mCallbackFragmentConnection = (ICallbackFragmentServiceConnection) fragment;
+//    }
 
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        mLayoutContainAllSongFragment = findViewById(R.id.sub_fragment_a);
+        mLayoutContainMediaPlaybackFragment = findViewById(R.id.sub_fragment_b);
 
         if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            //getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.main_fragment, mAllSongsFragment).commit();
             findViewById(R.id.layoutPlayMusic).setVisibility(View.VISIBLE);
-            //setContentView(R.layout.activity_main);
+            getSupportActionBar().show();
+            LinearLayout.LayoutParams paramA = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    0.0f
+            );
+            LinearLayout.LayoutParams paramB = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    1.0f
+            );
+            mLayoutContainAllSongFragment.setLayoutParams(paramA);
+            mLayoutContainMediaPlaybackFragment.setLayoutParams(paramB);
         } else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            //getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.main_fragment, mAllSongsFragment).commit();
-            //getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.sub_fragment, mMediaPlaybackFragment).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mAllSongsFragment).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_b, mMediaPlaybackFragment).commit();
             findViewById(R.id.layoutPlayMusic).setVisibility(View.GONE);
-            getSupportFragmentManager().beginTransaction().addToBackStack(null).add(R.id.main_fragment, mMediaPlaybackFragment).commit();
-
-            //setContentView(R.layout.activity_main);
+            getSupportActionBar().show();
+            LinearLayout.LayoutParams paramA = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    2.0f
+            );
+            LinearLayout.LayoutParams paramB = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    1.0f
+            );
+            mLayoutContainAllSongFragment.setLayoutParams(paramA);
+            mLayoutContainMediaPlaybackFragment.setLayoutParams(paramB);
         }
 
     }
@@ -315,12 +271,12 @@ public class ActivityMusic extends AppCompatActivity
     }
 
     public void onClickLayoutPlayMusic(View view) {
-        getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.main_fragment, mMediaPlaybackFragment).commit();
+        getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.sub_fragment_a, mMediaPlaybackFragment).commit();
         findViewById(R.id.layoutPlayMusic).setVisibility(View.GONE);
     }
 
-    // interface
-    interface ICallbackFragmentServiceConnection {
-        void service(MediaPlaybackService service);
-    }
+//    // interface
+//    interface ICallbackFragmentServiceConnection {
+//        void service(MediaPlaybackService service);
+//    }
 }
