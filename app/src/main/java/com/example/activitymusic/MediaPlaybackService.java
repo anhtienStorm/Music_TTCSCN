@@ -20,6 +20,10 @@ import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Random;
@@ -32,7 +36,7 @@ public class MediaPlaybackService extends Service {
     private ArrayList<Song> mPlayingSongList;
     private Song mPLayingSong;
     private int mIndexofPlayingSong;
-    private ICallbackService mCallbackService;
+    private IServiceCallback mServiceCallback;
     private int mStatusLoop = 0;
     private int mShuffle = 0;
     private AllSongsProvider mAllSongsProvider;
@@ -42,7 +46,6 @@ public class MediaPlaybackService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel musicServiceChannel = new NotificationChannel(
                     CHANNEL_ID,
@@ -54,7 +57,7 @@ public class MediaPlaybackService extends Service {
             manager.createNotificationChannel(musicServiceChannel);
         }
         mAllSongsProvider = new AllSongsProvider(getApplicationContext());
-        mSharedPreferences = getSharedPreferences(sharePrefFile, MODE_PRIVATE);
+        loadData();
     }
 
     @Override
@@ -164,13 +167,13 @@ public class MediaPlaybackService extends Service {
         return false;
     }
 
-    public void loadPreviousExitSong(){
-        setPreviousExitSong(mSharedPreferences.getInt("SONG_ID", 0));
-        Log.d("abc", String.valueOf(getPlayingSongList().size()));
-        Log.d("abc", String.valueOf(getPlayingSong().getId()));
-//        preparePlay();
-//        pause();
-    }
+//    public void loadPreviousExitSong(){
+//        setPreviousExitSong(mSharedPreferences.getInt("SONG_ID", 0));
+//        Log.d("abc", String.valueOf(getPlayingSongList().size()));
+//        Log.d("abc", String.valueOf(getPlayingSong().getId()));
+////        preparePlay();
+////        pause();
+//    }
 
     public String getNameSong() {
         return mPLayingSong.getNameSong();
@@ -210,7 +213,7 @@ public class MediaPlaybackService extends Service {
     public void play() {
         mMediaPlayer.start();
         showNotification();
-        mCallbackService.onSelect();
+        mServiceCallback.onUpdate();
     }
 
     public void pause() {
@@ -219,22 +222,16 @@ public class MediaPlaybackService extends Service {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             stopForeground(STOP_FOREGROUND_DETACH);
         }
-        mCallbackService.onSelect();
+        mServiceCallback.onUpdate();
     }
 
     public void stop() {
         mMediaPlayer.stop();
         showNotification();
-        mCallbackService.onSelect();
+        mServiceCallback.onUpdate();
     }
 
     public void preparePlay() {
-        SharedPreferences.Editor editor = mSharedPreferences.edit();
-        editor.putInt("SONG_ID", mPLayingSong.getId());
-        editor.putString("SONG_NAME", getNameSong());
-        editor.putString("SONGLIST_ID", "AllSong");
-        editor.apply();
-
         Uri uri = Uri.parse(mPLayingSong.getPathSong());
         if (mMediaPlayer != null) {
             if (mMediaPlayer.isPlaying()) {
@@ -246,7 +243,7 @@ public class MediaPlaybackService extends Service {
         mMediaPlayer.start();
         showNotification();
         mIndexofPlayingSong = mPlayingSongList.indexOf(mPLayingSong);
-        mCallbackService.onSelect();
+        mServiceCallback.onUpdate();
 
         mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
@@ -260,6 +257,8 @@ public class MediaPlaybackService extends Service {
                 }
             }
         });
+
+        saveData();
     }
 
     public void playSong(final ArrayList<Song> listSong, final Song song) {
@@ -284,7 +283,7 @@ public class MediaPlaybackService extends Service {
                 mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
             }
             preparePlay();
-            mCallbackService.onSelect();
+            mServiceCallback.onUpdate();
         }
     }
 
@@ -307,7 +306,7 @@ public class MediaPlaybackService extends Service {
                 mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
                 preparePlay();
             }
-            mCallbackService.onSelect();
+            mServiceCallback.onUpdate();
         }
     }
 
@@ -327,7 +326,7 @@ public class MediaPlaybackService extends Service {
                 mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
             }
             preparePlay();
-            mCallbackService.onSelect();
+            mServiceCallback.onUpdate();
         }
     }
 
@@ -339,7 +338,7 @@ public class MediaPlaybackService extends Service {
             mShuffle = 0;
             showToast("Shuffle Off");
         }
-        mCallbackService.onSelect();
+        mServiceCallback.onUpdate();
     }
 
     public void loopSong() {
@@ -353,7 +352,7 @@ public class MediaPlaybackService extends Service {
             mStatusLoop = 0;
             showToast("No Loop");
         }
-        mCallbackService.onSelect();
+        mServiceCallback.onUpdate();
 
     }
 
@@ -383,20 +382,38 @@ public class MediaPlaybackService extends Service {
         }
     }
 
-    public void setPlayingSongList(ArrayList<Song> list) {
-        mPlayingSongList = list;
-    }
-
     public ArrayList<Song> getPlayingSongList() {
         return mPlayingSongList;
     }
 
-    void onChangeStatus(ICallbackService callbackService) {
-        this.mCallbackService = callbackService;
+    void listenChangeStatus(IServiceCallback callbackService) {
+        this.mServiceCallback = callbackService;
     }
 
     void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    private void saveData(){
+        mSharedPreferences = getSharedPreferences(sharePrefFile, MODE_PRIVATE);
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putInt("SONG_ID", mPLayingSong.getId());
+        Gson gson = new Gson();
+        String json = gson.toJson(mPlayingSongList);
+        editor.putString("SONG_LIST", json);
+        editor.apply();
+    }
+
+    public void loadData(){
+        mSharedPreferences = getSharedPreferences(sharePrefFile, MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = mSharedPreferences.getString("SONG_LIST", null);
+        Type type = new TypeToken<ArrayList<Song>>(){}.getType();
+        mPlayingSongList = gson.fromJson(json, type);
+        if (mPlayingSongList == null){
+            mPlayingSongList = new ArrayList<>();
+        }
+        setPreviousExitSong(mSharedPreferences.getInt("SONG_ID", 0));
     }
 
     // class
@@ -404,11 +421,10 @@ public class MediaPlaybackService extends Service {
         public MediaPlaybackService getService() {
             return MediaPlaybackService.this;
         }
-
     }
 
     //interface
-    interface ICallbackService {
-        void onSelect();
+    interface IServiceCallback {
+        void onUpdate();
     }
 }

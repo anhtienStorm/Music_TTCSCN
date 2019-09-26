@@ -1,20 +1,11 @@
 package com.example.activitymusic;
 
 import android.content.ComponentName;
-import android.content.ContentUris;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.Bitmap;
-import android.graphics.BitmapRegionDecoder;
-import android.graphics.Rect;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,9 +20,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
-import com.bumptech.glide.Glide;
-
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 
 public class MediaPlaybackFragment extends Fragment {
@@ -51,9 +39,9 @@ public class MediaPlaybackFragment extends Fragment {
             MediaPlaybackService.MediaPlaybackServiceBinder mediaPlaybackServiceBinder = (MediaPlaybackService.MediaPlaybackServiceBinder) iBinder;
             mMediaPlaybackService = mediaPlaybackServiceBinder.getService();
             update();
-            mMediaPlaybackService.onChangeStatus(new MediaPlaybackService.ICallbackService() {
+            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
                 @Override
-                public void onSelect() {
+                public void onUpdate() {
                     update();
                 }
             });
@@ -73,9 +61,9 @@ public class MediaPlaybackFragment extends Fragment {
         getActivity().bindService(it, mServiceConnection, 0);
         if (mCheckService) {
             update();
-            mMediaPlaybackService.onChangeStatus(new MediaPlaybackService.ICallbackService() {
+            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
                 @Override
-                public void onSelect() {
+                public void onUpdate() {
                     update();
                 }
             });
@@ -88,9 +76,9 @@ public class MediaPlaybackFragment extends Fragment {
         super.onResume();
         if (mCheckService){
             update();
-            mMediaPlaybackService.onChangeStatus(new MediaPlaybackService.ICallbackService() {
+            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
                 @Override
-                public void onSelect() {
+                public void onUpdate() {
                     update();
                 }
             });

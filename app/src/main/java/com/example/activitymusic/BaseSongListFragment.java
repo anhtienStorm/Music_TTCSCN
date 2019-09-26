@@ -3,7 +3,7 @@ package com.example.activitymusic;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -28,9 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-import static android.content.Context.MODE_PRIVATE;
-
-public class BaseSongListFragment extends Fragment implements ListSongAdapter.IListSongAdapter/*, ActivityMusic.ICallbackFragmentServiceConnection */ {
+public class BaseSongListFragment extends Fragment implements ListSongAdapter.IListSongAdapter/*, ActivityMusic.ICallbackFragmentServiceConnection*/  {
 
     private MediaPlaybackService mMediaPlaybackService;
     private RecyclerView mRecyclerView;
@@ -42,16 +40,19 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IL
     AllSongsProvider mAllSongsProvider;
     private ArrayList<Song> mListSong = new ArrayList<>();
     private static final String TAG = "abc";
+//    private ActivityMusic mActivityMusic;
     ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             MediaPlaybackService.MediaPlaybackServiceBinder mediaPlaybackServiceBinder = (MediaPlaybackService.MediaPlaybackServiceBinder) iBinder;
             mMediaPlaybackService = mediaPlaybackServiceBinder.getService();
             mAdapter.setService(mMediaPlaybackService);
+            Log.d("abc", "onServiceConnected: " + mMediaPlaybackService.getNameSong());
+            Log.d("abc", "onServiceConnected: " + mMediaPlaybackService.getPlayingSongList().size());
             update();
-            mMediaPlaybackService.onChangeStatus(new MediaPlaybackService.ICallbackService() {
+            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
                 @Override
-                public void onSelect() {
+                public void onUpdate() {
                     update();
                 }
             });
@@ -69,7 +70,8 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IL
         super.onStart();
         connectService();
         mAllSongsProvider = new AllSongsProvider(getContext());
-
+//        mActivityMusic = new ActivityMusic();
+//        mActivityMusic.registerClientFragment(this);
     }
 
     @Override
@@ -81,12 +83,13 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IL
     @Override
     public void onResume() {
         super.onResume();
-        mAdapter.setService(mMediaPlaybackService);
+
         if (checkService){
+            mAdapter.setService(mMediaPlaybackService);
             update();
-            mMediaPlaybackService.onChangeStatus(new MediaPlaybackService.ICallbackService() {
+            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
                 @Override
-                public void onSelect() {
+                public void onUpdate() {
                     update();
                 }
             });
@@ -98,24 +101,22 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IL
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.base_song_list_fragment, container, false);
         initView(view);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().show();
-        Log.d(TAG, String.valueOf(mMediaPlaybackService));
-//        if (mMediaPlaybackService != null){
-//            mAdapter.setService(mMediaPlaybackService);
-//            update();
-//            mMediaPlaybackService.onChangeStatus(new MediaPlaybackService.ICallbackService() {
-//                @Override
-//                public void onSelect() {
-//                    update();
-//                }
-//            });
-//        }
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE){
+            view.findViewById(R.id.layoutPlayMusic).setVisibility(View.GONE);
+            ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+        } else {
+            view.findViewById(R.id.layoutPlayMusic).setVisibility(View.VISIBLE);
+            ((AppCompatActivity) getActivity()).getSupportActionBar().show();
+        }
+
         mRecyclerView = view.findViewById(R.id.recycler_view);
         mAdapter = new ListSongAdapter(mListSong, getActivity());
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(mRecyclerView.getContext(), DividerItemDecoration.VERTICAL));
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mAdapter.setOnClickListenner(this);
+//        mActivityMusic.listennerConnectService(this);
 
         imgPlay.setOnClickListener(new Button.OnClickListener() {
             @Override
@@ -138,9 +139,9 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IL
         mMediaPlaybackService.playSong(mListSong, mListSong.get(position));
         mAdapter.setService(mMediaPlaybackService);
         update();
-        mMediaPlaybackService.onChangeStatus(new MediaPlaybackService.ICallbackService() {
+        mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
             @Override
-            public void onSelect() {
+            public void onUpdate() {
                 update();
             }
         });
@@ -155,9 +156,9 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IL
 //        mMediaPlaybackService = service;
 //        mAdapter.setService(mMediaPlaybackService);
 //        mAdapter.notifyDataSetChanged();
-//        mMediaPlaybackService.onChangeStatus(new MediaPlaybackService.ICallbackService() {
+//        mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
 //            @Override
-//            public void onSelect() {
+//            public void onUpdate() {
 //                mAdapter.notifyDataSetChanged();
 //            }
 //        });
@@ -179,6 +180,8 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IL
     public void update() {
         if (mMediaPlaybackService.isMusicPlay()) {
             mAdapter.notifyDataSetChanged();
+            Log.d("abc", "update: " + mMediaPlaybackService.getNameSong());
+            Log.d("abc", "update: " + mMediaPlaybackService.getPlayingSongList().size());
 
             if (mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()) == null) {
                 imgMainSong.setImageResource(R.drawable.icon_default_song);
@@ -227,4 +230,31 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IL
             }
         });
     }
+
+//    public void setService(MediaPlaybackService service){
+//        mMediaPlaybackService = service;
+//        mAdapter.setService(mMediaPlaybackService);
+//        update();
+//        mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
+//            @Override
+//            public void onUpdate() {
+//                update();
+//            }
+//        });
+//        checkService = true;
+//    }
+
+//    @Override
+//    public void service(MediaPlaybackService service) {
+//        mMediaPlaybackService = service;
+//        mAdapter.setService(mMediaPlaybackService);
+//        update();
+//        mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
+//            @Override
+//            public void onUpdate() {
+//                update();
+//            }
+//        });
+//        checkService = true;
+//    }
 }
