@@ -6,6 +6,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,7 @@ public class MediaPlaybackFragment extends Fragment {
     MediaPlaybackService mMediaPlaybackService;
     boolean mCheckService = false;
     AllSongsProvider mAllSongsProvider;
+    private static final String TAG = "abcd";
 //    ActivityMusic mActivityMusic;
 
     ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -39,9 +41,11 @@ public class MediaPlaybackFragment extends Fragment {
             MediaPlaybackService.MediaPlaybackServiceBinder mediaPlaybackServiceBinder = (MediaPlaybackService.MediaPlaybackServiceBinder) iBinder;
             mMediaPlaybackService = mediaPlaybackServiceBinder.getService();
             update();
+            Log.d(TAG, "onServiceConnected: "+mMediaPlaybackService);
             mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
                 @Override
                 public void onUpdate() {
+                    Log.d(TAG, "onUpdate: "+mMediaPlaybackService);
                     update();
                 }
             });
@@ -55,26 +59,19 @@ public class MediaPlaybackFragment extends Fragment {
     };
 
     @Override
-    public void onStart() {
-        super.onStart();
-        Intent it = new Intent(getContext(), MediaPlaybackService.class);
-        getActivity().bindService(it, mServiceConnection, 0);
-        if (mCheckService) {
-            update();
-            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
-                @Override
-                public void onUpdate() {
-                    update();
-                }
-            });
-        }
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         mAllSongsProvider = new AllSongsProvider(getContext());
+        connectService();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (mCheckService){
+
+        Log.d(TAG, "onConnect: "+mMediaPlaybackService);
+
+        if (mCheckService) {
             update();
             mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
                 @Override
@@ -91,6 +88,16 @@ public class MediaPlaybackFragment extends Fragment {
         View view = inflater.inflate(R.layout.media_playback_fragment, container, false);
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
         initView(view);
+
+        if (mCheckService) {
+            update();
+            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
+                @Override
+                public void onUpdate() {
+                    update();
+                }
+            });
+        }
 
         btImgPlay.setOnClickListener(new Button.OnClickListener() {
             @Override
@@ -164,6 +171,13 @@ public class MediaPlaybackFragment extends Fragment {
         return view;
     }
 
+    protected ActivityMusic getMusicActivity() {
+        if (getActivity() instanceof ActivityMusic) {
+            return (ActivityMusic) getActivity();
+        }
+        return null;
+    }
+
     void initView(View view) {
         btImgLike = view.findViewById(R.id.btImgLike);
         btImgPrevious = view.findViewById(R.id.btImgPrevious);
@@ -235,9 +249,15 @@ public class MediaPlaybackFragment extends Fragment {
         }
     }
 
+    public void connectService() {
+        Intent it = new Intent(getContext(), MediaPlaybackService.class);
+        getActivity().bindService(it, mServiceConnection, 0);
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.d(TAG, "onDestroy: ");
         getActivity().unbindService(mServiceConnection);
     }
 }
