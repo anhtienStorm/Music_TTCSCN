@@ -1,8 +1,10 @@
 package com.example.activitymusic;
 
 import android.app.Service;
+import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Build;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -163,7 +165,7 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
             listenner.onItemClick(getAdapterPosition());
         }
 
-        public void bind(Song song, int position) {
+        public void bind(final Song song, int position) {
             tvStt.setText((position + 1) + "");
             tvTitleSong.setText(song.getNameSong());
             tvDuration.setText(song.getDuration());
@@ -174,7 +176,7 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
                         PopupMenu popupMenu = new PopupMenu(mContext, btImgMore);
                         if (mTypeSongList.equals("AllSongs")) {
                             popupMenu.inflate(R.menu.item_recyclerview_more_all_song_menu);
-                        } else {
+                        } else if (mTypeSongList.equals("FavoriteSongs")){
                             popupMenu.inflate(R.menu.item_recyclerview_more_favorite_song_menu);
                         }
                         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -182,10 +184,12 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
                             public boolean onMenuItemClick(MenuItem item) {
                                 switch (item.getItemId()) {
                                     case R.id.more_all_song:
-                                        Toast.makeText(mContext, "Added Favorite SongList", Toast.LENGTH_SHORT).show();
+                                        addFavoriteSongsList(song);
+//                                        Toast.makeText(mContext, "Added Favorite SongList", Toast.LENGTH_SHORT).show();
                                         return true;
                                     case R.id.more_favorite_song:
-                                        Toast.makeText(mContext, "Remove Favorite SongList", Toast.LENGTH_SHORT).show();
+                                        removeFavoriteSongsList(song);
+//                                        Toast.makeText(mContext, "Remove Favorite SongList", Toast.LENGTH_SHORT).show();
                                         return true;
                                     default:
                                         return false;
@@ -197,6 +201,30 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
                 });
             }
         }
+    }
+
+    public void addFavoriteSongsList(Song song) {
+        ContentValues values = new ContentValues();
+        values.put(FavoriteSongsProvider.TITLE,
+                song.getNameSong());
+        values.put(FavoriteSongsProvider.DATA,
+                song.getPathSong());
+        values.put(FavoriteSongsProvider.ARTIST,
+                song.getSinger());
+        values.put(FavoriteSongsProvider.ALBUM_ID,
+                song.getAlbumID());
+        values.put(FavoriteSongsProvider.DURATION,
+                song.getDuration());
+
+        Uri uri = mContext.getContentResolver().insert(
+                FavoriteSongsProvider.CONTENT_URI, values);
+        Toast.makeText(mContext,
+                uri.toString(), Toast.LENGTH_LONG).show();
+    }
+
+    public void removeFavoriteSongsList(Song song){
+        mContext.getContentResolver().delete(FavoriteSongsProvider.CONTENT_URI, "_id = "+song.getId(),null);
+        Toast.makeText(mContext, "Deteled Sucessfull !", Toast.LENGTH_SHORT).show();
     }
 
 }

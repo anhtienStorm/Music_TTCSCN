@@ -124,7 +124,7 @@
         android:thumbTint="#FF5722"
         android:paddingStart="0dp"
         android:paddingEnd="0dp"
-        android:layout_marginBottom="70dp"
+        android:layout_marginBottom="65dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
        />

@@ -26,7 +26,7 @@ import java.util.ArrayList;
 
 public class BaseSongFragmentList extends Fragment implements ListSongAdapter.ISongListAdapterClickListener {
 
-    MediaPlaybackService mMediaPlaybackService;
+    protected MediaPlaybackService mMediaPlaybackService;
     private RecyclerView mRecyclerView;
     protected ListSongAdapter mAdapter;
     ImageView imgPlay;

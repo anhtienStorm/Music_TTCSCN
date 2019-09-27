@@ -9,23 +9,26 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.text.TextUtils;
 
 import java.util.HashMap;
 
 public class FavoriteSongsProvider extends ContentProvider {
-    static final String AUTHORITY = "com.android.example.FavoriteSongsProvider";
+    static final String AUTHORITY = "com.android.example.provider.FavoriteSongs";
     static final String CONTENT_PATH = "backupdata";
     static final String URL = "content://" + AUTHORITY + "/" + CONTENT_PATH;
     static final Uri CONTENT_URI = Uri.parse(URL);
 
     static final String _ID = "_id";
-    static final String _TITLE = "_title";
-    static final String _DATA = "_data";
-    static final String _ALBUM_ID = "_albumID";
-    static final String _ARTIST = "_artist";
-    static final String _FAVORITE = "_favorite";
-    static final String _COUNT = "_count";
+    static final String TITLE = "title";
+    static final String DATA = "data";
+    static final String ALBUM_ID = "albumID";
+    static final String ARTIST = "artist";
+    static final String DURATION = "duration";
+    static final String FAVORITE = "favorite";
+    static final String COUNT = "count";
 
     private static HashMap<String, String> STUDENTS_PROJECTION_MAP;
 
@@ -70,12 +73,42 @@ public class FavoriteSongsProvider extends ContentProvider {
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        return null;
+        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+        qb.setTables(TABLE_NAME_1);
+
+        switch (uriMatcher.match(uri)) {
+            case URI_ALL_ITEMS_CODE:
+                qb.setProjectionMap(STUDENTS_PROJECTION_MAP);
+                break;
+
+            case URI_ONE_ITEM_CODE:
+                qb.appendWhere( _ID + "=" + uri.getPathSegments().get(1));
+                break;
+
+            default:
+        }
+
+        if (sortOrder == null || sortOrder == ""){
+            sortOrder = TITLE;
+        }
+
+        Cursor c = qb.query(db,	projection,	selection,
+                selectionArgs,null, null, sortOrder);
+
+        c.setNotificationUri(getContext().getContentResolver(), uri);
+        return c;
     }
 
     @Override
     public String getType(Uri uri) {
-        return null;
+        switch (uriMatcher.match(uri)){
+            case URI_ALL_ITEMS_CODE:
+                return "vnd.android.cursor.dir/vnd.example.backupdata";
+            case URI_ONE_ITEM_CODE:
+                return "vnd.android.cursor.item/vnd.example.backupdata";
+            default:
+                throw new IllegalArgumentException("Unsupported URI: " + uri);
+        }
     }
 
     @Override
@@ -93,12 +126,44 @@ public class FavoriteSongsProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        return 0;
+        int count = 0;
+        switch (uriMatcher.match(uri)){
+            case URI_ALL_ITEMS_CODE:
+                count = db.delete(TABLE_NAME_1, selection, selectionArgs);
+                break;
+
+            case URI_ONE_ITEM_CODE:
+                String id = uri.getPathSegments().get(1);
+                count = db.delete(TABLE_NAME_1, _ID +  " = " + id +
+                        (!TextUtils.isEmpty(selection) ? "AND (" + selection + ')' : ""), selectionArgs);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown URI " + uri);
+        }
+
+        getContext().getContentResolver().notifyChange(uri, null);
+        return count;
     }
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        return 0;
+        int count = 0;
+        switch (uriMatcher.match(uri)) {
+            case URI_ALL_ITEMS_CODE:
+                count = db.update(TABLE_NAME_1, values, selection, selectionArgs);
+                break;
+
+            case URI_ONE_ITEM_CODE:
+                count = db.update(TABLE_NAME_1, values,
+                        _ID + " = " + uri.getPathSegments().get(1) +
+                                (!TextUtils.isEmpty(selection) ? "AND (" +selection + ')' : ""), selectionArgs);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown URI " + uri );
+        }
+
+        getContext().getContentResolver().notifyChange(uri, null);
+        return count;
     }
 
 

@@ -25,6 +25,14 @@
         </activity>
 
         <service android:name=".MediaPlaybackService"/>
+
+        <provider
+            android:name=".FavoriteSongsProvider"
+            android:authorities="com.android.example.provider.FavoriteSongs"
+            android:enabled="true"
+            android:exported="true"
+            android:readPermission="com.android.example.provider.READ_DATABASE"
+            android:writePermission="com.android.example.provider.WRITE_DATABASE" />
     </application>
 
 </manifest>

@@ -70,6 +70,9 @@ public class ActivityMusic extends AppCompatActivity
 
         initPermission();   //xin cap quyen doc bo nho
         createFragment();
+        if (mSelectedFragment==null){
+            mSelectedFragment = mFravoriteSongsFragment;
+        }
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -83,10 +86,10 @@ public class ActivityMusic extends AppCompatActivity
 
         int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_PORTRAIT){
-            getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a,mAllSongsFragment).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a,mSelectedFragment).commit();
         } else {
             getSupportFragmentManager().popBackStack();
-            getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mAllSongsFragment).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mSelectedFragment).commit();
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_b, mMediaPlaybackFragment).commit();
         }
     }
