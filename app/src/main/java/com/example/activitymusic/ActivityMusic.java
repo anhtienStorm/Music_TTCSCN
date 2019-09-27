@@ -42,7 +42,8 @@ public class ActivityMusic extends AppCompatActivity
             MediaPlaybackService.MediaPlaybackServiceBinder mediaPlaybackServiceBinder = (MediaPlaybackService.MediaPlaybackServiceBinder) iBinder;
             mMediaPlaybackService = mediaPlaybackServiceBinder.getService();
             mCheckService = true;
-            mServiceConnectListenner.onConnect();
+            mServiceConnectListenner.onConnect(mAllSongsFragment);
+            mServiceConnectListenner.onConnect(mMediaPlaybackFragment);
         }
 
         @Override
@@ -82,12 +83,9 @@ public class ActivityMusic extends AppCompatActivity
 
         int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_PORTRAIT){
-            //mAllSongsFragment = new AllSongsFragment();
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a,mAllSongsFragment).commit();
         } else {
             getSupportFragmentManager().popBackStack();
-            //mAllSongsFragment = new AllSongsFragment();
-            //mMediaPlaybackFragment = new MediaPlaybackFragment();
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mAllSongsFragment).commit();
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_b, mMediaPlaybackFragment).commit();
         }
@@ -108,11 +106,9 @@ public class ActivityMusic extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         if (id == R.id.nav_list_music) {
-//            mAllSongsFragment = new AllSongsFragment();
             mSelectedFragment = mAllSongsFragment;
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mSelectedFragment).commit();
         } else if (id == R.id.nav_favorite) {
-//            mFravoriteSongsFragment = new FavoriteSongsFragment();
             mSelectedFragment = mFravoriteSongsFragment;
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mSelectedFragment).commit();
         }
@@ -196,7 +192,6 @@ public class ActivityMusic extends AppCompatActivity
     }
 
     public void onClickLayoutPlayMusic(View view) {
-        //mMediaPlaybackFragment = new MediaPlaybackFragment();
         getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.sub_fragment_a, mMediaPlaybackFragment).commit();
         findViewById(R.id.layoutPlayMusic).setVisibility(View.GONE);
     }
@@ -206,6 +201,6 @@ public class ActivityMusic extends AppCompatActivity
     };
 
     interface IServiceConnectListenner {
-        void onConnect();
+        void onConnect(Fragment fragment);
     }
 }

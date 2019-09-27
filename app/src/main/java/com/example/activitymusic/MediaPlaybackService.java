@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
@@ -43,6 +44,8 @@ public class MediaPlaybackService extends Service {
     private SharedPreferences mSharedPreferences;
     private String sharePrefFile = "SongSharedPreferences";
 
+    private IServiceCallbackMediaPlaybackFragment mServiceCallbackMediaPlaybackFragment;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -57,6 +60,7 @@ public class MediaPlaybackService extends Service {
             manager.createNotificationChannel(musicServiceChannel);
         }
         mAllSongsProvider = new AllSongsProvider(getApplicationContext());
+        mSharedPreferences = getSharedPreferences(sharePrefFile, MODE_PRIVATE);
     }
 
     @Override
@@ -186,6 +190,10 @@ public class MediaPlaybackService extends Service {
         return mPLayingSong.getAlbumID();
     }
 
+    public SharedPreferences getSharedPreferences() {
+        return mSharedPreferences;
+    }
+
     public int getId() {
         return mPLayingSong.getId();
     }
@@ -213,6 +221,8 @@ public class MediaPlaybackService extends Service {
         mMediaPlayer.start();
         showNotification();
         mServiceCallback.onUpdate();
+
+        mServiceCallbackMediaPlaybackFragment.onUpdate();
     }
 
     public void pause() {
@@ -222,12 +232,16 @@ public class MediaPlaybackService extends Service {
             stopForeground(STOP_FOREGROUND_DETACH);
         }
         mServiceCallback.onUpdate();
+
+        mServiceCallbackMediaPlaybackFragment.onUpdate();
     }
 
     public void stop() {
         mMediaPlayer.stop();
         showNotification();
         mServiceCallback.onUpdate();
+
+        mServiceCallbackMediaPlaybackFragment.onUpdate();
     }
 
     public void preparePlay() {
@@ -243,6 +257,11 @@ public class MediaPlaybackService extends Service {
         showNotification();
         mIndexofPlayingSong = mPlayingSongList.indexOf(mPLayingSong);
         mServiceCallback.onUpdate();
+
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE){
+            mServiceCallbackMediaPlaybackFragment.onUpdate();
+        }
 
         mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
@@ -282,7 +301,8 @@ public class MediaPlaybackService extends Service {
                 mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
             }
             preparePlay();
-            mServiceCallback.onUpdate();
+            //    mServiceCallback.onUpdate();
+            mServiceCallbackMediaPlaybackFragment.onUpdate();
         }
     }
 
@@ -305,7 +325,8 @@ public class MediaPlaybackService extends Service {
                 mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
                 preparePlay();
             }
-            mServiceCallback.onUpdate();
+            //  mServiceCallback.onUpdate();
+            mServiceCallbackMediaPlaybackFragment.onUpdate();
         }
     }
 
@@ -325,7 +346,8 @@ public class MediaPlaybackService extends Service {
                 mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
             }
             preparePlay();
-            mServiceCallback.onUpdate();
+            // mServiceCallback.onUpdate();
+            mServiceCallbackMediaPlaybackFragment.onUpdate();
         }
     }
 
@@ -338,6 +360,8 @@ public class MediaPlaybackService extends Service {
             showToast("Shuffle Off");
         }
         mServiceCallback.onUpdate();
+
+        mServiceCallbackMediaPlaybackFragment.onUpdate();
     }
 
     public void loopSong() {
@@ -353,6 +377,7 @@ public class MediaPlaybackService extends Service {
         }
         mServiceCallback.onUpdate();
 
+        mServiceCallbackMediaPlaybackFragment.onUpdate();
     }
 
     public String getTotalTime() {
@@ -393,8 +418,7 @@ public class MediaPlaybackService extends Service {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
-    private void saveData(){
-        mSharedPreferences = getSharedPreferences(sharePrefFile, MODE_PRIVATE);
+    private void saveData() {
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putInt("SONG_ID", mPLayingSong.getId());
         Gson gson = new Gson();
@@ -403,20 +427,16 @@ public class MediaPlaybackService extends Service {
         editor.apply();
     }
 
-    public void loadData(){
-        mSharedPreferences = getSharedPreferences(sharePrefFile, MODE_PRIVATE);
+    public void loadData() {
         Gson gson = new Gson();
         String json = mSharedPreferences.getString("SONG_LIST", null);
-        Type type = new TypeToken<ArrayList<Song>>(){}.getType();
+        Type type = new TypeToken<ArrayList<Song>>() {
+        }.getType();
         mPlayingSongList = gson.fromJson(json, type);
-        if (mPlayingSongList == null){
+        if (mPlayingSongList == null) {
             mPlayingSongList = new ArrayList<>();
         }
         setPreviousExitSong(mSharedPreferences.getInt("SONG_ID", 0));
-
-        preparePlay();
-        pause();
-
     }
 
     // class
@@ -429,5 +449,13 @@ public class MediaPlaybackService extends Service {
     //interface
     interface IServiceCallback {
         void onUpdate();
+    }
+
+    interface IServiceCallbackMediaPlaybackFragment {
+        void onUpdate();
+    }
+
+    public void mediaPlaybackFragmentListenChangeStatus(IServiceCallbackMediaPlaybackFragment serviceCallbackMediaPlaybackFragment) {
+        this.mServiceCallbackMediaPlaybackFragment = serviceCallbackMediaPlaybackFragment;
     }
 }

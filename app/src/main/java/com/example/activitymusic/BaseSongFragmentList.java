@@ -26,7 +26,7 @@ import java.util.ArrayList;
 
 public class BaseSongFragmentList extends Fragment implements ListSongAdapter.ISongListAdapterClickListener {
 
-    private MediaPlaybackService mMediaPlaybackService;
+    MediaPlaybackService mMediaPlaybackService;
     private RecyclerView mRecyclerView;
     protected ListSongAdapter mAdapter;
     ImageView imgPlay;
@@ -36,6 +36,8 @@ public class BaseSongFragmentList extends Fragment implements ListSongAdapter.IS
     AllSongsProvider mAllSongsProvider;
     private ArrayList<Song> mListSong = new ArrayList<>();
     private static final String TAG = "abc";
+
+//    IServiceConnectListennerMediaPlaybackFragment mServiceConnectListennerMediaPlaybackFragment;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,9 +52,8 @@ public class BaseSongFragmentList extends Fragment implements ListSongAdapter.IS
 
         getMusicActivity().setServiceConnectListenner(new ActivityMusic.IServiceConnectListenner() {
             @Override
-            public void onConnect() {
+            public void onConnect(Fragment fragment) {
                 mMediaPlaybackService = getMusicActivity().mMediaPlaybackService;
-                Log.d(TAG, "onConnect: " + mMediaPlaybackService);
                 mAdapter.setService(mMediaPlaybackService);
                 mCheckService = true;
                 update();
@@ -63,7 +64,10 @@ public class BaseSongFragmentList extends Fragment implements ListSongAdapter.IS
                     }
                 });
                 if (!mMediaPlaybackService.isMusicPlay()) {
-                    mMediaPlaybackService.loadData();
+                    if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")){
+                        mMediaPlaybackService.loadData();
+                        updateSaveSong();
+                    }
                 }
             }
         });
@@ -77,6 +81,12 @@ public class BaseSongFragmentList extends Fragment implements ListSongAdapter.IS
                     update();
                 }
             });
+            if (!mMediaPlaybackService.isMusicPlay()) {
+                if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")){
+                    mMediaPlaybackService.loadData();
+                    updateSaveSong();
+                }
+            }
         }
     }
 
@@ -118,6 +128,8 @@ public class BaseSongFragmentList extends Fragment implements ListSongAdapter.IS
                     } else {
                         mMediaPlaybackService.play();
                     }
+                } else {
+                    mMediaPlaybackService.preparePlay();
                 }
             }
         });
@@ -158,9 +170,6 @@ public class BaseSongFragmentList extends Fragment implements ListSongAdapter.IS
                 imgMainSong.setImageResource(R.drawable.icon_default_song);
             } else {
                 imgMainSong.setImageBitmap(mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()));
-                Log.d("abc", "update: " + mMediaPlaybackService.getNameSong());
-                Log.d("abc", "update: " + mMediaPlaybackService.getPlayingSongList().size());
-
             }
 
             tvNameSong.setText(mMediaPlaybackService.getNameSong());
@@ -171,6 +180,19 @@ public class BaseSongFragmentList extends Fragment implements ListSongAdapter.IS
                 imgPlay.setImageResource(R.drawable.ic_play_black_24dp);
             }
         }
+    }
+
+    public void updateSaveSong(){
+        mAdapter.notifyDataSetChanged();
+
+        if (mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()) == null) {
+            imgMainSong.setImageResource(R.drawable.icon_default_song);
+        } else {
+            imgMainSong.setImageBitmap(mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()));
+        }
+
+        tvNameSong.setText(mMediaPlaybackService.getNameSong());
+        tvArtist.setText(mMediaPlaybackService.getArtist());
     }
 
     @Override
@@ -198,5 +220,13 @@ public class BaseSongFragmentList extends Fragment implements ListSongAdapter.IS
             }
         });
     }
+
+//    interface IServiceConnectListennerMediaPlaybackFragment{
+//        void onConnect();
+//    }
+//
+//    public void setServiceConnectListennerMediaPlaybackFragment(IServiceConnectListennerMediaPlaybackFragment serviceConnectListennerMediaPlaybackFragment){
+//        this.mServiceConnectListennerMediaPlaybackFragment = serviceConnectListennerMediaPlaybackFragment;
+//    }
 
 }

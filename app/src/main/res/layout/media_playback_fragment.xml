@@ -51,7 +51,7 @@
             android:layout_height="20dp"
             android:layout_marginLeft="12dp"
             android:ellipsize="end"
-            android:gravity="top"
+            android:gravity="bottom"
             android:maxLines="1"
             android:textSize="12sp"
             android:layout_marginRight="16dp"
@@ -65,7 +65,7 @@
             android:layout_width="46dp"
             android:layout_height="46dp"
             android:layout_marginRight="16dp"
-            android:padding="8dp"
+            android:padding="10dp"
             android:src="@drawable/ic_queue_music_black_24dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toLeftOf="@+id/tvOptionsMediaPlayback"
@@ -124,7 +124,7 @@
         android:thumbTint="#FF5722"
         android:paddingStart="0dp"
         android:paddingEnd="0dp"
-        android:layout_marginBottom="80dp"
+        android:layout_marginBottom="70dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
        />
@@ -132,7 +132,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
-        android:layout_height="90dp"
+        android:layout_height="75dp"
         android:background="#aaf8f7f6"
         android:elevation="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -144,7 +144,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="15dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="4dp"
+            android:textSize="13sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -154,7 +155,7 @@
             android:layout_height="44dp"
             android:layout_marginStart="14dp"
             android:layout_marginLeft="14dp"
-            android:padding="7dp"
+            android:padding="9dp"
             android:src="@drawable/ic_like"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -173,8 +174,8 @@
 
         <ImageView
             android:id="@+id/btIngPlay"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:src="@drawable/ic_play_circle_filled_orange_24dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toRightOf="@+id/btImgPrevious"
@@ -198,7 +199,7 @@
             android:layout_height="44dp"
             android:layout_marginEnd="14dp"
             android:layout_marginRight="14dp"
-            android:padding="7dp"
+            android:padding="9dp"
             android:src="@drawable/ic_dislike"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -209,7 +210,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="15dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="4dp"
+            android:textSize="13sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 

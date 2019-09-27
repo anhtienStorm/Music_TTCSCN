@@ -41,13 +41,18 @@ public class MediaPlaybackFragment extends Fragment {
             MediaPlaybackService.MediaPlaybackServiceBinder mediaPlaybackServiceBinder = (MediaPlaybackService.MediaPlaybackServiceBinder) iBinder;
             mMediaPlaybackService = mediaPlaybackServiceBinder.getService();
             update();
-            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
+            mMediaPlaybackService.mediaPlaybackFragmentListenChangeStatus(new MediaPlaybackService.IServiceCallbackMediaPlaybackFragment() {
                 @Override
                 public void onUpdate() {
                     update();
                 }
             });
             mCheckService = true;
+            if (!mMediaPlaybackService.isMusicPlay()) {
+                if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")){
+                    updateSaveSong();
+                }
+            }
         }
 
         @Override
@@ -61,6 +66,7 @@ public class MediaPlaybackFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mAllSongsProvider = new AllSongsProvider(getContext());
         connectService();
+
     }
 
     @Override
@@ -69,7 +75,14 @@ public class MediaPlaybackFragment extends Fragment {
 
         if (mCheckService) {
             update();
-            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
+//            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
+//                @Override
+//                public void onUpdate() {
+//                    update();
+//                }
+//            });
+
+            mMediaPlaybackService.mediaPlaybackFragmentListenChangeStatus(new MediaPlaybackService.IServiceCallbackMediaPlaybackFragment() {
                 @Override
                 public void onUpdate() {
                     update();
@@ -94,7 +107,13 @@ public class MediaPlaybackFragment extends Fragment {
 
         if (mCheckService) {
             update();
-            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
+//            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
+//                @Override
+//                public void onUpdate() {
+//                    update();
+//                }
+//            });
+            mMediaPlaybackService.mediaPlaybackFragmentListenChangeStatus(new MediaPlaybackService.IServiceCallbackMediaPlaybackFragment() {
                 @Override
                 public void onUpdate() {
                     update();
@@ -111,6 +130,8 @@ public class MediaPlaybackFragment extends Fragment {
                     } else if (!mMediaPlaybackService.isPlaying()) {
                         mMediaPlaybackService.play();
                     }
+                } else {
+                    mMediaPlaybackService.preparePlay();
                 }
             }
         });
@@ -250,6 +271,19 @@ public class MediaPlaybackFragment extends Fragment {
             btImgShuffle.setImageResource
                     (R.drawable.ic_shuffle_orange_24dp);
         }
+    }
+
+    public void updateSaveSong() {
+        if (mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()) == null) {
+            imgSongSmall.setImageResource(R.drawable.icon_default_song);
+            imgSong.setImageResource(R.drawable.icon_default_song);
+        } else {
+            imgSong.setImageBitmap(mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()));
+            imgSongSmall.setImageBitmap(mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()));
+        }
+
+        tvNameSong.setText(mMediaPlaybackService.getNameSong());
+        tvArtist.setText(mMediaPlaybackService.getArtist());
     }
 
     public void connectService() {
