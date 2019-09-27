@@ -68,8 +68,7 @@ public class ActivityMusic extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         initPermission();   //xin cap quyen doc bo nho
-
-        int orientation = getResources().getConfiguration().orientation;
+        createFragment();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -81,13 +80,14 @@ public class ActivityMusic extends AppCompatActivity
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
 
+        int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_PORTRAIT){
-            mAllSongsFragment = new AllSongsFragment();
+            //mAllSongsFragment = new AllSongsFragment();
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a,mAllSongsFragment).commit();
         } else {
             getSupportFragmentManager().popBackStack();
-            mAllSongsFragment = new AllSongsFragment();
-            mMediaPlaybackFragment = new MediaPlaybackFragment();
+            //mAllSongsFragment = new AllSongsFragment();
+            //mMediaPlaybackFragment = new MediaPlaybackFragment();
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mAllSongsFragment).commit();
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_b, mMediaPlaybackFragment).commit();
         }
@@ -108,11 +108,11 @@ public class ActivityMusic extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         if (id == R.id.nav_list_music) {
-            mAllSongsFragment = new AllSongsFragment();
+//            mAllSongsFragment = new AllSongsFragment();
             mSelectedFragment = mAllSongsFragment;
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mSelectedFragment).commit();
         } else if (id == R.id.nav_favorite) {
-            mFravoriteSongsFragment = new FavoriteSongsFragment();
+//            mFravoriteSongsFragment = new FavoriteSongsFragment();
             mSelectedFragment = mFravoriteSongsFragment;
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mSelectedFragment).commit();
         }
@@ -196,7 +196,7 @@ public class ActivityMusic extends AppCompatActivity
     }
 
     public void onClickLayoutPlayMusic(View view) {
-        mMediaPlaybackFragment = new MediaPlaybackFragment();
+        //mMediaPlaybackFragment = new MediaPlaybackFragment();
         getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.sub_fragment_a, mMediaPlaybackFragment).commit();
         findViewById(R.id.layoutPlayMusic).setVisibility(View.GONE);
     }
