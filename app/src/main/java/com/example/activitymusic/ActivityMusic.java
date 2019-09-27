@@ -35,7 +35,7 @@ public class ActivityMusic extends AppCompatActivity
     MediaPlaybackService mMediaPlaybackService;
     Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment;
     Boolean mCheckService = false;
-    IServiceConnectListennerA mServiceConnectListenner;
+    IServiceConnectListenner mServiceConnectListenner;
     ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
@@ -61,22 +61,6 @@ public class ActivityMusic extends AppCompatActivity
             connectService();
         }
     }
-
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        if (mMediaPlaybackService != null){
-//            if (mMediaPlaybackService.isMusicPlay()){
-//                update();
-//                mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
-//                    @Override
-//                    public void onUpdate() {
-//                        update();
-//                    }
-//                });
-//            }
-//        }
-//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -217,11 +201,11 @@ public class ActivityMusic extends AppCompatActivity
         findViewById(R.id.layoutPlayMusic).setVisibility(View.GONE);
     }
 
-    public void setServiceConnectListenner(IServiceConnectListennerA serviceConnectListenner){
+    public void setServiceConnectListenner(IServiceConnectListenner serviceConnectListenner){
         this.mServiceConnectListenner = serviceConnectListenner;
     };
 
-    interface IServiceConnectListennerA {
+    interface IServiceConnectListenner {
         void onConnect();
     }
 }

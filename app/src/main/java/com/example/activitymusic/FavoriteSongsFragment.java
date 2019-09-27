@@ -10,7 +10,7 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 
-public class FavoriteSongsFragment extends BaseSongListFragment {
+public class FavoriteSongsFragment extends BaseSongFragmentList {
 
 
     @Nullable

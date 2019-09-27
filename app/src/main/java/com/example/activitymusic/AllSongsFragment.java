@@ -4,12 +4,8 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,10 +16,9 @@ import androidx.loader.content.Loader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-public class AllSongsFragment extends BaseSongListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class AllSongsFragment extends BaseSongFragmentList implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int LOADER_ID = 1;
-    private ArrayList<Song> mSongList;
 
     @Nullable
     @Override
@@ -64,7 +59,6 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
         }
         mAdapter.updateList(songList);
         setListSong(songList);
-        mSongList = songList;
         mAdapter.setTypeSongList("AllSongs");
     }
 
@@ -73,13 +67,5 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
         if (mAdapter != null) {
             mAdapter.updateList(new ArrayList<Song>());
         }
-    }
-
-    public ArrayList<Song> getSongList(){
-        return mSongList;
-    }
-
-    public ListSongAdapter getSongListAdapter(){
-        return mAdapter;
     }
 }

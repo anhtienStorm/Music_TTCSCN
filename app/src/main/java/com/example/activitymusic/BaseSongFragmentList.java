@@ -24,7 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-public class BaseSongListFragment extends Fragment implements ListSongAdapter.IListSongAdapter/*, ActivityMusic.ICallbackFragmentServiceConnection*/  {
+public class BaseSongFragmentList extends Fragment implements ListSongAdapter.ISongListAdapterClickListener {
 
     private MediaPlaybackService mMediaPlaybackService;
     private RecyclerView mRecyclerView;
@@ -36,36 +36,11 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IL
     AllSongsProvider mAllSongsProvider;
     private ArrayList<Song> mListSong = new ArrayList<>();
     private static final String TAG = "abc";
-//    ServiceConnection mServiceConnection = new ServiceConnection() {
-//        @Override
-//        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-//            MediaPlaybackService.MediaPlaybackServiceBinder mediaPlaybackServiceBinder = (MediaPlaybackService.MediaPlaybackServiceBinder) iBinder;
-//            mMediaPlaybackService = mediaPlaybackServiceBinder.getService();
-//            mAdapter.setService(mMediaPlaybackService);
-////            Log.d("abc", "onServiceConnected: " + mMediaPlaybackService.getNameSong());
-////            Log.d("abc", "onServiceConnected: " + mMediaPlaybackService.getPlayingSongList().size());
-//            update();
-//            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
-//                @Override
-//                public void onUpdate() {
-//                    update();
-//                }
-//            });
-//            mCheckService = true;
-//        }
-//
-//        @Override
-//        public void onServiceDisconnected(ComponentName componentName) {
-//            mCheckService = false;
-//        }
-//    };
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAllSongsProvider = new AllSongsProvider(getContext());
-//        connectService();
         setHasOptionsMenu(true);
     }
 
@@ -73,11 +48,11 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IL
     public void onResume() {
         super.onResume();
 
-        getMusicActivity().setServiceConnectListenner(new ActivityMusic.IServiceConnectListennerA() {
+        getMusicActivity().setServiceConnectListenner(new ActivityMusic.IServiceConnectListenner() {
             @Override
             public void onConnect() {
                 mMediaPlaybackService = getMusicActivity().mMediaPlaybackService;
-                Log.d(TAG, "onConnect: "+mMediaPlaybackService);
+                Log.d(TAG, "onConnect: " + mMediaPlaybackService);
                 mAdapter.setService(mMediaPlaybackService);
                 mCheckService = true;
                 update();
@@ -87,19 +62,22 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IL
                         update();
                     }
                 });
+                if (!mMediaPlaybackService.isMusicPlay()) {
+                    mMediaPlaybackService.loadData();
+                }
             }
         });
 
-//        if (mCheckService){
-//
-//            update();
-//            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
-//                @Override
-//                public void onUpdate() {
-//                    update();
-//                }
-//            });
-//        }
+        if (mCheckService) {
+            mAdapter.setService(mMediaPlaybackService);
+            update();
+            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
+                @Override
+                public void onUpdate() {
+                    update();
+                }
+            });
+        }
     }
 
     protected ActivityMusic getMusicActivity() {
@@ -114,21 +92,9 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IL
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.base_song_list_fragment, container, false);
 
-        Log.d(TAG, "onCreateView: "+getMusicActivity().mMediaPlaybackService);
-        if (getMusicActivity().mMediaPlaybackService!=null){
-            mMediaPlaybackService = getMusicActivity().mMediaPlaybackService;
-            update();
-            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
-                @Override
-                public void onUpdate() {
-                    update();
-                }
-            });
-        }
-
         initView(view);
         int orientation = getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE){
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
             view.findViewById(R.id.layoutPlayMusic).setVisibility(View.GONE);
             ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
         } else {
@@ -176,12 +142,6 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IL
         mListSong = listSong;
     }
 
-
-//    public void connectService() {
-//        Intent it = new Intent(getContext(), MediaPlaybackService.class);
-//        getActivity().bindService(it, mServiceConnection, 0);
-//    }
-
     public void initView(View view) {
         imgPlay = view.findViewById(R.id.btMainPlay);
         tvNameSong = view.findViewById(R.id.tvMainNameSong);
@@ -212,12 +172,6 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IL
             }
         }
     }
-
-//    @Override
-//    public void onDestroy() {
-//        super.onDestroy();
-//        getActivity().unbindService(mServiceConnection);
-//    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {

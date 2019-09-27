@@ -57,7 +57,6 @@ public class MediaPlaybackService extends Service {
             manager.createNotificationChannel(musicServiceChannel);
         }
         mAllSongsProvider = new AllSongsProvider(getApplicationContext());
-        loadData();
     }
 
     @Override
@@ -414,6 +413,10 @@ public class MediaPlaybackService extends Service {
             mPlayingSongList = new ArrayList<>();
         }
         setPreviousExitSong(mSharedPreferences.getInt("SONG_ID", 0));
+
+        preparePlay();
+        pause();
+
     }
 
     // class

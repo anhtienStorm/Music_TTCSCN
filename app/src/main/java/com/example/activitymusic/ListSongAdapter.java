@@ -2,10 +2,8 @@ package com.example.activitymusic;
 
 import android.app.Service;
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -32,7 +30,7 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
     private List<Song> mListSong = new ArrayList<>();
     private List<Song> mListFullSong = new ArrayList<>();
     private Context mContext;
-    private IListSongAdapter listenner;
+    private ISongListAdapterClickListener listenner;
     private String mTypeSongList;
     private MediaPlaybackService mMediaPlaybackService;
     private Song mPlayingSong;
@@ -87,7 +85,7 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
         return mListSong.size();
     }
 
-    public void setOnClickListenner(IListSongAdapter listenner) {
+    public void setOnClickListenner(ISongListAdapterClickListener listenner) {
         this.listenner = listenner;
     }
 
@@ -139,7 +137,7 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
 
 
     //interface
-    interface IListSongAdapter {
+    interface ISongListAdapterClickListener {
         void onItemClick(int position);
     }
 
