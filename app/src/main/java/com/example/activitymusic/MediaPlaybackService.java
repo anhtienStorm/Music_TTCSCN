@@ -170,14 +170,6 @@ public class MediaPlaybackService extends Service {
         return false;
     }
 
-//    public void loadPreviousExitSong(){
-//        setPreviousExitSong(mSharedPreferences.getInt("SONG_ID", 0));
-//        Log.d("abc", String.valueOf(getPlayingSongList().size()));
-//        Log.d("abc", String.valueOf(getPlayingSong().getId()));
-////        preparePlay();
-////        pause();
-//    }
-
     public String getNameSong() {
         return mPLayingSong.getNameSong();
     }

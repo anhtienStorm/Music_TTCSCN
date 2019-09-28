@@ -6,7 +6,6 @@ import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,7 +16,7 @@ import androidx.loader.content.Loader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-public class AllSongsFragment extends BaseSongFragmentList implements LoaderManager.LoaderCallbacks<Cursor> {
+public class AllSongsFragment extends BaseSongListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int LOADER_ID = 1;
 
@@ -25,7 +24,6 @@ public class AllSongsFragment extends BaseSongFragmentList implements LoaderMana
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         getLoaderManager().initLoader(LOADER_ID, null, this);
-        Toast.makeText(getContext(), mMediaPlaybackService+"|"+mAdapter, Toast.LENGTH_SHORT).show();
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -40,7 +38,7 @@ public class AllSongsFragment extends BaseSongFragmentList implements LoaderMana
         ArrayList<Song> songList = new ArrayList<>();
         if (data != null && data.getCount() > 0) {
             data.moveToFirst();
-            int i = 0;
+            int i = 1;
             int indexTitleColumn = data.getColumnIndex(MediaStore.Audio.Media.TITLE);
             int indexDataColumn = data.getColumnIndex(MediaStore.Audio.Media.DATA);
             int indexArtistColumn = data.getColumnIndex(MediaStore.Audio.Media.ARTIST);

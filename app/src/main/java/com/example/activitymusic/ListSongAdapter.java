@@ -185,11 +185,9 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
                                 switch (item.getItemId()) {
                                     case R.id.more_all_song:
                                         addFavoriteSongsList(song);
-//                                        Toast.makeText(mContext, "Added Favorite SongList", Toast.LENGTH_SHORT).show();
                                         return true;
                                     case R.id.more_favorite_song:
                                         removeFavoriteSongsList(song);
-//                                        Toast.makeText(mContext, "Remove Favorite SongList", Toast.LENGTH_SHORT).show();
                                         return true;
                                     default:
                                         return false;
@@ -205,6 +203,9 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
 
     public void addFavoriteSongsList(Song song) {
         ContentValues values = new ContentValues();
+
+        values.put(FavoriteSongsProvider._ID,
+                song.getId());
         values.put(FavoriteSongsProvider.TITLE,
                 song.getNameSong());
         values.put(FavoriteSongsProvider.DATA,

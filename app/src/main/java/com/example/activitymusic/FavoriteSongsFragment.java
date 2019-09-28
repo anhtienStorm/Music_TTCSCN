@@ -3,11 +3,9 @@ package com.example.activitymusic;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,7 +15,7 @@ import androidx.loader.content.Loader;
 
 import java.util.ArrayList;
 
-public class FavoriteSongsFragment extends BaseSongFragmentList implements LoaderManager.LoaderCallbacks<Cursor>{
+public class FavoriteSongsFragment extends BaseSongListFragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
     private static final int LOADER_ID = 1;
 
@@ -35,42 +33,39 @@ public class FavoriteSongsFragment extends BaseSongFragmentList implements Loade
     static final String FAVORITE = "favorite";
     static final String COUNT = "count";
 
-    ArrayList<Song> mFavoriteSongsList;
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         getLoaderManager().initLoader(LOADER_ID, null, this);
-        Toast.makeText(getContext(), mMediaPlaybackService+"|"+mAdapter, Toast.LENGTH_SHORT).show();
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
-    public ArrayList<Song> loadFavoriteSongs(){
-        ArrayList<Song> list = new ArrayList<>();
-        Cursor c = getContext().getContentResolver().query(CONTENT_URI, null, null, null,null);
-
-        int indexIdColumn = c.getColumnIndex(_ID);
-        int indexTitleColumn = c.getColumnIndex(TITLE);
-        int indexDataColumn = c.getColumnIndex(DATA);
-        int indexArtistColumn = c.getColumnIndex(ARTIST);
-        int indexAlbumIDColumn = c.getColumnIndex(ALBUM_ID);
-        int indexDurationColumn = c.getColumnIndex(DURATION);
-
-        if (c.moveToFirst()){
-            do {
-                int id = Integer.parseInt(c.getString(indexIdColumn));
-                String title = c.getString(indexTitleColumn);
-                String data = c.getString(indexDataColumn);
-                String artist = c.getString(indexArtistColumn);
-                String album_id = c.getString(indexAlbumIDColumn);
-                String duration = c.getString(indexDurationColumn);
-                Song song = new Song(id,title,data,artist,album_id,duration);
-                list.add(song);
-            } while (c.moveToNext());
-        }
-
-        return list;
-    }
+//    public ArrayList<Song> loadFavoriteSongs(){
+//        ArrayList<Song> list = new ArrayList<>();
+//        Cursor c = getContext().getContentResolver().query(CONTENT_URI, null, null, null,null);
+//
+//        int indexIdColumn = c.getColumnIndex(_ID);
+//        int indexTitleColumn = c.getColumnIndex(TITLE);
+//        int indexDataColumn = c.getColumnIndex(DATA);
+//        int indexArtistColumn = c.getColumnIndex(ARTIST);
+//        int indexAlbumIDColumn = c.getColumnIndex(ALBUM_ID);
+//        int indexDurationColumn = c.getColumnIndex(DURATION);
+//
+//        if (c.moveToFirst()){
+//            do {
+//                int id = Integer.parseInt(c.getString(indexIdColumn));
+//                String title = c.getString(indexTitleColumn);
+//                String data = c.getString(indexDataColumn);
+//                String artist = c.getString(indexArtistColumn);
+//                String album_id = c.getString(indexAlbumIDColumn);
+//                String duration = c.getString(indexDurationColumn);
+//                Song song = new Song(id,title,data,artist,album_id,duration);
+//                list.add(song);
+//            } while (c.moveToNext());
+//        }
+//
+//        return list;
+//    }
 
     @NonNull
     @Override

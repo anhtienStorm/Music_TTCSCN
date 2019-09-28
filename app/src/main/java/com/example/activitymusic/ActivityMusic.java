@@ -32,36 +32,7 @@ import android.widget.Toast;
 public class ActivityMusic extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    MediaPlaybackService mMediaPlaybackService;
     Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment;
-    Boolean mCheckService = false;
-    IServiceConnectListenner mServiceConnectListenner;
-    ServiceConnection mServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            MediaPlaybackService.MediaPlaybackServiceBinder mediaPlaybackServiceBinder = (MediaPlaybackService.MediaPlaybackServiceBinder) iBinder;
-            mMediaPlaybackService = mediaPlaybackServiceBinder.getService();
-            mCheckService = true;
-            mServiceConnectListenner.onConnect(mAllSongsFragment);
-            mServiceConnectListenner.onConnect(mMediaPlaybackFragment);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            mCheckService = false;
-        }
-    };
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if (isMyServiceRunning(MediaPlaybackService.class)) {
-            connectService();
-        } else {
-            startService();
-            connectService();
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,8 +41,8 @@ public class ActivityMusic extends AppCompatActivity
 
         initPermission();   //xin cap quyen doc bo nho
         createFragment();
-        if (mSelectedFragment==null){
-            mSelectedFragment = mFravoriteSongsFragment;
+        if (mSelectedFragment == null) {
+            mSelectedFragment = mAllSongsFragment;
         }
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -85,8 +56,8 @@ public class ActivityMusic extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         int orientation = getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_PORTRAIT){
-            getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a,mSelectedFragment).commit();
+        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mSelectedFragment).commit();
         } else {
             getSupportFragmentManager().popBackStack();
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mSelectedFragment).commit();
@@ -121,12 +92,6 @@ public class ActivityMusic extends AppCompatActivity
         return true;
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unbindService(mServiceConnection);
-    }
-
     //method
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
@@ -150,13 +115,6 @@ public class ActivityMusic extends AppCompatActivity
             startService(it);
         }
     }
-
-    public void connectService() {
-        Intent it = new Intent(ActivityMusic.this, MediaPlaybackService.class);
-        bindService(it, mServiceConnection, 0);
-    }
-
-
 
     // cap quyen doc bo nho
     public void initPermission() {
@@ -199,11 +157,4 @@ public class ActivityMusic extends AppCompatActivity
         findViewById(R.id.layoutPlayMusic).setVisibility(View.GONE);
     }
 
-    public void setServiceConnectListenner(IServiceConnectListenner serviceConnectListenner){
-        this.mServiceConnectListenner = serviceConnectListenner;
-    };
-
-    interface IServiceConnectListenner {
-        void onConnect(Fragment fragment);
-    }
 }

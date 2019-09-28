@@ -12,6 +12,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.util.HashMap;
 
@@ -24,13 +25,13 @@ public class FavoriteSongsProvider extends ContentProvider {
     static final String _ID = "_id";
     static final String TITLE = "title";
     static final String DATA = "data";
-    static final String ALBUM_ID = "albumID";
+    static final String ALBUM_ID = "albumid";
     static final String ARTIST = "artist";
     static final String DURATION = "duration";
     static final String FAVORITE = "favorite";
     static final String COUNT = "count";
 
-    private static HashMap<String, String> STUDENTS_PROJECTION_MAP;
+    private static HashMap<String, String> PROJECTION_MAP;
 
     static final int URI_ALL_ITEMS_CODE = 1;
     static final int URI_ONE_ITEM_CODE = 2;
@@ -50,7 +51,7 @@ public class FavoriteSongsProvider extends ContentProvider {
     static final int DATABASE_VERSION = 1;
     static final String CREATE_DB_TABLE_INFORMATION_SONG =
             " CREATE TABLE " + TABLE_NAME_1 +
-                    " (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    " (_id INTEGER PRIMARY KEY, " +
                     " title TEXT," +
                     " data TEXT," +
                     " artist TEXT," +
@@ -58,7 +59,7 @@ public class FavoriteSongsProvider extends ContentProvider {
                     " duration TEXT);";
     static final String CREATE_DB_TABLE_INFORMATION_FAVORITE_SONG =
             " CREATE TABLE " + TABLE_NAME_2 +
-                    " (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    " (_id INTEGER PRIMARY KEY , " +
                     " favorite INTEGER," +
                     " count INTEGER);";
 
@@ -78,7 +79,7 @@ public class FavoriteSongsProvider extends ContentProvider {
 
         switch (uriMatcher.match(uri)) {
             case URI_ALL_ITEMS_CODE:
-                qb.setProjectionMap(STUDENTS_PROJECTION_MAP);
+                qb.setProjectionMap(PROJECTION_MAP);
                 break;
 
             case URI_ONE_ITEM_CODE:
@@ -174,6 +175,7 @@ public class FavoriteSongsProvider extends ContentProvider {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
+            Log.d("aaaa", "onCreate: ");
             db.execSQL(CREATE_DB_TABLE_INFORMATION_SONG);
             db.execSQL(CREATE_DB_TABLE_INFORMATION_FAVORITE_SONG);
         }
