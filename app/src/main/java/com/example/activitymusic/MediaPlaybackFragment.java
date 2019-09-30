@@ -26,46 +26,45 @@ import java.text.SimpleDateFormat;
 
 public class MediaPlaybackFragment extends Fragment {
 
-    ConstraintLayout layoutMediaPlaybackFragment;
     ImageView btImgLike, btImgPrevious, btImgPlay, btImgNext, btImgDislike, btImgLoop, btImgShuffle, imgSongSmall, imgSong, btImgListSong;
     SeekBar seekBarSong;
     TextView tvNameSong, tvArtist, tvTotalTimeSong, tvTimeSong;
     MediaPlaybackService mMediaPlaybackService;
     boolean mCheckService = false;
     AllSongsProvider mAllSongsProvider;
-    private static final String TAG = "abcd";
+    private static final String TAG = "abc";
 
-    ServiceConnection mServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            MediaPlaybackService.MediaPlaybackServiceBinder mediaPlaybackServiceBinder = (MediaPlaybackService.MediaPlaybackServiceBinder) iBinder;
-            mMediaPlaybackService = mediaPlaybackServiceBinder.getService();
-            update();
-            mMediaPlaybackService.mediaPlaybackFragmentListenChangeStatus(new MediaPlaybackService.IServiceCallbackMediaPlaybackFragment() {
-                @Override
-                public void onUpdate() {
-                    update();
-                }
-            });
-            mCheckService = true;
-            if (!mMediaPlaybackService.isMusicPlay()) {
-                if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")){
-                    updateSaveSong();
-                }
-            }
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            mCheckService = false;
-        }
-    };
+//    ServiceConnection mServiceConnection = new ServiceConnection() {
+//        @Override
+//        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+//            MediaPlaybackService.MediaPlaybackServiceBinder mediaPlaybackServiceBinder = (MediaPlaybackService.MediaPlaybackServiceBinder) iBinder;
+//            mMediaPlaybackService = mediaPlaybackServiceBinder.getService();
+//            update();
+//            mMediaPlaybackService.mediaPlaybackFragmentListenChangeStatus(new MediaPlaybackService.IServiceCallbackMediaPlaybackFragment() {
+//                @Override
+//                public void onUpdate() {
+//                    update();
+//                }
+//            });
+//            mCheckService = true;
+//            if (!mMediaPlaybackService.isMusicPlay()) {
+//                if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")){
+//                    updateSaveSong();
+//                }
+//            }
+//        }
+//
+//        @Override
+//        public void onServiceDisconnected(ComponentName componentName) {
+//            mCheckService = false;
+//        }
+//    };
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAllSongsProvider = new AllSongsProvider(getContext());
-        connectService();
+//        connectService();
 
     }
 
@@ -73,22 +72,66 @@ public class MediaPlaybackFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
+        if (getMusicActivity().mMediaPlaybackService != null) {
+            mMediaPlaybackService = getMusicActivity().mMediaPlaybackService;
+            mCheckService = true;
+        }
+
+        getMusicActivity().setServiceConnectListenner2(new ActivityMusic.IServiceConnectListenner2() {
+            @Override
+            public void onConnect() {
+                Log.d(TAG, "MediaPlayback: ");
+                mMediaPlaybackService = getMusicActivity().mMediaPlaybackService;
+                mCheckService = true;
+                update();
+                mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
+                    @Override
+                    public void onUpdate() {
+                        update();
+                    }
+
+                });
+                if (!mMediaPlaybackService.isMusicPlay()) {
+                    if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")) {
+                        mMediaPlaybackService.loadData();
+                        updateSaveSong();
+                    }
+                }
+            }
+        });
+
         if (mCheckService) {
-            update();
-//            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
+//            update();
+////            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
+////                @Override
+////                public void onUpdate() {
+////                    update();
+////                }
+////            });
+//
+//            mMediaPlaybackService.mediaPlaybackFragmentListenChangeStatus(new MediaPlaybackService.IServiceCallbackMediaPlaybackFragment() {
 //                @Override
 //                public void onUpdate() {
 //                    update();
 //                }
 //            });
 
-            mMediaPlaybackService.mediaPlaybackFragmentListenChangeStatus(new MediaPlaybackService.IServiceCallbackMediaPlaybackFragment() {
+            update();
+            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
                 @Override
                 public void onUpdate() {
                     update();
                 }
             });
+            if (!mMediaPlaybackService.isMusicPlay()) {
+                if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")) {
+                    mMediaPlaybackService.loadData();
+                    updateSaveSong();
+                }
+            }
         }
+
+        Log.d(TAG, "mediaPlayback: "+mMediaPlaybackService);
     }
 
     @Nullable
@@ -106,14 +149,22 @@ public class MediaPlaybackFragment extends Fragment {
         }
 
         if (mCheckService) {
-            update();
-//            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
+//            update();
+////            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
+////                @Override
+////                public void onUpdate() {
+////                    update();
+////                }
+////            });
+//            mMediaPlaybackService.mediaPlaybackFragmentListenChangeStatus(new MediaPlaybackService.IServiceCallbackMediaPlaybackFragment() {
 //                @Override
 //                public void onUpdate() {
 //                    update();
 //                }
 //            });
-            mMediaPlaybackService.mediaPlaybackFragmentListenChangeStatus(new MediaPlaybackService.IServiceCallbackMediaPlaybackFragment() {
+
+            update();
+            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
                 @Override
                 public void onUpdate() {
                     update();
@@ -219,7 +270,6 @@ public class MediaPlaybackFragment extends Fragment {
         imgSongSmall = view.findViewById(R.id.imgSongSmall);
         btImgListSong = view.findViewById(R.id.btImgListSong);
         imgSong = view.findViewById(R.id.imgSong);
-        layoutMediaPlaybackFragment = view.findViewById(R.id.media_playback_fragment);
     }
 
     public void updateTimeSong() {
@@ -286,14 +336,14 @@ public class MediaPlaybackFragment extends Fragment {
         tvArtist.setText(mMediaPlaybackService.getArtist());
     }
 
-    public void connectService() {
-        Intent it = new Intent(getContext(), MediaPlaybackService.class);
-        getActivity().bindService(it, mServiceConnection, 0);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        getActivity().unbindService(mServiceConnection);
-    }
+//    public void connectService() {
+//        Intent it = new Intent(getContext(), MediaPlaybackService.class);
+//        getActivity().bindService(it, mServiceConnection, 0);
+//    }
+//
+//    @Override
+//    public void onDestroy() {
+//        super.onDestroy();
+//        getActivity().unbindService(mServiceConnection);
+//    }
 }

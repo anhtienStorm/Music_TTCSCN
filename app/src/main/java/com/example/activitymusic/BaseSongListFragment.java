@@ -46,43 +46,44 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
 
 //    IServiceConnectListennerMediaPlaybackFragment mServiceConnectListennerMediaPlaybackFragment;
 
-    ServiceConnection mServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            MediaPlaybackService.MediaPlaybackServiceBinder mediaPlaybackServiceBinder = (MediaPlaybackService.MediaPlaybackServiceBinder) iBinder;
-            mMediaPlaybackService = mediaPlaybackServiceBinder.getService();
-            mAdapter.setService(mMediaPlaybackService);
-            mCheckService = true;
-            update();
-            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
-                @Override
-                public void onUpdate() {
-                    update();
-                }
-            });
-            if (!mMediaPlaybackService.isMusicPlay()) {
-                if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")){
-                    mMediaPlaybackService.loadData();
-                    updateSaveSong();
-                }
-            }
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            mCheckService = false;
-        }
-    };
+//    ServiceConnection mServiceConnection = new ServiceConnection() {
+//        @Override
+//        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+//            MediaPlaybackService.MediaPlaybackServiceBinder mediaPlaybackServiceBinder = (MediaPlaybackService.MediaPlaybackServiceBinder) iBinder;
+//            mMediaPlaybackService = mediaPlaybackServiceBinder.getService();
+//            mAdapter.setService(mMediaPlaybackService);
+//            mCheckService = true;
+//            mRecyclerView.scrollToPosition(mMediaPlaybackService.getIndexofPlayingSong());
+//            update();
+//            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
+//                @Override
+//                public void onUpdate() {
+//                    update();
+//                }
+//            });
+//            if (!mMediaPlaybackService.isMusicPlay()) {
+//                if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")){
+//                    mMediaPlaybackService.loadData();
+//                    updateSaveSong();
+//                }
+//            }
+//        }
+//
+//        @Override
+//        public void onServiceDisconnected(ComponentName componentName) {
+//            mCheckService = false;
+//        }
+//    };
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (isMyServiceRunning(MediaPlaybackService.class)) {
-            connectService();
-        } else {
-            startService();
-            connectService();
-        }
+//        if (isMyServiceRunning(MediaPlaybackService.class)) {
+//            connectService();
+//        } else {
+//            startService();
+//            connectService();
+//        }
     }
 
     @Override
@@ -96,30 +97,37 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
     public void onResume() {
         super.onResume();
 
-//        getMusicActivity().setServiceConnectListenner(new ActivityMusic.IServiceConnectListenner() {
-//            @Override
-//            public void onConnect() {
-//                mMediaPlaybackService = getMusicActivity().mMediaPlaybackService;
-//                mAdapter.setService(mMediaPlaybackService);
-//                mCheckService = true;
-//                update();
-//                mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
-//                    @Override
-//                    public void onUpdate() {
-//                        update();
-//                    }
-//                });
-//                if (!mMediaPlaybackService.isMusicPlay()) {
-//                    if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")){
-//                        mMediaPlaybackService.loadData();
-//                        updateSaveSong();
-//                    }
-//                }
-//            }
-//        });
+        if (getMusicActivity().mMediaPlaybackService != null) {
+            mMediaPlaybackService = getMusicActivity().mMediaPlaybackService;
+            mCheckService = true;
+        }
+        getMusicActivity().setServiceConnectListenner1(new ActivityMusic.IServiceConnectListenner1() {
+            @Override
+            public void onConnect() {
+                Log.d(TAG, "BaseSong: ");
+                mMediaPlaybackService = getMusicActivity().mMediaPlaybackService;
+                mRecyclerView.scrollToPosition(mMediaPlaybackService.getIndexofPlayingSong());
+                mAdapter.setService(mMediaPlaybackService);
+                mCheckService = true;
+                update();
+                mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
+                    @Override
+                    public void onUpdate() {
+                        update();
+                    }
+                });
+                if (!mMediaPlaybackService.isMusicPlay()) {
+                    if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")) {
+                        mMediaPlaybackService.loadData();
+                        updateSaveSong();
+                    }
+                }
+            }
+        });
 
         if (mCheckService) {
             mAdapter.setService(mMediaPlaybackService);
+            mRecyclerView.scrollToPosition(mMediaPlaybackService.getIndexofPlayingSong());
             update();
             mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
                 @Override
@@ -128,20 +136,23 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
                 }
             });
             if (!mMediaPlaybackService.isMusicPlay()) {
-                if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")){
+                if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")) {
                     mMediaPlaybackService.loadData();
                     updateSaveSong();
                 }
             }
         }
+
+        Log.d(TAG, "BaseSong: " + mMediaPlaybackService);
+
     }
 
-//    protected ActivityMusic getMusicActivity() {
-//        if (getActivity() instanceof ActivityMusic) {
-//            return (ActivityMusic) getActivity();
-//        }
-//        return null;
-//    }
+    protected ActivityMusic getMusicActivity() {
+        if (getActivity() instanceof ActivityMusic) {
+            return (ActivityMusic) getActivity();
+        }
+        return null;
+    }
 
     @Nullable
     @Override
@@ -164,7 +175,6 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
         mRecyclerView.addItemDecoration(new DividerItemDecoration(mRecyclerView.getContext(), DividerItemDecoration.VERTICAL));
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mAdapter.setOnClickListenner(this);
-//        mRecyclerView.scrollToPosition();
 
         imgPlay.setOnClickListener(new Button.OnClickListener() {
             @Override
@@ -201,6 +211,27 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
         mListSong = listSong;
     }
 
+//    protected void setService(MediaPlaybackService service){
+//        mMediaPlaybackService = service;
+//        Log.d(TAG, "baseSong: "+service);
+//        mAdapter.setService(mMediaPlaybackService);
+//            mCheckService = true;
+//            mRecyclerView.scrollToPosition(mMediaPlaybackService.getIndexofPlayingSong());
+//            update();
+//            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
+//                @Override
+//                public void onUpdate() {
+//                    update();
+//                }
+//            });
+//            if (!mMediaPlaybackService.isMusicPlay()) {
+//                if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")){
+//                    mMediaPlaybackService.loadData();
+//                    updateSaveSong();
+//                }
+//            }
+//    }
+
     public void initView(View view) {
         imgPlay = view.findViewById(R.id.btMainPlay);
         tvNameSong = view.findViewById(R.id.tvMainNameSong);
@@ -229,7 +260,7 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
         }
     }
 
-    public void updateSaveSong(){
+    public void updateSaveSong() {
         mAdapter.notifyDataSetChanged();
 
         if (mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()) == null) {
@@ -268,23 +299,23 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
         });
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        getActivity().unbindService(mServiceConnection);
-    }
+//    @Override
+//    public void onDestroy() {
+//        super.onDestroy();
+//        getActivity().unbindService(mServiceConnection);
+//    }
 
-    public void connectService() {
-        Intent it = new Intent(getContext(), MediaPlaybackService.class);
-        getActivity().bindService(it, mServiceConnection, 0);
-    }
+//    public void connectService() {
+//        Intent it = new Intent(getContext(), MediaPlaybackService.class);
+//        getActivity().bindService(it, mServiceConnection, 0);
+//    }
 
-    public void startService() {
-        Intent it = new Intent(getContext(), MediaPlaybackService.class);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            getActivity().startService(it);
-        }
-    }
+//    public void startService() {
+//        Intent it = new Intent(getContext(), MediaPlaybackService.class);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            getActivity().startService(it);
+//        }
+//    }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getActivity().getSystemService(Context.ACTIVITY_SERVICE);

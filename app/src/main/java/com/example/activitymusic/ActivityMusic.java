@@ -32,7 +32,37 @@ import android.widget.Toast;
 public class ActivityMusic extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    MediaPlaybackService mMediaPlaybackService;
     Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment;
+    boolean mCheckService = false;
+    IServiceConnectListenner1 mServiceConnectListenner1;
+    IServiceConnectListenner2 mServiceConnectListenner2;
+    ServiceConnection mServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            MediaPlaybackService.MediaPlaybackServiceBinder mediaPlaybackServiceBinder = (MediaPlaybackService.MediaPlaybackServiceBinder) iBinder;
+            mMediaPlaybackService = mediaPlaybackServiceBinder.getService();
+//            mCheckService = true;
+            mServiceConnectListenner1.onConnect();
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+//            mCheckService = false;
+        }
+    };
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (isMyServiceRunning(MediaPlaybackService.class)) {
+            connectService();
+        } else {
+            startService();
+            connectService();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,10 +88,11 @@ public class ActivityMusic extends AppCompatActivity
         int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_PORTRAIT) {
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mSelectedFragment).commit();
+
         } else {
             getSupportFragmentManager().popBackStack();
-            getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mSelectedFragment).commit();
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_b, mMediaPlaybackFragment).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mSelectedFragment).commit();
         }
     }
 
@@ -116,6 +147,17 @@ public class ActivityMusic extends AppCompatActivity
         }
     }
 
+    public void connectService() {
+        Intent it = new Intent(this, MediaPlaybackService.class);
+        bindService(it, mServiceConnection, 0);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unbindService(mServiceConnection);
+    }
+
     // cap quyen doc bo nho
     public void initPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -157,4 +199,20 @@ public class ActivityMusic extends AppCompatActivity
         findViewById(R.id.layoutPlayMusic).setVisibility(View.GONE);
     }
 
+    void setServiceConnectListenner1(IServiceConnectListenner1 serviceConnectListenner){
+        this.mServiceConnectListenner1 = serviceConnectListenner;
+    }
+
+    void setServiceConnectListenner2(IServiceConnectListenner2 serviceConnectListenner){
+        this.mServiceConnectListenner2 = serviceConnectListenner;
+    }
+
+    //interface
+    interface IServiceConnectListenner1 {
+        void onConnect();
+    }
+
+    interface IServiceConnectListenner2 {
+        void onConnect();
+    }
 }

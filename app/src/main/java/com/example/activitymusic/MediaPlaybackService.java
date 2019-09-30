@@ -44,7 +44,7 @@ public class MediaPlaybackService extends Service {
     private SharedPreferences mSharedPreferences;
     private String sharePrefFile = "SongSharedPreferences";
 
-    private IServiceCallbackMediaPlaybackFragment mServiceCallbackMediaPlaybackFragment;
+   // private IServiceCallbackMediaPlaybackFragment mServiceCallbackMediaPlaybackFragment;
 
     @Override
     public void onCreate() {
@@ -194,6 +194,10 @@ public class MediaPlaybackService extends Service {
         return mPLayingSong;
     }
 
+    public int getIndexofPlayingSong(){
+        return mIndexofPlayingSong;
+    }
+
     public int getmStatusLoop() {
         return mStatusLoop;
     }
@@ -214,7 +218,7 @@ public class MediaPlaybackService extends Service {
         showNotification();
         mServiceCallback.onUpdate();
 
-        mServiceCallbackMediaPlaybackFragment.onUpdate();
+//        mServiceCallbackMediaPlaybackFragment.onUpdate();
     }
 
     public void pause() {
@@ -225,7 +229,7 @@ public class MediaPlaybackService extends Service {
         }
         mServiceCallback.onUpdate();
 
-        mServiceCallbackMediaPlaybackFragment.onUpdate();
+//        mServiceCallbackMediaPlaybackFragment.onUpdate();
     }
 
     public void stop() {
@@ -233,7 +237,7 @@ public class MediaPlaybackService extends Service {
         showNotification();
         mServiceCallback.onUpdate();
 
-        mServiceCallbackMediaPlaybackFragment.onUpdate();
+//        mServiceCallbackMediaPlaybackFragment.onUpdate();
     }
 
     public void preparePlay() {
@@ -250,10 +254,10 @@ public class MediaPlaybackService extends Service {
         mIndexofPlayingSong = mPlayingSongList.indexOf(mPLayingSong);
         mServiceCallback.onUpdate();
 
-        int orientation = getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE){
-            mServiceCallbackMediaPlaybackFragment.onUpdate();
-        }
+//        int orientation = getResources().getConfiguration().orientation;
+//        if (orientation == Configuration.ORIENTATION_LANDSCAPE){
+////            mServiceCallbackMediaPlaybackFragment.onUpdate();
+//        }
 
         mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
@@ -294,7 +298,7 @@ public class MediaPlaybackService extends Service {
             }
             preparePlay();
             //    mServiceCallback.onUpdate();
-            mServiceCallbackMediaPlaybackFragment.onUpdate();
+//            mServiceCallbackMediaPlaybackFragment.onUpdate();
         }
     }
 
@@ -318,7 +322,7 @@ public class MediaPlaybackService extends Service {
                 preparePlay();
             }
             //  mServiceCallback.onUpdate();
-            mServiceCallbackMediaPlaybackFragment.onUpdate();
+//            mServiceCallbackMediaPlaybackFragment.onUpdate();
         }
     }
 
@@ -339,7 +343,7 @@ public class MediaPlaybackService extends Service {
             }
             preparePlay();
             // mServiceCallback.onUpdate();
-            mServiceCallbackMediaPlaybackFragment.onUpdate();
+//            mServiceCallbackMediaPlaybackFragment.onUpdate();
         }
     }
 
@@ -353,7 +357,7 @@ public class MediaPlaybackService extends Service {
         }
         mServiceCallback.onUpdate();
 
-        mServiceCallbackMediaPlaybackFragment.onUpdate();
+//        mServiceCallbackMediaPlaybackFragment.onUpdate();
     }
 
     public void loopSong() {
@@ -369,7 +373,7 @@ public class MediaPlaybackService extends Service {
         }
         mServiceCallback.onUpdate();
 
-        mServiceCallbackMediaPlaybackFragment.onUpdate();
+//        mServiceCallbackMediaPlaybackFragment.onUpdate();
     }
 
     public String getTotalTime() {
@@ -447,7 +451,7 @@ public class MediaPlaybackService extends Service {
         void onUpdate();
     }
 
-    public void mediaPlaybackFragmentListenChangeStatus(IServiceCallbackMediaPlaybackFragment serviceCallbackMediaPlaybackFragment) {
-        this.mServiceCallbackMediaPlaybackFragment = serviceCallbackMediaPlaybackFragment;
-    }
+//    public void mediaPlaybackFragmentListenChangeStatus(IServiceCallbackMediaPlaybackFragment serviceCallbackMediaPlaybackFragment) {
+//        this.mServiceCallbackMediaPlaybackFragment = serviceCallbackMediaPlaybackFragment;
+//    }
 }
