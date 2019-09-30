@@ -1,8 +1,10 @@
 package com.example.activitymusic;
 
 import android.app.Service;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
@@ -169,6 +171,9 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
             tvStt.setText((position + 1) + "");
             tvTitleSong.setText(song.getNameSong());
             tvDuration.setText(song.getDuration());
+            if (!checkIdExitFavoriteSongs(song.getId())){
+                addIdProviderForFavoriteSongsList(song.getId());
+            }
             if (mTypeSongList != null) {
                 btImgMore.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -184,7 +189,8 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
                             public boolean onMenuItemClick(MenuItem item) {
                                 switch (item.getItemId()) {
                                     case R.id.more_all_song:
-                                        addFavoriteSongsList(song);
+                                       // addFavoriteSongsList(song);
+                                        addFavoriteSongsList(song.getId());
                                         return true;
                                     case R.id.more_favorite_song:
                                         removeFavoriteSongsList(song);
@@ -201,21 +207,26 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
         }
     }
 
-    public void addFavoriteSongsList(Song song) {
+    public void addIdProviderForFavoriteSongsList(int id) {
         ContentValues values = new ContentValues();
 
-        values.put(FavoriteSongsProvider._ID,
-                song.getId());
-        values.put(FavoriteSongsProvider.TITLE,
-                song.getNameSong());
-        values.put(FavoriteSongsProvider.DATA,
-                song.getPathSong());
-        values.put(FavoriteSongsProvider.ARTIST,
-                song.getSinger());
-        values.put(FavoriteSongsProvider.ALBUM_ID,
-                song.getAlbumID());
-        values.put(FavoriteSongsProvider.DURATION,
-                song.getDuration());
+//        values.put(FavoriteSongsProvider._ID,
+//                song.getId());
+//        values.put(FavoriteSongsProvider.TITLE,
+//                song.getNameSong());
+//        values.put(FavoriteSongsProvider.DATA,
+//                song.getPathSong());
+//        values.put(FavoriteSongsProvider.ARTIST,
+//                song.getSinger());
+//        values.put(FavoriteSongsProvider.ALBUM_ID,
+//                song.getAlbumID());
+//        values.put(FavoriteSongsProvider.DURATION,
+//                song.getDuration());
+
+        values.put(FavoriteSongsProvider.ID_PROVIDER,
+                id);
+        values.put(FavoriteSongsProvider.IS_FAVORITE,0);
+        values.put(FavoriteSongsProvider.COUNT_OF_PLAY,0);
 
         Uri uri = mContext.getContentResolver().insert(
                 FavoriteSongsProvider.CONTENT_URI, values);
@@ -228,4 +239,29 @@ public class ListSongAdapter extends RecyclerView.Adapter<ListSongAdapter.SongVi
         Toast.makeText(mContext, "Deteled Sucessfull !", Toast.LENGTH_SHORT).show();
     }
 
+    public ArrayList<Integer> loadIdProviderFromFavoriteSongs(){
+        ArrayList<Integer> listId = new ArrayList<>();
+        Cursor c = mContext.getContentResolver().query(FavoriteSongsProvider.CONTENT_URI, null, null, null, null);
+        if (c.moveToFirst()){
+            do {
+                int id = Integer.parseInt(c.getString(c.getColumnIndex(FavoriteSongsProvider.ID_PROVIDER)));
+                listId.add(id);
+            } while (c.moveToNext());
+        }
+        return listId;
+    }
+
+    public boolean checkIdExitFavoriteSongs(int id){
+        ArrayList<Integer> list = loadIdProviderFromFavoriteSongs();
+        if (list.contains(id))
+            return true;
+        else
+            return false;
+    }
+
+    public void addFavoriteSongsList(int id){
+        ContentValues values = new ContentValues();
+        values.put(FavoriteSongsProvider.IS_FAVORITE,2);
+        mContext.getContentResolver().update(FavoriteSongsProvider.CONTENT_URI,values,"ID_PROVIDER = "+id,null);
+    }
 }

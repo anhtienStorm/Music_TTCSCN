@@ -91,6 +91,17 @@ public class MediaPlaybackFragment extends Fragment {
                     }
 
                 });
+
+                int orientation = getResources().getConfiguration().orientation;
+                if (orientation == Configuration.ORIENTATION_LANDSCAPE){
+                    mMediaPlaybackService.mediaPlaybackFragmentListenChangeStatus(new MediaPlaybackService.IServiceCallbackMediaPlaybackFragment() {
+                        @Override
+                        public void onUpdate() {
+                            update();
+                        }
+                    });
+                }
+
                 if (!mMediaPlaybackService.isMusicPlay()) {
                     if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")) {
                         mMediaPlaybackService.loadData();
@@ -123,6 +134,17 @@ public class MediaPlaybackFragment extends Fragment {
                     update();
                 }
             });
+
+            int orientation = getResources().getConfiguration().orientation;
+            if (orientation == Configuration.ORIENTATION_LANDSCAPE){
+                mMediaPlaybackService.mediaPlaybackFragmentListenChangeStatus(new MediaPlaybackService.IServiceCallbackMediaPlaybackFragment() {
+                    @Override
+                    public void onUpdate() {
+                        update();
+                    }
+                });
+            }
+
             if (!mMediaPlaybackService.isMusicPlay()) {
                 if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")) {
                     mMediaPlaybackService.loadData();
@@ -170,6 +192,15 @@ public class MediaPlaybackFragment extends Fragment {
                     update();
                 }
             });
+
+            if (orientation == Configuration.ORIENTATION_LANDSCAPE){
+                mMediaPlaybackService.mediaPlaybackFragmentListenChangeStatus(new MediaPlaybackService.IServiceCallbackMediaPlaybackFragment() {
+                    @Override
+                    public void onUpdate() {
+                        update();
+                    }
+                });
+            }
         }
 
         btImgPlay.setOnClickListener(new Button.OnClickListener() {

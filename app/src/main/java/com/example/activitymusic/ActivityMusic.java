@@ -34,7 +34,6 @@ public class ActivityMusic extends AppCompatActivity
 
     MediaPlaybackService mMediaPlaybackService;
     Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment;
-    boolean mCheckService = false;
     IServiceConnectListenner1 mServiceConnectListenner1;
     IServiceConnectListenner2 mServiceConnectListenner2;
     ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -42,19 +41,15 @@ public class ActivityMusic extends AppCompatActivity
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             MediaPlaybackService.MediaPlaybackServiceBinder mediaPlaybackServiceBinder = (MediaPlaybackService.MediaPlaybackServiceBinder) iBinder;
             mMediaPlaybackService = mediaPlaybackServiceBinder.getService();
-//            mCheckService = true;
+            mServiceConnectListenner1.onConnect();
             int orientation = getResources().getConfiguration().orientation;
-            if (orientation == Configuration.ORIENTATION_PORTRAIT){
-                mServiceConnectListenner1.onConnect();
-            } else {
-                mServiceConnectListenner1.onConnect();
+            if (orientation == Configuration.ORIENTATION_LANDSCAPE){
                 mServiceConnectListenner2.onConnect();
             }
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
-//            mCheckService = false;
         }
     };
 

@@ -42,9 +42,8 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
     boolean mCheckService = false;
     AllSongsProvider mAllSongsProvider;
     private ArrayList<Song> mListSong = new ArrayList<>();
+    protected ArrayList<Song> mAllSongList;
     private static final String TAG = "abc";
-
-//    IServiceConnectListennerMediaPlaybackFragment mServiceConnectListennerMediaPlaybackFragment;
 
 //    ServiceConnection mServiceConnection = new ServiceConnection() {
 //        @Override
@@ -326,13 +325,5 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
         }
         return false;
     }
-
-//    interface IServiceConnectListennerMediaPlaybackFragment{
-//        void onConnect();
-//    }
-//
-//    public void setServiceConnectListennerMediaPlaybackFragment(IServiceConnectListennerMediaPlaybackFragment serviceConnectListennerMediaPlaybackFragment){
-//        this.mServiceConnectListennerMediaPlaybackFragment = serviceConnectListennerMediaPlaybackFragment;
-//    }
 
 }

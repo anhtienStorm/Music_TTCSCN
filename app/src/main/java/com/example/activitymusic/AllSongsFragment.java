@@ -1,11 +1,14 @@
 package com.example.activitymusic;
 
+import android.content.ContentValues;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -59,6 +62,7 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
         }
         mAdapter.updateList(songList);
         setListSong(songList);
+        mAllSongList = songList;
         mAdapter.setTypeSongList("AllSongs");
     }
 
@@ -68,4 +72,17 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
             mAdapter.updateList(new ArrayList<Song>());
         }
     }
+
+    public void addFavoriteSongsList(Song song) {
+        ContentValues values = new ContentValues();
+
+        values.put(FavoriteSongsProvider.ID_PROVIDER,
+                song.getId());
+
+        Uri uri = getActivity().getContentResolver().insert(
+                FavoriteSongsProvider.CONTENT_URI, values);
+        Toast.makeText(getActivity(),
+                uri.toString(), Toast.LENGTH_LONG).show();
+    }
+
 }

@@ -23,13 +23,14 @@ public class FavoriteSongsProvider extends ContentProvider {
     static final Uri CONTENT_URI = Uri.parse(URL);
 
     static final String _ID = "_id";
-    static final String TITLE = "title";
-    static final String DATA = "data";
-    static final String ALBUM_ID = "albumid";
-    static final String ARTIST = "artist";
-    static final String DURATION = "duration";
-    static final String FAVORITE = "favorite";
-    static final String COUNT = "count";
+//    static final String TITLE = "title";
+//    static final String DATA = "data";
+//    static final String ALBUM_ID = "albumid";
+//    static final String ARTIST = "artist";
+//    static final String DURATION = "duration";
+    static final String ID_PROVIDER = "id_provider";
+    static final String IS_FAVORITE = "is_favorite";
+    static final String COUNT_OF_PLAY = "count_of_play";
 
     private static HashMap<String, String> PROJECTION_MAP;
 
@@ -46,22 +47,23 @@ public class FavoriteSongsProvider extends ContentProvider {
 
     private SQLiteDatabase db;
     static final String DATABASE_NAME = "FavoriteSongsDatabase";
-    static final String TABLE_NAME_1 = "InfomationSongs";
-    static final String TABLE_NAME_2 = "InfomationFavoriteSongs";
-    static final int DATABASE_VERSION = 1;
+    static final String TABLE_NAME = "InfomationFavoriteSongs";
+    static final int DATABASE_VERSION = 2;
+//    static final String CREATE_DB_TABLE_INFORMATION_SONG =
+//            " CREATE TABLE " + TABLE_NAME +
+//                    " (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+//                    " title TEXT," +
+//                    " data TEXT," +
+//                    " artist TEXT," +
+//                    " albumid TEXT," +
+//                    " duration TEXT);";
+
     static final String CREATE_DB_TABLE_INFORMATION_SONG =
-            " CREATE TABLE " + TABLE_NAME_1 +
-                    " (_id INTEGER PRIMARY KEY, " +
-                    " title TEXT," +
-                    " data TEXT," +
-                    " artist TEXT," +
-                    " albumid TEXT," +
-                    " duration TEXT);";
-    static final String CREATE_DB_TABLE_INFORMATION_FAVORITE_SONG =
-            " CREATE TABLE " + TABLE_NAME_2 +
-                    " (_id INTEGER PRIMARY KEY , " +
-                    " favorite INTEGER," +
-                    " count INTEGER);";
+            " CREATE TABLE " + TABLE_NAME +
+                    " (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    " id_provider INTEGER," +
+                    " is_favorite INTEGER default 0," +
+                    " count_of_play INTEGER default 0);";
 
 
     @Override
@@ -75,7 +77,7 @@ public class FavoriteSongsProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-        qb.setTables(TABLE_NAME_1);
+        qb.setTables(TABLE_NAME);
 
         switch (uriMatcher.match(uri)) {
             case URI_ALL_ITEMS_CODE:
@@ -90,7 +92,7 @@ public class FavoriteSongsProvider extends ContentProvider {
         }
 
         if (sortOrder == null || sortOrder == ""){
-            sortOrder = TITLE;
+            sortOrder = _ID;
         }
 
         Cursor c = qb.query(db,	projection,	selection,
@@ -114,7 +116,7 @@ public class FavoriteSongsProvider extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        long rowID = db.insert(TABLE_NAME_1, "", values);
+        long rowID = db.insert(TABLE_NAME, "", values);
 
         if (rowID > 0) {
             Uri _uri = ContentUris.withAppendedId(CONTENT_URI, rowID);
@@ -130,12 +132,12 @@ public class FavoriteSongsProvider extends ContentProvider {
         int count = 0;
         switch (uriMatcher.match(uri)){
             case URI_ALL_ITEMS_CODE:
-                count = db.delete(TABLE_NAME_1, selection, selectionArgs);
+                count = db.delete(TABLE_NAME, selection, selectionArgs);
                 break;
 
             case URI_ONE_ITEM_CODE:
                 String id = uri.getPathSegments().get(1);
-                count = db.delete(TABLE_NAME_1, _ID +  " = " + id +
+                count = db.delete(TABLE_NAME, _ID +  " = " + id +
                         (!TextUtils.isEmpty(selection) ? "AND (" + selection + ')' : ""), selectionArgs);
                 break;
             default:
@@ -151,11 +153,11 @@ public class FavoriteSongsProvider extends ContentProvider {
         int count = 0;
         switch (uriMatcher.match(uri)) {
             case URI_ALL_ITEMS_CODE:
-                count = db.update(TABLE_NAME_1, values, selection, selectionArgs);
+                count = db.update(TABLE_NAME, values, selection, selectionArgs);
                 break;
 
             case URI_ONE_ITEM_CODE:
-                count = db.update(TABLE_NAME_1, values,
+                count = db.update(TABLE_NAME, values,
                         _ID + " = " + uri.getPathSegments().get(1) +
                                 (!TextUtils.isEmpty(selection) ? "AND (" +selection + ')' : ""), selectionArgs);
                 break;
@@ -177,13 +179,11 @@ public class FavoriteSongsProvider extends ContentProvider {
         public void onCreate(SQLiteDatabase db) {
             Log.d("aaaa", "onCreate: ");
             db.execSQL(CREATE_DB_TABLE_INFORMATION_SONG);
-            db.execSQL(CREATE_DB_TABLE_INFORMATION_FAVORITE_SONG);
         }
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_1);
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_2);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
             onCreate(db);
         }
     }
