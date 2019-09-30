@@ -43,8 +43,13 @@ public class ActivityMusic extends AppCompatActivity
             MediaPlaybackService.MediaPlaybackServiceBinder mediaPlaybackServiceBinder = (MediaPlaybackService.MediaPlaybackServiceBinder) iBinder;
             mMediaPlaybackService = mediaPlaybackServiceBinder.getService();
 //            mCheckService = true;
-            mServiceConnectListenner1.onConnect();
-
+            int orientation = getResources().getConfiguration().orientation;
+            if (orientation == Configuration.ORIENTATION_PORTRAIT){
+                mServiceConnectListenner1.onConnect();
+            } else {
+                mServiceConnectListenner1.onConnect();
+                mServiceConnectListenner2.onConnect();
+            }
         }
 
         @Override
