@@ -42,7 +42,6 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
     boolean mCheckService = false;
     AllSongsProvider mAllSongsProvider;
     private ArrayList<Song> mListSong = new ArrayList<>();
-    protected ArrayList<Song> mAllSongList;
     private static final String TAG = "abc";
 
 //    ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -99,6 +98,7 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
         if (getMusicActivity().mMediaPlaybackService != null) {
             mMediaPlaybackService = getMusicActivity().mMediaPlaybackService;
             mCheckService = true;
+            mRecyclerView.scrollToPosition(mMediaPlaybackService.getIndexofPlayingSong());
         }
         getMusicActivity().setServiceConnectListenner1(new ActivityMusic.IServiceConnectListenner1() {
             @Override

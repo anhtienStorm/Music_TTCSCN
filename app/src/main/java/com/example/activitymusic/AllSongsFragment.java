@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,12 +58,16 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
                 String timeSong = formatTimeSong.format(duration);
                 Song song = new Song(i, title, path, artist, albumID, timeSong);
                 songList.add(song);
+
+                if (!checkIdExitFavoriteSongs(i)){
+                    addIdProviderForFavoriteSongsList(i);
+                }
+
                 i++;
             } while (data.moveToNext());
         }
         mAdapter.updateList(songList);
         setListSong(songList);
-        mAllSongList = songList;
         mAdapter.setTypeSongList("AllSongs");
     }
 
@@ -73,11 +78,31 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
         }
     }
 
-    public void addFavoriteSongsList(Song song) {
+    public ArrayList<Integer> loadIdProviderFromFavoriteSongs(){
+        ArrayList<Integer> listId = new ArrayList<>();
+        Cursor c = getActivity().getContentResolver().query(FavoriteSongsProvider.CONTENT_URI, null, null, null, null);
+        if (c.moveToFirst()){
+            do {
+                int id = Integer.parseInt(c.getString(c.getColumnIndex(FavoriteSongsProvider.ID_PROVIDER)));
+                listId.add(id);
+            } while (c.moveToNext());
+        }
+        return listId;
+    }
+
+    public boolean checkIdExitFavoriteSongs(int id){
+        ArrayList<Integer> list = loadIdProviderFromFavoriteSongs();
+        if (list.contains(id))
+            return true;
+        else
+            return false;
+    }
+
+    public void addIdProviderForFavoriteSongsList(int id) {
         ContentValues values = new ContentValues();
 
         values.put(FavoriteSongsProvider.ID_PROVIDER,
-                song.getId());
+                id);
 
         Uri uri = getActivity().getContentResolver().insert(
                 FavoriteSongsProvider.CONTENT_URI, values);

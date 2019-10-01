@@ -3,6 +3,8 @@ package com.example.activitymusic;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,11 +15,13 @@ import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class FavoriteSongsFragment extends BaseSongListFragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
-    private static final int LOADER_ID = 1;
+    private static final int LOADER_ID = 2;
+    ArrayList<Song> mAllSongList;
 
     static final String AUTHORITY = "com.android.example.provider.FavoriteSongs";
     static final String CONTENT_PATH = "backupdata";
@@ -40,6 +44,7 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mAllSongList = loadAllSongs();
         getLoaderManager().initLoader(LOADER_ID, null, this);
         return super.onCreateView(inflater, container, savedInstanceState);
     }
@@ -74,7 +79,7 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
-        return new CursorLoader(getContext(), CONTENT_URI, null, FavoriteSongsProvider.IS_FAVORITE+" = "+1, null, null);
+        return new CursorLoader(getContext(), CONTENT_URI, null, FavoriteSongsProvider.IS_FAVORITE+" = "+2, null, null);
     }
 
     @Override
@@ -85,7 +90,8 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
             do {
                 int id = Integer.parseInt(c.getString(c.getColumnIndex(FavoriteSongsProvider._ID)));
                 int id_provider = Integer.parseInt(c.getString(c.getColumnIndex(FavoriteSongsProvider.ID_PROVIDER)));
-                Song song = mAllSongList.get(id_provider);
+
+                Song song = mAllSongList.get(id_provider-1);
                 Song newSong = new Song(id,song.getNameSong(),song.getPathSong(),song.getSinger(),song.getAlbumID(),song.getDuration());
                 list.add(newSong);
 
@@ -108,5 +114,26 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
         if (mAdapter != null) {
             mAdapter.updateList(new ArrayList<Song>());
         }
+    }
+
+    public ArrayList<Song> loadAllSongs(){
+        ArrayList<Song> list = new ArrayList<>();
+        Cursor c = getActivity().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null, null, null, null);
+        if (c.moveToFirst()){
+            int id = 1;
+            do {
+                String title = c.getString(c.getColumnIndex(MediaStore.Audio.Media.TITLE));
+                String data = c.getString(c.getColumnIndex(MediaStore.Audio.Media.DATA));
+                String artist = c.getString(c.getColumnIndex(MediaStore.Audio.Media.ARTIST));
+                String albumid = c.getString(c.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
+                int duration = Integer.parseInt(c.getString(c.getColumnIndex(MediaStore.Audio.Media.DURATION)));
+                SimpleDateFormat formatTimeSong = new SimpleDateFormat("mm:ss");
+                String timeSong = formatTimeSong.format(duration);
+                Song song = new Song(id, title, data, artist, albumid, timeSong);
+                list.add(song);
+                id++;
+            } while (c.moveToNext());
+        }
+        return list;
     }
 }
