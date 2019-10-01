@@ -42,13 +42,14 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
         ArrayList<Song> songList = new ArrayList<>();
         if (data != null && data.getCount() > 0) {
             data.moveToFirst();
-            int i = 1;
+            int indexIdColumn = data.getColumnIndex(MediaStore.Audio.Media._ID);
             int indexTitleColumn = data.getColumnIndex(MediaStore.Audio.Media.TITLE);
             int indexDataColumn = data.getColumnIndex(MediaStore.Audio.Media.DATA);
             int indexArtistColumn = data.getColumnIndex(MediaStore.Audio.Media.ARTIST);
             int indexAlbumIDColumn = data.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
             int indexDurationColumn = data.getColumnIndex(MediaStore.Audio.Media.DURATION);
             do {
+                int id = Integer.parseInt(data.getString(indexIdColumn));
                 String title = data.getString(indexTitleColumn);
                 String path = data.getString(indexDataColumn);
                 String artist = data.getString(indexArtistColumn);
@@ -56,14 +57,13 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
                 int duration = Integer.parseInt(data.getString(indexDurationColumn));
                 SimpleDateFormat formatTimeSong = new SimpleDateFormat("mm:ss");
                 String timeSong = formatTimeSong.format(duration);
-                Song song = new Song(i, title, path, artist, albumID, timeSong);
+                Song song = new Song(id, title, path, artist, albumID, timeSong);
                 songList.add(song);
 
-                if (!checkIdExitFavoriteSongs(i)){
-                    addIdProviderForFavoriteSongsList(i);
+                if (!checkIdExitFavoriteSongs(id)){
+                    addIdProviderForFavoriteSongsList(id);
                 }
 
-                i++;
             } while (data.moveToNext());
         }
         mAdapter.updateList(songList);

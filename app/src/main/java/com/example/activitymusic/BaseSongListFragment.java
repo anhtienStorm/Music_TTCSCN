@@ -108,13 +108,13 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
                 mRecyclerView.scrollToPosition(mMediaPlaybackService.getIndexofPlayingSong());
                 mAdapter.setService(mMediaPlaybackService);
                 mCheckService = true;
-                update();
+                /*update();
                 mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
                     @Override
                     public void onUpdate() {
                         update();
                     }
-                });
+                });*/
                 if (!mMediaPlaybackService.isMusicPlay()) {
                     if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")) {
                         mMediaPlaybackService.loadData();
@@ -128,12 +128,12 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
             mAdapter.setService(mMediaPlaybackService);
             mRecyclerView.scrollToPosition(mMediaPlaybackService.getIndexofPlayingSong());
             update();
-            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
+            /*mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
                 @Override
                 public void onUpdate() {
                     update();
                 }
-            });
+            });*/
             if (!mMediaPlaybackService.isMusicPlay()) {
                 if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")) {
                     mMediaPlaybackService.loadData();
@@ -162,7 +162,7 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
         int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
             view.findViewById(R.id.layoutPlayMusic).setVisibility(View.GONE);
-            ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+            ((AppCompatActivity) getActivity()).getSupportActionBar().show();
         } else {
             view.findViewById(R.id.layoutPlayMusic).setVisibility(View.VISIBLE);
             ((AppCompatActivity) getActivity()).getSupportActionBar().show();
@@ -198,12 +198,12 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
         mMediaPlaybackService.playSong(mListSong, mListSong.get(position));
         mAdapter.setService(mMediaPlaybackService);
         update();
-        mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
-            @Override
-            public void onUpdate() {
-                update();
-            }
-        });
+//        mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
+//            @Override
+//            public void onUpdate() {
+//                update();
+//            }
+//        });
     }
 
     public void setListSong(ArrayList<Song> listSong) {

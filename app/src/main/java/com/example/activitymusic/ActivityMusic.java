@@ -16,6 +16,7 @@ import androidx.core.view.GravityCompat;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 
 import android.os.IBinder;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.google.android.material.navigation.NavigationView;
@@ -36,14 +37,23 @@ public class ActivityMusic extends AppCompatActivity
     Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment;
     IServiceConnectListenner1 mServiceConnectListenner1;
     IServiceConnectListenner2 mServiceConnectListenner2;
+    String mNameFragmentSelect;
     ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             MediaPlaybackService.MediaPlaybackServiceBinder mediaPlaybackServiceBinder = (MediaPlaybackService.MediaPlaybackServiceBinder) iBinder;
             mMediaPlaybackService = mediaPlaybackServiceBinder.getService();
+           // update();
+            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
+                @Override
+                public void onUpdate() {
+                    update();
+                }
+
+            });
             mServiceConnectListenner1.onConnect();
             int orientation = getResources().getConfiguration().orientation;
-            if (orientation == Configuration.ORIENTATION_LANDSCAPE){
+            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 mServiceConnectListenner2.onConnect();
             }
         }
@@ -71,9 +81,6 @@ public class ActivityMusic extends AppCompatActivity
 
         initPermission();   //xin cap quyen doc bo nho
         createFragment();
-        if (mSelectedFragment == null) {
-            mSelectedFragment = mAllSongsFragment;
-        }
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -85,15 +92,45 @@ public class ActivityMusic extends AppCompatActivity
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
 
+        if (savedInstanceState != null) {
+            mNameFragmentSelect = savedInstanceState.getString("name_fragment_select");
+            if (mNameFragmentSelect != null) {
+                if (mNameFragmentSelect.equals("FavoriteSong")) {
+                    mSelectedFragment = mFravoriteSongsFragment;
+                    navigationView.setCheckedItem(R.id.nav_favorite);
+
+                } else {
+                    mSelectedFragment = mAllSongsFragment;
+                    navigationView.setCheckedItem(R.id.nav_list_music);
+                }
+            } else {
+                mSelectedFragment = mAllSongsFragment;
+                navigationView.setCheckedItem(R.id.nav_list_music);
+            }
+        } else {
+            mSelectedFragment = mAllSongsFragment;
+            navigationView.setCheckedItem(R.id.nav_list_music);
+        }
+
         int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_PORTRAIT) {
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mSelectedFragment).commit();
-
         } else {
             getSupportFragmentManager().popBackStack();
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_b, mMediaPlaybackFragment).commit();
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mSelectedFragment).commit();
         }
+
+//        if (mMediaPlaybackService!=null){
+//            update();
+//            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
+//                @Override
+//                public void onUpdate() {
+//                    update();
+//                }
+//
+//            });
+//        }
     }
 
     @Override
@@ -113,9 +150,11 @@ public class ActivityMusic extends AppCompatActivity
         if (id == R.id.nav_list_music) {
             mSelectedFragment = mAllSongsFragment;
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mSelectedFragment).commit();
+            mNameFragmentSelect = "AllSong";
         } else if (id == R.id.nav_favorite) {
             mSelectedFragment = mFravoriteSongsFragment;
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mSelectedFragment).commit();
+            mNameFragmentSelect = "FavoriteSong";
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -199,12 +238,34 @@ public class ActivityMusic extends AppCompatActivity
         findViewById(R.id.layoutPlayMusic).setVisibility(View.GONE);
     }
 
-    void setServiceConnectListenner1(IServiceConnectListenner1 serviceConnectListenner){
+    void setServiceConnectListenner1(IServiceConnectListenner1 serviceConnectListenner) {
         this.mServiceConnectListenner1 = serviceConnectListenner;
     }
 
-    void setServiceConnectListenner2(IServiceConnectListenner2 serviceConnectListenner){
+    void setServiceConnectListenner2(IServiceConnectListenner2 serviceConnectListenner) {
         this.mServiceConnectListenner2 = serviceConnectListenner;
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("name_fragment_select", mNameFragmentSelect);
+    }
+
+    private void update() {
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            Log.d("TienNAb", "update: ");
+            Log.d("TienNAb", "update: "+mMediaPlaybackFragment);
+//            if (mMediaPlaybackFragment != null){
+//                ((MediaPlaybackFragment) mMediaPlaybackFragment).update();
+//            }
+            ((BaseSongListFragment) mSelectedFragment).update();
+        } else {
+            Log.d("TienNAb", "update: ");
+            ((BaseSongListFragment) mSelectedFragment).update();
+            ((MediaPlaybackFragment) mMediaPlaybackFragment).update();
+        }
     }
 
     //interface

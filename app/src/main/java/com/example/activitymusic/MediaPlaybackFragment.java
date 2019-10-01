@@ -34,37 +34,10 @@ public class MediaPlaybackFragment extends Fragment {
     AllSongsProvider mAllSongsProvider;
     private static final String TAG = "abc";
 
-//    ServiceConnection mServiceConnection = new ServiceConnection() {
-//        @Override
-//        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-//            MediaPlaybackService.MediaPlaybackServiceBinder mediaPlaybackServiceBinder = (MediaPlaybackService.MediaPlaybackServiceBinder) iBinder;
-//            mMediaPlaybackService = mediaPlaybackServiceBinder.getService();
-//            update();
-//            mMediaPlaybackService.mediaPlaybackFragmentListenChangeStatus(new MediaPlaybackService.IServiceCallbackMediaPlaybackFragment() {
-//                @Override
-//                public void onUpdate() {
-//                    update();
-//                }
-//            });
-//            mCheckService = true;
-//            if (!mMediaPlaybackService.isMusicPlay()) {
-//                if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")){
-//                    updateSaveSong();
-//                }
-//            }
-//        }
-//
-//        @Override
-//        public void onServiceDisconnected(ComponentName componentName) {
-//            mCheckService = false;
-//        }
-//    };
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAllSongsProvider = new AllSongsProvider(getContext());
-//        connectService();
 
     }
 
@@ -80,21 +53,11 @@ public class MediaPlaybackFragment extends Fragment {
         getMusicActivity().setServiceConnectListenner2(new ActivityMusic.IServiceConnectListenner2() {
             @Override
             public void onConnect() {
-                Log.d(TAG, "MediaPlayback: ");
                 mMediaPlaybackService = getMusicActivity().mMediaPlaybackService;
                 mCheckService = true;
-                update();
-                mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
-                    @Override
-                    public void onUpdate() {
-                        update();
-                    }
-
-                });
-
                 int orientation = getResources().getConfiguration().orientation;
-                if (orientation == Configuration.ORIENTATION_LANDSCAPE){
-                    mMediaPlaybackService.mediaPlaybackFragmentListenChangeStatus(new MediaPlaybackService.IServiceCallbackMediaPlaybackFragment() {
+                if (orientation == Configuration.ORIENTATION_PORTRAIT){
+                    mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
                         @Override
                         public void onUpdate() {
                             update();
@@ -112,30 +75,16 @@ public class MediaPlaybackFragment extends Fragment {
         });
 
         if (mCheckService) {
-//            update();
-////            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
-////                @Override
-////                public void onUpdate() {
-////                    update();
-////                }
-////            });
-//
-//            mMediaPlaybackService.mediaPlaybackFragmentListenChangeStatus(new MediaPlaybackService.IServiceCallbackMediaPlaybackFragment() {
-//                @Override
-//                public void onUpdate() {
-//                    update();
-//                }
-//            });
 
             update();
-            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
+            /*mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
                 @Override
                 public void onUpdate() {
                     update();
                 }
-            });
+            });*/
 
-            int orientation = getResources().getConfiguration().orientation;
+            /*int orientation = getResources().getConfiguration().orientation;
             if (orientation == Configuration.ORIENTATION_LANDSCAPE){
                 mMediaPlaybackService.mediaPlaybackFragmentListenChangeStatus(new MediaPlaybackService.IServiceCallbackMediaPlaybackFragment() {
                     @Override
@@ -143,7 +92,7 @@ public class MediaPlaybackFragment extends Fragment {
                         update();
                     }
                 });
-            }
+            }*/
 
             if (!mMediaPlaybackService.isMusicPlay()) {
                 if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")) {
@@ -171,36 +120,23 @@ public class MediaPlaybackFragment extends Fragment {
         }
 
         if (mCheckService) {
-//            update();
-////            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
-////                @Override
-////                public void onUpdate() {
-////                    update();
-////                }
-////            });
-//            mMediaPlaybackService.mediaPlaybackFragmentListenChangeStatus(new MediaPlaybackService.IServiceCallbackMediaPlaybackFragment() {
-//                @Override
-//                public void onUpdate() {
-//                    update();
-//                }
-//            });
 
             update();
-            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
+            /*mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
                 @Override
                 public void onUpdate() {
                     update();
                 }
-            });
+            });*/
 
-            if (orientation == Configuration.ORIENTATION_LANDSCAPE){
+            /*if (orientation == Configuration.ORIENTATION_LANDSCAPE){
                 mMediaPlaybackService.mediaPlaybackFragmentListenChangeStatus(new MediaPlaybackService.IServiceCallbackMediaPlaybackFragment() {
                     @Override
                     public void onUpdate() {
                         update();
                     }
                 });
-            }
+            }*/
         }
 
         btImgPlay.setOnClickListener(new Button.OnClickListener() {
@@ -367,14 +303,4 @@ public class MediaPlaybackFragment extends Fragment {
         tvArtist.setText(mMediaPlaybackService.getArtist());
     }
 
-//    public void connectService() {
-//        Intent it = new Intent(getContext(), MediaPlaybackService.class);
-//        getActivity().bindService(it, mServiceConnection, 0);
-//    }
-//
-//    @Override
-//    public void onDestroy() {
-//        super.onDestroy();
-//        getActivity().unbindService(mServiceConnection);
-//    }
 }

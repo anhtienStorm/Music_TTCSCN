@@ -91,9 +91,13 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
                 int id = Integer.parseInt(c.getString(c.getColumnIndex(FavoriteSongsProvider._ID)));
                 int id_provider = Integer.parseInt(c.getString(c.getColumnIndex(FavoriteSongsProvider.ID_PROVIDER)));
 
-                Song song = mAllSongList.get(id_provider-1);
-                Song newSong = new Song(id,song.getNameSong(),song.getPathSong(),song.getSinger(),song.getAlbumID(),song.getDuration());
-                list.add(newSong);
+                Song song = getSongFromID(id_provider,mAllSongList);
+                if (song != null){
+                    Song newSong = new Song(id,song.getNameSong(),song.getPathSong(),song.getSinger(),song.getAlbumID(),song.getDuration());
+                    list.add(newSong);
+                } else {
+                    //..... remove song in favorite song list
+                }
 
 //                String title = c.getString(indexTitleColumn);
 //                String data = c.getString(indexDataColumn);
@@ -120,8 +124,8 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
         ArrayList<Song> list = new ArrayList<>();
         Cursor c = getActivity().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null, null, null, null);
         if (c.moveToFirst()){
-            int id = 1;
             do {
+                int id = Integer.parseInt(c.getString(c.getColumnIndex(MediaStore.Audio.Media._ID)));
                 String title = c.getString(c.getColumnIndex(MediaStore.Audio.Media.TITLE));
                 String data = c.getString(c.getColumnIndex(MediaStore.Audio.Media.DATA));
                 String artist = c.getString(c.getColumnIndex(MediaStore.Audio.Media.ARTIST));
@@ -131,9 +135,16 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
                 String timeSong = formatTimeSong.format(duration);
                 Song song = new Song(id, title, data, artist, albumid, timeSong);
                 list.add(song);
-                id++;
             } while (c.moveToNext());
         }
         return list;
+    }
+
+    public Song getSongFromID(int id, ArrayList<Song> list){
+        for (int i = 0; i < list.size(); i++) {
+            if (id == list.get(i).getId())
+                return list.get(i);
+        }
+        return null;
     }
 }

@@ -12,7 +12,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
-import android.util.Log;
 
 import java.util.HashMap;
 
@@ -58,7 +57,7 @@ public class FavoriteSongsProvider extends ContentProvider {
 //                    " albumid TEXT," +
 //                    " duration TEXT);";
 
-    static final String CREATE_DB_TABLE_INFORMATION_SONG =
+    static final String CREATE_DB_TABLE_INFORMATION_FAVORITE_SONG =
             " CREATE TABLE " + TABLE_NAME +
                     " (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     " id_provider INTEGER," +
@@ -177,8 +176,7 @@ public class FavoriteSongsProvider extends ContentProvider {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-            Log.d("aaaa", "onCreate: ");
-            db.execSQL(CREATE_DB_TABLE_INFORMATION_SONG);
+            db.execSQL(CREATE_DB_TABLE_INFORMATION_FAVORITE_SONG);
         }
 
         @Override
