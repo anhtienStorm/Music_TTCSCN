@@ -72,7 +72,6 @@ public class ActivityMusic extends AppCompatActivity
             startService();
             connectService();
         }
-        Toast.makeText(this, "start" + mMediaPlaybackService, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -121,17 +120,6 @@ public class ActivityMusic extends AppCompatActivity
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_b, mMediaPlaybackFragment).commit();
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mSelectedFragment).commit();
         }
-
-//        if (mMediaPlaybackService!=null){
-//            update();
-//            mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
-//                @Override
-//                public void onUpdate() {
-//                    update();
-//                }
-//
-//            });
-//        }
     }
 
     @Override
@@ -256,9 +244,9 @@ public class ActivityMusic extends AppCompatActivity
     private void update() {
         int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-//            if (mMediaPlaybackFragment != null){
-//                ((MediaPlaybackFragment) mMediaPlaybackFragment).update();
-//            }
+            if (mMediaPlaybackFragment.getView() != null){
+                ((MediaPlaybackFragment) mMediaPlaybackFragment).update();
+            }
             ((BaseSongListFragment) mSelectedFragment).update();
         } else {
             ((BaseSongListFragment) mSelectedFragment).update();

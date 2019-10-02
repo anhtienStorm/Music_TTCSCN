@@ -269,56 +269,50 @@ public class MediaPlaybackService extends Service {
 
     public void nextSong() {
         if (isMusicPlay()) {
-            if (getDuration() < 3000) {
-                preparePlay();
-            } else {
-                if (mShuffle == 0) {
-                    if (mIndexofPlayingSong == mPlayingSongList.size() - 1) {
-                        mIndexofPlayingSong = 0;
-                        mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
-                    } else {
-                        mIndexofPlayingSong += 1;
-                        mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
-                    }
+
+            if (mShuffle == 0) {
+                if (mIndexofPlayingSong == mPlayingSongList.size() - 1) {
+                    mIndexofPlayingSong = 0;
+                    mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
                 } else {
-                    Random rd = new Random();
-                    mIndexofPlayingSong = rd.nextInt(mPlayingSongList.size());
+                    mIndexofPlayingSong += 1;
                     mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
                 }
-                preparePlay();
+            } else {
+                Random rd = new Random();
+                mIndexofPlayingSong = rd.nextInt(mPlayingSongList.size());
+                mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
             }
+            preparePlay();
         }
     }
 
     public void nextSongNoloop() {
         if (isMusicPlay()) {
-            if (getDuration() < 3000) {
-                preparePlay();
-            } else {
-                if (mShuffle == 0) {
-                    if (mIndexofPlayingSong == mPlayingSongList.size() - 1) {
-                        stop();
-                        playSong(mPlayingSongList, mPLayingSong);
-                        preparePlay();
-                        pause();
-                    } else {
-                        mIndexofPlayingSong += 1;
-                        mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
-                        preparePlay();
-                    }
+
+            if (mShuffle == 0) {
+                if (mIndexofPlayingSong == mPlayingSongList.size() - 1) {
+                    stop();
+                    playSong(mPlayingSongList, mPLayingSong);
+                    preparePlay();
+                    pause();
                 } else {
-                    Random rd = new Random();
-                    mIndexofPlayingSong = rd.nextInt(mPlayingSongList.size());
+                    mIndexofPlayingSong += 1;
                     mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
                     preparePlay();
                 }
+            } else {
+                Random rd = new Random();
+                mIndexofPlayingSong = rd.nextInt(mPlayingSongList.size());
+                mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
+                preparePlay();
             }
         }
     }
 
     public void previousSong() {
         if (isMusicPlay()) {
-            if (getDuration() < 3000) {
+            if (getCurrentDuration() > 3000) {
                 preparePlay();
             } else {
                 if (mShuffle == 0) {
@@ -348,6 +342,7 @@ public class MediaPlaybackService extends Service {
             showToast("Shuffle Off");
         }
         mServiceCallback.onUpdate();
+        saveData();
     }
 
     public void loopSong() {
@@ -362,6 +357,7 @@ public class MediaPlaybackService extends Service {
             showToast("No Loop");
         }
         mServiceCallback.onUpdate();
+        saveData();
     }
 
     public String getTotalTime() {
@@ -434,5 +430,4 @@ public class MediaPlaybackService extends Service {
     interface IServiceCallback {
         void onUpdate();
     }
-
 }

@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,11 +28,6 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
     static final String CONTENT_PATH = "backupdata";
     static final String URL = "content://" + AUTHORITY + "/" + CONTENT_PATH;
     static final Uri CONTENT_URI = Uri.parse(URL);
-
-    static final String _ID = "_id";
-    static final String ID_PROVIDER = "id_provider";
-    static final String IS_FAVORITE = "is_favorite";
-    static final String COUNT_OF_PLAY = "count_of_play";
 
     @Nullable
     @Override
@@ -53,15 +49,14 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
 
         if (c.moveToFirst()){
             do {
-                int id = Integer.parseInt(c.getString(c.getColumnIndex(FavoriteSongsProvider._ID)));
+                //int id = Integer.parseInt(c.getString(c.getColumnIndex(FavoriteSongsProvider._ID)));
                 int id_provider = Integer.parseInt(c.getString(c.getColumnIndex(FavoriteSongsProvider.ID_PROVIDER)));
 
                 Song song = getSongFromID(id_provider,mAllSongList);
                 if (song != null){
-//                    Song newSong = new Song(id_provider,song.getNameSong(),song.getPathSong(),song.getSinger(),song.getAlbumID(),song.getDuration());
                     list.add(song);
                 } else {
-                    //..... remove song in favorite song list
+                    deleteSongFromFavoriteSongsList(id_provider);
                 }
             } while (c.moveToNext());
         }
@@ -103,5 +98,10 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
                 return list.get(i);
         }
         return null;
+    }
+
+    public void deleteSongFromFavoriteSongsList(int id){
+        getActivity().getContentResolver().delete(FavoriteSongsProvider.CONTENT_URI,FavoriteSongsProvider.ID_PROVIDER+" = "+id, null);
+        //Toast.makeText(getActivity(), "Deleted ID_PROVIDER "+id, Toast.LENGTH_SHORT).show();
     }
 }

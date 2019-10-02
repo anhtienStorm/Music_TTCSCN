@@ -22,11 +22,6 @@ public class FavoriteSongsProvider extends ContentProvider {
     static final Uri CONTENT_URI = Uri.parse(URL);
 
     static final String _ID = "_id";
-//    static final String TITLE = "title";
-//    static final String DATA = "data";
-//    static final String ALBUM_ID = "albumid";
-//    static final String ARTIST = "artist";
-//    static final String DURATION = "duration";
     static final String ID_PROVIDER = "id_provider";
     static final String IS_FAVORITE = "is_favorite";
     static final String COUNT_OF_PLAY = "count_of_play";
@@ -48,14 +43,6 @@ public class FavoriteSongsProvider extends ContentProvider {
     static final String DATABASE_NAME = "FavoriteSongsDatabase";
     static final String TABLE_NAME = "InfomationFavoriteSongs";
     static final int DATABASE_VERSION = 2;
-//    static final String CREATE_DB_TABLE_INFORMATION_SONG =
-//            " CREATE TABLE " + TABLE_NAME +
-//                    " (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-//                    " title TEXT," +
-//                    " data TEXT," +
-//                    " artist TEXT," +
-//                    " albumid TEXT," +
-//                    " duration TEXT);";
 
     static final String CREATE_DB_TABLE_INFORMATION_FAVORITE_SONG =
             " CREATE TABLE " + TABLE_NAME +

@@ -1,6 +1,8 @@
 package com.example.activitymusic;
 
+import android.content.ContentValues;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -11,6 +13,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 public class MediaPlaybackFragment extends Fragment {
 
@@ -27,7 +31,6 @@ public class MediaPlaybackFragment extends Fragment {
     MediaPlaybackService mMediaPlaybackService;
     boolean mCheckService = false;
     AllSongsProvider mAllSongsProvider;
-    private static final String TAG = "abc";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,15 +53,6 @@ public class MediaPlaybackFragment extends Fragment {
             public void onConnect() {
                 mMediaPlaybackService = getMusicActivity().mMediaPlaybackService;
                 mCheckService = true;
-                int orientation = getResources().getConfiguration().orientation;
-                if (orientation == Configuration.ORIENTATION_PORTRAIT){
-                    mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
-                        @Override
-                        public void onUpdate() {
-                            update();
-                        }
-                    });
-                }
 
                 if (!mMediaPlaybackService.isMusicPlay()) {
                     if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")) {
@@ -72,23 +66,6 @@ public class MediaPlaybackFragment extends Fragment {
         if (mCheckService) {
 
             update();
-            /*mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
-                @Override
-                public void onUpdate() {
-                    update();
-                }
-            });*/
-
-            /*int orientation = getResources().getConfiguration().orientation;
-            if (orientation == Configuration.ORIENTATION_LANDSCAPE){
-                mMediaPlaybackService.mediaPlaybackFragmentListenChangeStatus(new MediaPlaybackService.IServiceCallbackMediaPlaybackFragment() {
-                    @Override
-                    public void onUpdate() {
-                        update();
-                    }
-                });
-            }*/
-
             if (!mMediaPlaybackService.isMusicPlay()) {
                 if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")) {
                     mMediaPlaybackService.loadData();
@@ -96,8 +73,6 @@ public class MediaPlaybackFragment extends Fragment {
                 }
             }
         }
-
-        Log.d(TAG, "mediaPlayback: "+mMediaPlaybackService);
     }
 
     @Nullable
@@ -115,23 +90,7 @@ public class MediaPlaybackFragment extends Fragment {
         }
 
         if (mCheckService) {
-
             update();
-            /*mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
-                @Override
-                public void onUpdate() {
-                    update();
-                }
-            });*/
-
-            /*if (orientation == Configuration.ORIENTATION_LANDSCAPE){
-                mMediaPlaybackService.mediaPlaybackFragmentListenChangeStatus(new MediaPlaybackService.IServiceCallbackMediaPlaybackFragment() {
-                    @Override
-                    public void onUpdate() {
-                        update();
-                    }
-                });
-            }*/
         }
 
         btImgPlay.setOnClickListener(new Button.OnClickListener() {
@@ -181,15 +140,45 @@ public class MediaPlaybackFragment extends Fragment {
             }
         });
 
+        btImgLike.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (loadFavoriteStatus(mMediaPlaybackService.getId()) == 2) {
+                    setDefaultFavoriteStatus(mMediaPlaybackService.getId());
+                    btImgLike.setImageResource(R.drawable.ic_like);
+                    btImgDislike.setImageResource(R.drawable.ic_dislike);
+                    Toast.makeText(getActivity(), "Unliked Song", Toast.LENGTH_SHORT).show();
+                } else {
+                    likeSong(mMediaPlaybackService.getId());
+                    btImgLike.setImageResource(R.drawable.ic_liked_black_24dp);
+                    btImgDislike.setImageResource(R.drawable.ic_dislike);
+                }
+            }
+        });
+
+        btImgDislike.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (loadFavoriteStatus(mMediaPlaybackService.getId()) == 1) {
+                    setDefaultFavoriteStatus(mMediaPlaybackService.getId());
+                    btImgLike.setImageResource(R.drawable.ic_like);
+                    btImgDislike.setImageResource(R.drawable.ic_dislike);
+                    Toast.makeText(getActivity(), "Undisliked Song", Toast.LENGTH_SHORT).show();
+                } else {
+                    dislikeSong(mMediaPlaybackService.getId());
+                    btImgDislike.setImageResource(R.drawable.ic_disliked_black_24dp);
+                    btImgLike.setImageResource(R.drawable.ic_like);
+                }
+            }
+        });
+
         seekBarSong.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
             }
 
             @Override
@@ -283,6 +272,16 @@ public class MediaPlaybackFragment extends Fragment {
             btImgShuffle.setImageResource
                     (R.drawable.ic_shuffle_orange_24dp);
         }
+        if (loadFavoriteStatus(mMediaPlaybackService.getId()) == 2) {
+            btImgLike.setImageResource(R.drawable.ic_liked_black_24dp);
+            btImgDislike.setImageResource(R.drawable.ic_dislike);
+        } else if (loadFavoriteStatus(mMediaPlaybackService.getId()) == 1) {
+            btImgDislike.setImageResource(R.drawable.ic_disliked_black_24dp);
+            btImgLike.setImageResource(R.drawable.ic_like);
+        } else {
+            btImgLike.setImageResource(R.drawable.ic_like);
+            btImgDislike.setImageResource(R.drawable.ic_dislike);
+        }
     }
 
     public void updateSaveSong() {
@@ -296,6 +295,46 @@ public class MediaPlaybackFragment extends Fragment {
 
         tvNameSong.setText(mMediaPlaybackService.getNameSong());
         tvArtist.setText(mMediaPlaybackService.getArtist());
+        if (loadFavoriteStatus(mMediaPlaybackService.getId()) == 2) {
+            btImgLike.setImageResource(R.drawable.ic_liked_black_24dp);
+            btImgDislike.setImageResource(R.drawable.ic_dislike);
+        } else if (loadFavoriteStatus(mMediaPlaybackService.getId()) == 1) {
+            btImgDislike.setImageResource(R.drawable.ic_disliked_black_24dp);
+            btImgLike.setImageResource(R.drawable.ic_like);
+        } else {
+            btImgLike.setImageResource(R.drawable.ic_like);
+            btImgDislike.setImageResource(R.drawable.ic_dislike);
+        }
     }
 
+    public void likeSong(int id) {
+        ContentValues values = new ContentValues();
+        values.put(FavoriteSongsProvider.IS_FAVORITE, 2);
+        getActivity().getContentResolver().update(FavoriteSongsProvider.CONTENT_URI, values, "ID_PROVIDER = " + id, null);
+        Toast.makeText(getActivity(), "Liked Song", Toast.LENGTH_SHORT).show();
+    }
+
+    public void dislikeSong(int id) {
+        ContentValues values = new ContentValues();
+        values.put(FavoriteSongsProvider.IS_FAVORITE, 1);
+        getActivity().getContentResolver().update(FavoriteSongsProvider.CONTENT_URI, values, "ID_PROVIDER = " + id, null);
+        Toast.makeText(getActivity(), "Disliked Song", Toast.LENGTH_SHORT).show();
+    }
+
+    public void setDefaultFavoriteStatus(int id) {
+        ContentValues values = new ContentValues();
+        values.put(FavoriteSongsProvider.IS_FAVORITE, 0);
+        getActivity().getContentResolver().update(FavoriteSongsProvider.CONTENT_URI, values, "ID_PROVIDER = " + id, null);
+    }
+
+    public int loadFavoriteStatus(int id) {
+        int isFavorite = 0;
+        Cursor c = getActivity().getContentResolver().query(FavoriteSongsProvider.CONTENT_URI, null, FavoriteSongsProvider.ID_PROVIDER + " = " + id, null, null);
+        if (c.moveToFirst()) {
+            do {
+                isFavorite = Integer.parseInt(c.getString(c.getColumnIndex(FavoriteSongsProvider.IS_FAVORITE)));
+            } while (c.moveToNext());
+        }
+        return isFavorite;
+    }
 }

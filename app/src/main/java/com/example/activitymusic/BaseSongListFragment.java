@@ -1,7 +1,10 @@
 package com.example.activitymusic;
 
+import android.content.ContentValues;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,6 +15,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -133,6 +137,22 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
         mMediaPlaybackService.playSong(mListSong, mListSong.get(position));
         mAdapter.setService(mMediaPlaybackService);
         update();
+        int favorite = loadFavoriteStatus(mMediaPlaybackService.getId());
+        int count = loadCountOfPlayStatus(mMediaPlaybackService.getId());
+
+        if (favorite == 0) {
+            if (count == 2) {
+                addToFavoriteSongsList(mMediaPlaybackService.getId());
+                Toast.makeText(getActivity(), "Count Of Play Three times\nAdd to Favorite Songs List", Toast.LENGTH_SHORT).show();
+                setDefaultCountOfPlayStatus(mMediaPlaybackService.getId());
+            } else {
+                increaseCountOfPlay(mMediaPlaybackService.getId());
+            }
+        } else {
+            if (count != 0) {
+                setDefaultCountOfPlayStatus(mMediaPlaybackService.getId());
+            }
+        }
     }
 
     public void setListSong(ArrayList<Song> listSong) {
@@ -150,6 +170,7 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
     public void update() {
         if (mMediaPlaybackService.isMusicPlay()) {
             mAdapter.notifyDataSetChanged();
+            //mRecyclerView.scrollToPosition(mMediaPlaybackService.getIndexofPlayingSong());
 
             if (mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()) == null) {
                 imgMainSong.setImageResource(R.drawable.icon_default_song);
@@ -206,4 +227,45 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
         });
     }
 
+    public void increaseCountOfPlay(int id) {
+        int count = loadCountOfPlayStatus(id);
+        count++;
+        ContentValues values = new ContentValues();
+        values.put(FavoriteSongsProvider.COUNT_OF_PLAY, count);
+        getActivity().getContentResolver().update(FavoriteSongsProvider.CONTENT_URI, values, "ID_PROVIDER = " + id, null);
+    }
+
+    public int loadFavoriteStatus(int id) {
+        int isFavorite = 0;
+        Cursor c = getActivity().getContentResolver().query(FavoriteSongsProvider.CONTENT_URI, null, FavoriteSongsProvider.ID_PROVIDER + " = " + id, null, null);
+        if (c.moveToFirst()) {
+            do {
+                isFavorite = Integer.parseInt(c.getString(c.getColumnIndex(FavoriteSongsProvider.IS_FAVORITE)));
+            } while (c.moveToNext());
+        }
+        return isFavorite;
+    }
+
+    public int loadCountOfPlayStatus(int id) {
+        int countOfPlay = 0;
+        Cursor c = getActivity().getContentResolver().query(FavoriteSongsProvider.CONTENT_URI, null, FavoriteSongsProvider.ID_PROVIDER + " = " + id, null, null);
+        if (c.moveToFirst()) {
+            do {
+                countOfPlay = Integer.parseInt(c.getString(c.getColumnIndex(FavoriteSongsProvider.COUNT_OF_PLAY)));
+            } while (c.moveToNext());
+        }
+        return countOfPlay;
+    }
+
+    public void setDefaultCountOfPlayStatus(int id) {
+        ContentValues values = new ContentValues();
+        values.put(FavoriteSongsProvider.COUNT_OF_PLAY, 0);
+        getActivity().getContentResolver().update(FavoriteSongsProvider.CONTENT_URI, values, "ID_PROVIDER = " + id, null);
+    }
+
+    public void addToFavoriteSongsList(int id) {
+        ContentValues values = new ContentValues();
+        values.put(FavoriteSongsProvider.IS_FAVORITE, 2);
+        getActivity().getContentResolver().update(FavoriteSongsProvider.CONTENT_URI, values, "ID_PROVIDER = " + id, null);
+    }
 }
