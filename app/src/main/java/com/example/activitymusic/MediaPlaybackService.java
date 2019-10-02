@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
@@ -39,7 +40,6 @@ public class MediaPlaybackService extends Service {
     private IServiceCallback mServiceCallback;
     private int mLoopStatus = 0;
     private int mShuffle = 0;
-    private AllSongsProvider mAllSongsProvider;
     private SharedPreferences mSharedPreferences;
     private String sharePrefFile = "SongSharedPreferences";
 
@@ -56,7 +56,6 @@ public class MediaPlaybackService extends Service {
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(musicServiceChannel);
         }
-        mAllSongsProvider = new AllSongsProvider(getApplicationContext());
         mSharedPreferences = getSharedPreferences(sharePrefFile, MODE_PRIVATE);
     }
 
@@ -115,7 +114,7 @@ public class MediaPlaybackService extends Service {
             nextPendingIntent = PendingIntent.getForegroundService(this, 0, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         }
 
-        Bitmap bitmap = mAllSongsProvider.getBitmapAlbumArt(getAlbumID());
+        Bitmap bitmap = loadImageFromPath(getPathSong());
 
         notificationLayout.setOnClickPendingIntent(R.id.notify_previous, previousPendingIntent);
         notificationLayout.setOnClickPendingIntent(R.id.notify_play, playPendingIntent);
@@ -135,13 +134,7 @@ public class MediaPlaybackService extends Service {
                 .setSmallIcon(R.drawable.icon_notification)
 //                .setContentTitle(getNameSong())
 //                .setContentText(getArtist())
-//                .setLargeIcon(bitmap == null ? BitmapFactory.decodeResource(getResources(), R.drawable.icon_default_song) : bitmap)
                 .setPriority(2)
-//                .addAction(R.drawable.ic_skip_previous_black_24dp, "previous", previousPendingIntent)
-//                .addAction(isPlaying() ? R.drawable.ic_pause_circle_filled_orange_24dp : R.drawable.ic_play_circle_filled_orange_24dp, "play", playPendingIntent)
-//                .addAction(R.drawable.ic_skip_next_black_24dp, "next", nextPendingIntent)
-//                .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
-//                        .setShowActionsInCompactView(0, 1, 2))
                 .setCustomContentView(subNotificationLayout)
                 .setCustomBigContentView(notificationLayout)
                 .setContentIntent(pendingIntent)
@@ -173,6 +166,10 @@ public class MediaPlaybackService extends Service {
 
     public String getArtist() {
         return mPLayingSong.getSinger();
+    }
+
+    public String getPathSong() {
+        return mPLayingSong.getPathSong();
     }
 
     public String getAlbumID() {
@@ -233,32 +230,46 @@ public class MediaPlaybackService extends Service {
 
     public void preparePlay() {
         Uri uri = Uri.parse(mPLayingSong.getPathSong());
+
         if (mMediaPlayer != null) {
             if (mMediaPlayer.isPlaying()) {
                 mMediaPlayer.stop();
             }
         }
 
-        mMediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
-        mMediaPlayer.start();
-        showNotification();
-        mIndexofPlayingSong = mPlayingSongList.indexOf(mPLayingSong);
-        mServiceCallback.onUpdate();
+        try {
+            mMediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-                if (mLoopStatus == 0) {
-                    nextSongNoloop();
-                } else if (mLoopStatus == 1) {
-                    nextSong();
-                } else {
-                    playSong(mPlayingSongList, mPLayingSong);
-                }
+        if (mMediaPlayer == null) {
+            showToast("\t\t\t\t\tSong not exist !\nPlease chose different Song");
+            if (mLoopStatus == 0) {
+                nextSongNoloop();
+            } else if (mLoopStatus == 1) {
+                nextSong();
             }
-        });
+        } else {
+            mMediaPlayer.start();
+            showNotification();
+            mIndexofPlayingSong = mPlayingSongList.indexOf(mPLayingSong);
+            mServiceCallback.onUpdate();
 
-        saveData();
+            mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mediaPlayer) {
+                    if (mLoopStatus == 0) {
+                        nextSongNoloop();
+                    } else if (mLoopStatus == 1) {
+                        nextSong();
+                    } else {
+                        playSong(mPlayingSongList, mPLayingSong);
+                    }
+                }
+            });
+            saveData();
+        }
     }
 
     public void playSong(final ArrayList<Song> listSong, final Song song) {
@@ -384,6 +395,17 @@ public class MediaPlaybackService extends Service {
                 mPLayingSong = mPlayingSongList.get(i);
             }
         }
+    }
+
+    public Bitmap loadImageFromPath(String path) {
+        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+        try {
+            mediaMetadataRetriever.setDataSource(path);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        byte[] data = mediaMetadataRetriever.getEmbeddedPicture();
+        return data == null ? null : BitmapFactory.decodeByteArray(data, 0, data.length);
     }
 
     void listenChangeStatus(IServiceCallback callbackService) {

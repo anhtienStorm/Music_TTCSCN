@@ -3,6 +3,9 @@ package com.example.activitymusic;
 import android.content.ContentValues;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -36,13 +39,11 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
     TextView tvNameSong, tvArtist;
     ImageView imgMainSong;
     boolean mCheckService = false;
-    AllSongsProvider mAllSongsProvider;
     private ArrayList<Song> mListSong = new ArrayList<>();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAllSongsProvider = new AllSongsProvider(getContext());
         setHasOptionsMenu(true);
     }
 
@@ -143,7 +144,7 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
         if (favorite == 0) {
             if (count == 2) {
                 addToFavoriteSongsList(mMediaPlaybackService.getId());
-                Toast.makeText(getActivity(), "Count Of Play Three times\nAdd to Favorite Songs List", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "\tPlay Three times\nAdd to Favorite Songs List", Toast.LENGTH_SHORT).show();
                 setDefaultCountOfPlayStatus(mMediaPlaybackService.getId());
             } else {
                 increaseCountOfPlay(mMediaPlaybackService.getId());
@@ -172,10 +173,10 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
             mAdapter.notifyDataSetChanged();
             //mRecyclerView.scrollToPosition(mMediaPlaybackService.getIndexofPlayingSong());
 
-            if (mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()) == null) {
+            if (loadImageFromPath(mMediaPlaybackService.getPathSong()) == null) {
                 imgMainSong.setImageResource(R.drawable.icon_default_song);
             } else {
-                imgMainSong.setImageBitmap(mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()));
+                imgMainSong.setImageBitmap(loadImageFromPath(mMediaPlaybackService.getPathSong()));
             }
 
             tvNameSong.setText(mMediaPlaybackService.getNameSong());
@@ -191,10 +192,10 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
     public void updateSaveSong() {
         mAdapter.notifyDataSetChanged();
 
-        if (mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()) == null) {
+        if (loadImageFromPath(mMediaPlaybackService.getPathSong()) == null) {
             imgMainSong.setImageResource(R.drawable.icon_default_song);
         } else {
-            imgMainSong.setImageBitmap(mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()));
+            imgMainSong.setImageBitmap(loadImageFromPath(mMediaPlaybackService.getPathSong()));
         }
 
         tvNameSong.setText(mMediaPlaybackService.getNameSong());
@@ -225,6 +226,17 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
                 return false;
             }
         });
+    }
+
+    public Bitmap loadImageFromPath(String path){
+        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+        try {
+            mediaMetadataRetriever.setDataSource(path);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        byte[] data = mediaMetadataRetriever.getEmbeddedPicture();
+        return data == null ? null : BitmapFactory.decodeByteArray(data, 0, data.length);
     }
 
     public void increaseCountOfPlay(int id) {

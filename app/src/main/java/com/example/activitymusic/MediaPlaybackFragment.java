@@ -3,6 +3,9 @@ package com.example.activitymusic;
 import android.content.ContentValues;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -30,14 +33,6 @@ public class MediaPlaybackFragment extends Fragment {
     TextView tvNameSong, tvArtist, tvTotalTimeSong, tvTimeSong;
     MediaPlaybackService mMediaPlaybackService;
     boolean mCheckService = false;
-    AllSongsProvider mAllSongsProvider;
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mAllSongsProvider = new AllSongsProvider(getContext());
-
-    }
 
     @Override
     public void onResume() {
@@ -238,12 +233,12 @@ public class MediaPlaybackFragment extends Fragment {
 
     public void update() {
         if (mMediaPlaybackService.isMusicPlay()) {
-            if (mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()) == null) {
+            if (loadImageFromPath(mMediaPlaybackService.getPathSong()) == null) {
                 imgSongSmall.setImageResource(R.drawable.icon_default_song);
                 imgSong.setImageResource(R.drawable.icon_default_song);
             } else {
-                imgSong.setImageBitmap(mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()));
-                imgSongSmall.setImageBitmap(mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()));
+                imgSong.setImageBitmap(loadImageFromPath(mMediaPlaybackService.getPathSong()));
+                imgSongSmall.setImageBitmap(loadImageFromPath(mMediaPlaybackService.getPathSong()));
             }
 
             tvNameSong.setText(mMediaPlaybackService.getNameSong());
@@ -285,12 +280,12 @@ public class MediaPlaybackFragment extends Fragment {
     }
 
     public void updateSaveSong() {
-        if (mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()) == null) {
+        if (loadImageFromPath(mMediaPlaybackService.getPathSong()) == null) {
             imgSongSmall.setImageResource(R.drawable.icon_default_song);
             imgSong.setImageResource(R.drawable.icon_default_song);
         } else {
-            imgSong.setImageBitmap(mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()));
-            imgSongSmall.setImageBitmap(mAllSongsProvider.getBitmapAlbumArt(mMediaPlaybackService.getAlbumID()));
+            imgSong.setImageBitmap(loadImageFromPath(mMediaPlaybackService.getPathSong()));
+            imgSongSmall.setImageBitmap(loadImageFromPath(mMediaPlaybackService.getPathSong()));
         }
 
         tvNameSong.setText(mMediaPlaybackService.getNameSong());
@@ -305,6 +300,17 @@ public class MediaPlaybackFragment extends Fragment {
             btImgLike.setImageResource(R.drawable.ic_like);
             btImgDislike.setImageResource(R.drawable.ic_dislike);
         }
+    }
+
+    public Bitmap loadImageFromPath(String path){
+        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+        try {
+            mediaMetadataRetriever.setDataSource(path);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        byte[] data = mediaMetadataRetriever.getEmbeddedPicture();
+        return data == null ? null : BitmapFactory.decodeByteArray(data, 0, data.length);
     }
 
     public void likeSong(int id) {
