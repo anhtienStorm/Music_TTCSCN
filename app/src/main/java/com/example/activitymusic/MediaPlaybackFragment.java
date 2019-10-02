@@ -1,12 +1,8 @@
 package com.example.activitymusic;
 
-import android.content.ComponentName;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +15,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import java.text.SimpleDateFormat;
@@ -273,7 +268,7 @@ public class MediaPlaybackFragment extends Fragment {
                 btImgPlay.setImageResource(R.drawable.ic_play_circle_filled_orange_24dp);
             }
         }
-        int loop = mMediaPlaybackService.getmStatusLoop();
+        int loop = mMediaPlaybackService.getmLoopStatus();
         int shuffle = mMediaPlaybackService.getmShuffle();
         if (loop == 0) {
             btImgLoop.setImageResource(R.drawable.ic_repeat_white_24dp);

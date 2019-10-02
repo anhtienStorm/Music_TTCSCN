@@ -37,7 +37,7 @@ public class MediaPlaybackService extends Service {
     private Song mPLayingSong;
     private int mIndexofPlayingSong;
     private IServiceCallback mServiceCallback;
-    private int mStatusLoop = 0;
+    private int mLoopStatus = 0;
     private int mShuffle = 0;
     private AllSongsProvider mAllSongsProvider;
     private SharedPreferences mSharedPreferences;
@@ -195,8 +195,8 @@ public class MediaPlaybackService extends Service {
         return mIndexofPlayingSong;
     }
 
-    public int getmStatusLoop() {
-        return mStatusLoop;
+    public int getmLoopStatus() {
+        return mLoopStatus;
     }
 
     public int getmShuffle() {
@@ -248,9 +248,9 @@ public class MediaPlaybackService extends Service {
         mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
-                if (mStatusLoop == 0) {
+                if (mLoopStatus == 0) {
                     nextSongNoloop();
-                } else if (mStatusLoop == 1) {
+                } else if (mLoopStatus == 1) {
                     nextSong();
                 } else {
                     playSong(mPlayingSongList, mPLayingSong);
@@ -339,14 +339,14 @@ public class MediaPlaybackService extends Service {
     }
 
     public void loopSong() {
-        if (mStatusLoop == 0) {
-            mStatusLoop = 1;
+        if (mLoopStatus == 0) {
+            mLoopStatus = 1;
             showToast("Loop List");
-        } else if (mStatusLoop == 1) {
-            mStatusLoop = 2;
+        } else if (mLoopStatus == 1) {
+            mLoopStatus = 2;
             showToast("Loop One");
-        } else if (mStatusLoop == 2) {
-            mStatusLoop = 0;
+        } else if (mLoopStatus == 2) {
+            mLoopStatus = 0;
             showToast("No Loop");
         }
         mServiceCallback.onUpdate();
@@ -392,6 +392,8 @@ public class MediaPlaybackService extends Service {
         Gson gson = new Gson();
         String json = gson.toJson(mPlayingSongList);
         editor.putString("SONG_LIST", json);
+        editor.putInt("LoopStatus", mLoopStatus);
+        editor.putInt("ShuffleStatus", mShuffle);
         editor.apply();
     }
 
@@ -405,6 +407,8 @@ public class MediaPlaybackService extends Service {
             mPlayingSongList = new ArrayList<>();
         }
         setPreviousExitSong(mSharedPreferences.getInt("SONG_ID", 0));
+        mLoopStatus = mSharedPreferences.getInt("LoopStatus", 0);
+        mShuffle = mSharedPreferences.getInt("ShuffleStatus", 0);
     }
 
     // class
