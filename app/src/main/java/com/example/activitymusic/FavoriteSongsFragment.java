@@ -29,14 +29,6 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
     static final Uri CONTENT_URI = Uri.parse(URL);
 
     static final String _ID = "_id";
-//    static final String TITLE = "title";
-//    static final String DATA = "data";
-//    static final String ALBUM_ID = "albumid";
-//    static final String ARTIST = "artist";
-//    static final String DURATION = "duration";
-//    static final String FAVORITE = "favorite";
-//    static final String COUNT = "count";
-
     static final String ID_PROVIDER = "id_provider";
     static final String IS_FAVORITE = "is_favorite";
     static final String COUNT_OF_PLAY = "count_of_play";
@@ -48,33 +40,6 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
         getLoaderManager().initLoader(LOADER_ID, null, this);
         return super.onCreateView(inflater, container, savedInstanceState);
     }
-
-//    public ArrayList<Song> loadFavoriteSongs(){
-//        ArrayList<Song> list = new ArrayList<>();
-//        Cursor c = getContext().getContentResolver().query(CONTENT_URI, null, null, null,null);
-//
-//        int indexIdColumn = c.getColumnIndex(_ID);
-//        int indexTitleColumn = c.getColumnIndex(TITLE);
-//        int indexDataColumn = c.getColumnIndex(DATA);
-//        int indexArtistColumn = c.getColumnIndex(ARTIST);
-//        int indexAlbumIDColumn = c.getColumnIndex(ALBUM_ID);
-//        int indexDurationColumn = c.getColumnIndex(DURATION);
-//
-//        if (c.moveToFirst()){
-//            do {
-//                int id = Integer.parseInt(c.getString(indexIdColumn));
-//                String title = c.getString(indexTitleColumn);
-//                String data = c.getString(indexDataColumn);
-//                String artist = c.getString(indexArtistColumn);
-//                String album_id = c.getString(indexAlbumIDColumn);
-//                String duration = c.getString(indexDurationColumn);
-//                Song song = new Song(id,title,data,artist,album_id,duration);
-//                list.add(song);
-//            } while (c.moveToNext());
-//        }
-//
-//        return list;
-//    }
 
     @NonNull
     @Override
@@ -93,19 +58,11 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
 
                 Song song = getSongFromID(id_provider,mAllSongList);
                 if (song != null){
-                    Song newSong = new Song(id,song.getNameSong(),song.getPathSong(),song.getSinger(),song.getAlbumID(),song.getDuration());
-                    list.add(newSong);
+//                    Song newSong = new Song(id_provider,song.getNameSong(),song.getPathSong(),song.getSinger(),song.getAlbumID(),song.getDuration());
+                    list.add(song);
                 } else {
                     //..... remove song in favorite song list
                 }
-
-//                String title = c.getString(indexTitleColumn);
-//                String data = c.getString(indexDataColumn);
-//                String artist = c.getString(indexArtistColumn);
-//                String album_id = c.getString(indexAlbumIDColumn);
-//                String duration = c.getString(indexDurationColumn);
-//                Song song = new Song(id,title,data,artist,album_id,duration);
-//                list.add(song);
             } while (c.moveToNext());
         }
         mAdapter.updateList(list);

@@ -43,7 +43,12 @@ public class ActivityMusic extends AppCompatActivity
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             MediaPlaybackService.MediaPlaybackServiceBinder mediaPlaybackServiceBinder = (MediaPlaybackService.MediaPlaybackServiceBinder) iBinder;
             mMediaPlaybackService = mediaPlaybackServiceBinder.getService();
-           // update();
+            mServiceConnectListenner1.onConnect();
+            int orientation = getResources().getConfiguration().orientation;
+            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                mServiceConnectListenner2.onConnect();
+            }
+            update();
             mMediaPlaybackService.listenChangeStatus(new MediaPlaybackService.IServiceCallback() {
                 @Override
                 public void onUpdate() {
@@ -51,11 +56,6 @@ public class ActivityMusic extends AppCompatActivity
                 }
 
             });
-            mServiceConnectListenner1.onConnect();
-            int orientation = getResources().getConfiguration().orientation;
-            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                mServiceConnectListenner2.onConnect();
-            }
         }
 
         @Override
@@ -72,6 +72,7 @@ public class ActivityMusic extends AppCompatActivity
             startService();
             connectService();
         }
+        Toast.makeText(this, "start" + mMediaPlaybackService, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -255,14 +256,11 @@ public class ActivityMusic extends AppCompatActivity
     private void update() {
         int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-            Log.d("TienNAb", "update: ");
-            Log.d("TienNAb", "update: "+mMediaPlaybackFragment);
 //            if (mMediaPlaybackFragment != null){
 //                ((MediaPlaybackFragment) mMediaPlaybackFragment).update();
 //            }
             ((BaseSongListFragment) mSelectedFragment).update();
         } else {
-            Log.d("TienNAb", "update: ");
             ((BaseSongListFragment) mSelectedFragment).update();
             ((MediaPlaybackFragment) mMediaPlaybackFragment).update();
         }

@@ -43,8 +43,6 @@ public class MediaPlaybackService extends Service {
     private SharedPreferences mSharedPreferences;
     private String sharePrefFile = "SongSharedPreferences";
 
-//    private IServiceCallbackMediaPlaybackFragment mServiceCallbackMediaPlaybackFragment;
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -216,11 +214,6 @@ public class MediaPlaybackService extends Service {
         mMediaPlayer.start();
         showNotification();
         mServiceCallback.onUpdate();
-
-//        int orientation = getResources().getConfiguration().orientation;
-//        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//            mServiceCallbackMediaPlaybackFragment.onUpdate();
-//        }
     }
 
     public void pause() {
@@ -230,22 +223,12 @@ public class MediaPlaybackService extends Service {
             stopForeground(STOP_FOREGROUND_DETACH);
         }
         mServiceCallback.onUpdate();
-
-//        int orientation = getResources().getConfiguration().orientation;
-//        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//            mServiceCallbackMediaPlaybackFragment.onUpdate();
-//        }
     }
 
     public void stop() {
         mMediaPlayer.stop();
         showNotification();
         mServiceCallback.onUpdate();
-
-//        int orientation = getResources().getConfiguration().orientation;
-//        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//            mServiceCallbackMediaPlaybackFragment.onUpdate();
-//        }
     }
 
     public void preparePlay() {
@@ -261,11 +244,6 @@ public class MediaPlaybackService extends Service {
         showNotification();
         mIndexofPlayingSong = mPlayingSongList.indexOf(mPLayingSong);
         mServiceCallback.onUpdate();
-
-//        int orientation = getResources().getConfiguration().orientation;
-//        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//            mServiceCallbackMediaPlaybackFragment.onUpdate();
-//        }
 
         mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
@@ -358,11 +336,6 @@ public class MediaPlaybackService extends Service {
             showToast("Shuffle Off");
         }
         mServiceCallback.onUpdate();
-
-//        int orientation = getResources().getConfiguration().orientation;
-//        if (orientation == Configuration.ORIENTATION_LANDSCAPE){
-//            mServiceCallbackMediaPlaybackFragment.onUpdate();
-//        }
     }
 
     public void loopSong() {
@@ -377,11 +350,6 @@ public class MediaPlaybackService extends Service {
             showToast("No Loop");
         }
         mServiceCallback.onUpdate();
-
-//        int orientation = getResources().getConfiguration().orientation;
-//        if (orientation == Configuration.ORIENTATION_LANDSCAPE){
-//            mServiceCallbackMediaPlaybackFragment.onUpdate();
-//        }
     }
 
     public String getTotalTime() {
@@ -451,11 +419,4 @@ public class MediaPlaybackService extends Service {
         void onUpdate();
     }
 
-    interface IServiceCallbackMediaPlaybackFragment {
-        void onUpdate();
-    }
-
-//    public void mediaPlaybackFragmentListenChangeStatus(IServiceCallbackMediaPlaybackFragment serviceCallbackMediaPlaybackFragment) {
-//        this.mServiceCallbackMediaPlaybackFragment = serviceCallbackMediaPlaybackFragment;
-//    }
 }
