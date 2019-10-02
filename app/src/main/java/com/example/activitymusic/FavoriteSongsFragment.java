@@ -49,7 +49,6 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
 
         if (c.moveToFirst()){
             do {
-                //int id = Integer.parseInt(c.getString(c.getColumnIndex(FavoriteSongsProvider._ID)));
                 int id_provider = Integer.parseInt(c.getString(c.getColumnIndex(FavoriteSongsProvider.ID_PROVIDER)));
 
                 Song song = getSongFromID(id_provider,mAllSongList);
@@ -102,6 +101,6 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
 
     public void deleteSongFromFavoriteSongsList(int id){
         getActivity().getContentResolver().delete(FavoriteSongsProvider.CONTENT_URI,FavoriteSongsProvider.ID_PROVIDER+" = "+id, null);
-        //Toast.makeText(getActivity(), "Deleted ID_PROVIDER "+id, Toast.LENGTH_SHORT).show();
+        Log.d("tiennab", "deleteSongFromFavoriteSongsList: "+id);
     }
 }
