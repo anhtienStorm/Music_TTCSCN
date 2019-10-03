@@ -18,8 +18,10 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.MediaController;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
@@ -32,6 +34,10 @@ import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Random;
+
+import static android.media.AudioManager.AUDIOFOCUS_GAIN;
+import static android.media.AudioManager.AUDIOFOCUS_LOSS;
+import static android.media.AudioManager.AUDIOFOCUS_LOSS_TRANSIENT;
 
 
 public class MediaPlaybackService extends Service {
@@ -47,6 +53,11 @@ public class MediaPlaybackService extends Service {
     private SharedPreferences mSharedPreferences;
     private String sharePrefFile = "SongSharedPreferences";
 
+    private AudioManager mAudioManager;
+    private AudioAttributes mAudioAttributes = null;
+    private AudioFocusRequest mAudioFocusRequest = null;
+    private int mFocusRequest;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -61,6 +72,7 @@ public class MediaPlaybackService extends Service {
             manager.createNotificationChannel(musicServiceChannel);
         }
         mSharedPreferences = getSharedPreferences(sharePrefFile, MODE_PRIVATE);
+//        audioFocus();
     }
 
     @Override
@@ -70,8 +82,6 @@ public class MediaPlaybackService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
-        showToast(intent.getAction());
 
         if (isMusicPlay()) {
             switch (intent.getAction()) {
@@ -136,8 +146,6 @@ public class MediaPlaybackService extends Service {
 
         Notification notification = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                 .setSmallIcon(R.drawable.icon_notification)
-//                .setContentTitle(getNameSong())
-//                .setContentText(getArtist())
                 .setPriority(2)
                 .setCustomContentView(subNotificationLayout)
                 .setCustomBigContentView(notificationLayout)
@@ -176,10 +184,6 @@ public class MediaPlaybackService extends Service {
         return mPLayingSong.getPathSong();
     }
 
-    public String getAlbumID() {
-        return mPLayingSong.getAlbumID();
-    }
-
     public SharedPreferences getSharedPreferences() {
         return mSharedPreferences;
     }
@@ -212,9 +216,42 @@ public class MediaPlaybackService extends Service {
     }
 
     public void play() {
-        mMediaPlayer.start();
-        showNotification();
-        mServiceCallback.onUpdate();
+        mAudioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            mAudioAttributes = new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .build();
+        }
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            mAudioFocusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                    .setAudioAttributes(mAudioAttributes)
+                    .setAcceptsDelayedFocusGain(true)
+                    .setOnAudioFocusChangeListener(new AudioManager.OnAudioFocusChangeListener() {
+                        @Override
+                        public void onAudioFocusChange(int focusChange) {
+                            switch (focusChange){
+                                case AUDIOFOCUS_LOSS_TRANSIENT:
+                                    pause();
+                                    break;
+                                case AUDIOFOCUS_LOSS:
+                                    pause();
+                                    break;
+                            }
+                        }
+                    })
+                    .build();
+            int focusRequest = mAudioManager.requestAudioFocus(mAudioFocusRequest);
+            switch (focusRequest) {
+                case AudioManager.AUDIOFOCUS_REQUEST_FAILED:
+                    // don’t start playback
+                case AudioManager.AUDIOFOCUS_REQUEST_GRANTED:
+                    mMediaPlayer.start();
+                    showNotification();
+                    mServiceCallback.onUpdate();
+                    break;
+            }
+        }
     }
 
     public void pause() {
@@ -459,28 +496,32 @@ public class MediaPlaybackService extends Service {
 
 
     public void audioFocus() {
-        AudioManager mAudioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-        AudioAttributes mAudioAttributes = null;
-        AudioFocusRequest mAudioFocusRequest = null;
+        mAudioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             mAudioAttributes = new AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_MEDIA)
                     .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                     .build();
         }
-
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             mAudioFocusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
                     .setAudioAttributes(mAudioAttributes)
                     .setAcceptsDelayedFocusGain(true)
-                    .setOnAudioFocusChangeListener()
+                    .setOnAudioFocusChangeListener(new AudioManager.OnAudioFocusChangeListener() {
+                        @Override
+                        public void onAudioFocusChange(int focusChange) {
+                            switch (focusChange){
+                                case AUDIOFOCUS_LOSS_TRANSIENT:
+                                    pause();
+                                    break;
+                                case AUDIOFOCUS_LOSS:
+                                    pause();
+                                    break;
+                            }
+                        }
+                    })
                     .build();
-            int focusRequest = mAudioManager.requestAudioFocus(mAudioFocusRequest);
-            switch (focusRequest) {
-                case AudioManager.AUDIOFOCUS_REQUEST_FAILED:
-                    // don’t start playback
-                case AudioManager.AUDIOFOCUS_REQUEST_GRANTED:
-                    // actually start playback
-            }
+            mFocusRequest = mAudioManager.requestAudioFocus(mAudioFocusRequest);
         }
     }
+}
