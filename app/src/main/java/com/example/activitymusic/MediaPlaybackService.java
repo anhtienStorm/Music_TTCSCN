@@ -5,10 +5,14 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
+import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -452,4 +456,31 @@ public class MediaPlaybackService extends Service {
     interface IServiceCallback {
         void onUpdate();
     }
-}
+
+
+    public void audioFocus() {
+        AudioManager mAudioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+        AudioAttributes mAudioAttributes = null;
+        AudioFocusRequest mAudioFocusRequest = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            mAudioAttributes = new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .build();
+        }
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            mAudioFocusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                    .setAudioAttributes(mAudioAttributes)
+                    .setAcceptsDelayedFocusGain(true)
+                    .setOnAudioFocusChangeListener()
+                    .build();
+            int focusRequest = mAudioManager.requestAudioFocus(mAudioFocusRequest);
+            switch (focusRequest) {
+                case AudioManager.AUDIOFOCUS_REQUEST_FAILED:
+                    // don’t start playback
+                case AudioManager.AUDIOFOCUS_REQUEST_GRANTED:
+                    // actually start playback
+            }
+        }
+    }

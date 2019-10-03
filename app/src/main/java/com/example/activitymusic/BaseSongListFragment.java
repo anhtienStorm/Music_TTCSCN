@@ -144,7 +144,7 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
         if (favorite == 0) {
             if (count == 2) {
                 addToFavoriteSongsList(mMediaPlaybackService.getId());
-                Toast.makeText(getActivity(), "\tPlay Three times\nAdd to Favorite Songs List", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "\t\t\t\t\tPlay Three times\nAdd to Favorite Songs List", Toast.LENGTH_SHORT).show();
                 setDefaultCountOfPlayStatus(mMediaPlaybackService.getId());
             } else {
                 increaseCountOfPlay(mMediaPlaybackService.getId());
@@ -171,7 +171,6 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
     public void update() {
         if (mMediaPlaybackService.isMusicPlay()) {
             mAdapter.notifyDataSetChanged();
-            //mRecyclerView.scrollToPosition(mMediaPlaybackService.getIndexofPlayingSong());
 
             if (loadImageFromPath(mMediaPlaybackService.getPathSong()) == null) {
                 imgMainSong.setImageResource(R.drawable.icon_default_song);
