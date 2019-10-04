@@ -5,8 +5,10 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -26,6 +28,7 @@ import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -56,11 +59,25 @@ public class MediaPlaybackService extends Service {
     private AudioManager mAudioManager;
     private AudioAttributes mAudioAttributes = null;
     private AudioFocusRequest mAudioFocusRequest = null;
-    private int mFocusRequest;
+    private AudioManager.OnAudioFocusChangeListener mAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
+        @Override
+        public void onAudioFocusChange(int focusChange) {
+            switch (focusChange){
+                case AUDIOFOCUS_LOSS_TRANSIENT:
+                    pause();
+                    break;
+                case AUDIOFOCUS_LOSS:
+                    pause();
+                    break;
+            }
+        }
+    };
+    private HeadsetPlugReceiver mHeadsetPlugReceiver;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        mHeadsetPlugReceiver = new HeadsetPlugReceiver();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel musicServiceChannel = new NotificationChannel(
                     CHANNEL_ID,
@@ -72,7 +89,11 @@ public class MediaPlaybackService extends Service {
             manager.createNotificationChannel(musicServiceChannel);
         }
         mSharedPreferences = getSharedPreferences(sharePrefFile, MODE_PRIVATE);
-//        audioFocus();
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Intent.ACTION_HEADSET_PLUG);
+
+        this.registerReceiver(mHeadsetPlugReceiver,intentFilter);
     }
 
     @Override
@@ -162,6 +183,7 @@ public class MediaPlaybackService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        unregisterReceiver(mHeadsetPlugReceiver);
     }
 
     // method
@@ -219,37 +241,19 @@ public class MediaPlaybackService extends Service {
         mAudioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             mAudioAttributes = new AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_MEDIA)
                     .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                     .build();
         }
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             mAudioFocusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
                     .setAudioAttributes(mAudioAttributes)
-                    .setAcceptsDelayedFocusGain(true)
-                    .setOnAudioFocusChangeListener(new AudioManager.OnAudioFocusChangeListener() {
-                        @Override
-                        public void onAudioFocusChange(int focusChange) {
-                            switch (focusChange){
-                                case AUDIOFOCUS_LOSS_TRANSIENT:
-                                    pause();
-                                    break;
-                                case AUDIOFOCUS_LOSS:
-                                    pause();
-                                    break;
-                            }
-                        }
-                    })
+                    .setOnAudioFocusChangeListener(mAudioFocusChangeListener)
                     .build();
             int focusRequest = mAudioManager.requestAudioFocus(mAudioFocusRequest);
-            switch (focusRequest) {
-                case AudioManager.AUDIOFOCUS_REQUEST_FAILED:
-                    // don’t start playback
-                case AudioManager.AUDIOFOCUS_REQUEST_GRANTED:
-                    mMediaPlayer.start();
-                    showNotification();
-                    mServiceCallback.onUpdate();
-                    break;
+            if (focusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED){
+                mMediaPlayer.start();
+                showNotification();
+                mServiceCallback.onUpdate();
             }
         }
     }
@@ -292,10 +296,8 @@ public class MediaPlaybackService extends Service {
                 nextSong();
             }
         } else {
-            mMediaPlayer.start();
-            showNotification();
             mIndexofPlayingSong = mPlayingSongList.indexOf(mPLayingSong);
-            mServiceCallback.onUpdate();
+            play();
 
             mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
@@ -489,39 +491,36 @@ public class MediaPlaybackService extends Service {
         }
     }
 
-    //interface
-    interface IServiceCallback {
-        void onUpdate();
-    }
+    public class HeadsetPlugReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String intentAction = intent.getAction();
 
-
-    public void audioFocus() {
-        mAudioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            mAudioAttributes = new AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                    .build();
-        }
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            mAudioFocusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-                    .setAudioAttributes(mAudioAttributes)
-                    .setAcceptsDelayedFocusGain(true)
-                    .setOnAudioFocusChangeListener(new AudioManager.OnAudioFocusChangeListener() {
-                        @Override
-                        public void onAudioFocusChange(int focusChange) {
-                            switch (focusChange){
-                                case AUDIOFOCUS_LOSS_TRANSIENT:
+            if (intentAction != null) {
+                String toastMessage = "null";
+                switch (intentAction){
+                    case Intent.ACTION_HEADSET_PLUG:
+                        if (isMusicPlay()){
+                            switch (intent.getIntExtra("state",-1)){
+                                case 0:
                                     pause();
+                                    toastMessage = "headphone disconnected";
                                     break;
-                                case AUDIOFOCUS_LOSS:
-                                    pause();
+                                case 1:
+                                    play();
+                                    toastMessage = "headphone connected";
                                     break;
                             }
                         }
-                    })
-                    .build();
-            mFocusRequest = mAudioManager.requestAudioFocus(mAudioFocusRequest);
+                        break;
+                }
+                Toast.makeText(context, toastMessage, Toast.LENGTH_SHORT).show();
+            }
         }
+    }
+
+    //interface
+    interface IServiceCallback {
+        void onUpdate();
     }
 }

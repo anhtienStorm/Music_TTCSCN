@@ -67,6 +67,8 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
                     if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")) {
                         mMediaPlaybackService.loadData();
                         updateSaveSong();
+                    } else {
+                        getView().findViewById(R.id.layoutPlayMusic).setVisibility(View.GONE);
                     }
                 }
             }
@@ -80,6 +82,8 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
                 if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")) {
                     mMediaPlaybackService.loadData();
                     updateSaveSong();
+                } else {
+                    getView().findViewById(R.id.layoutPlayMusic).setVisibility(View.GONE);
                 }
             }
         }
@@ -135,6 +139,12 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
 
     @Override
     public void onItemClick(int position) {
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            getView().findViewById(R.id.layoutPlayMusic).setVisibility(View.GONE);
+        } else {
+            getView().findViewById(R.id.layoutPlayMusic).setVisibility(View.VISIBLE);
+        }
         mMediaPlaybackService.playSong(mListSong, mListSong.get(position));
         mAdapter.setService(mMediaPlaybackService);
         update();
