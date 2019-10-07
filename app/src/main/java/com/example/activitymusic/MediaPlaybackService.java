@@ -78,9 +78,10 @@ public class MediaPlaybackService extends Service {
             NotificationChannel musicServiceChannel = new NotificationChannel(
                     CHANNEL_ID,
                     "AllSongsProvider Service Channel",
-                    NotificationManager.IMPORTANCE_HIGH
+                    NotificationManager.IMPORTANCE_LOW
             );
             musicServiceChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            musicServiceChannel.enableVibration(false);
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(musicServiceChannel);
         }
@@ -163,7 +164,7 @@ public class MediaPlaybackService extends Service {
 
         Notification notification = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                 .setSmallIcon(R.drawable.icon_notification)
-                .setPriority(2)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setCustomContentView(subNotificationLayout)
                 .setCustomBigContentView(notificationLayout)
                 .setContentIntent(pendingIntent)
