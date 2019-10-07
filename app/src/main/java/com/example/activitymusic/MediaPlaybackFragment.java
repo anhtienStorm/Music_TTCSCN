@@ -2,7 +2,6 @@ package com.example.activitymusic;
 
 import android.content.ContentValues;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
@@ -23,7 +22,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 
 public class MediaPlaybackFragment extends Fragment {
 
@@ -301,11 +299,11 @@ public class MediaPlaybackFragment extends Fragment {
         }
     }
 
-    public Bitmap loadImageFromPath(String path){
+    public Bitmap loadImageFromPath(String path) {
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
         try {
             mediaMetadataRetriever.setDataSource(path);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         byte[] data = mediaMetadataRetriever.getEmbeddedPicture();
