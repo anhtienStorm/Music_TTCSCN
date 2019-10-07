@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioAttributes;
@@ -20,15 +21,11 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
-import android.util.Log;
-import android.widget.MediaController;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -38,7 +35,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Random;
 
-import static android.media.AudioManager.AUDIOFOCUS_GAIN;
 import static android.media.AudioManager.AUDIOFOCUS_LOSS;
 import static android.media.AudioManager.AUDIOFOCUS_LOSS_TRANSIENT;
 
@@ -289,7 +285,7 @@ public class MediaPlaybackService extends Service {
         }
 
         if (mMediaPlayer == null) {
-            showToast("\t\t\t\t\tSong not exist !\nPlease chose different Song");
+            showToast("\t\t\t\tSong not exist !\nPlease chose different Song");
             if (mLoopStatus == 0) {
                 nextSongNoloop();
             } else if (mLoopStatus == 1) {
@@ -416,7 +412,6 @@ public class MediaPlaybackService extends Service {
 
     public String getTotalTime() {
         SimpleDateFormat formatTimeSong = new SimpleDateFormat("mm:ss");
-        Log.d("aa", "getTotalTime: ");
         return formatTimeSong.format(mMediaPlayer.getDuration());
     }
 
@@ -457,6 +452,17 @@ public class MediaPlaybackService extends Service {
 
     void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    public int loadFavoriteStatus(int id) {
+        int isFavorite = 0;
+        Cursor c = getApplicationContext().getContentResolver().query(FavoriteSongsProvider.CONTENT_URI, null, FavoriteSongsProvider.ID_PROVIDER + " = " + id, null, null);
+        if (c.moveToFirst()) {
+            do {
+                isFavorite = Integer.parseInt(c.getString(c.getColumnIndex(FavoriteSongsProvider.IS_FAVORITE)));
+            } while (c.moveToNext());
+        }
+        return isFavorite;
     }
 
     private void saveData() {

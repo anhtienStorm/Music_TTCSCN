@@ -8,7 +8,6 @@ import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -138,7 +137,7 @@ public class MediaPlaybackFragment extends Fragment {
         btImgLike.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (loadFavoriteStatus(mMediaPlaybackService.getId()) == 2) {
+                if (mMediaPlaybackService.loadFavoriteStatus(mMediaPlaybackService.getId()) == 2) {
                     setDefaultFavoriteStatus(mMediaPlaybackService.getId());
                     btImgLike.setImageResource(R.drawable.ic_like);
                     btImgDislike.setImageResource(R.drawable.ic_dislike);
@@ -154,7 +153,7 @@ public class MediaPlaybackFragment extends Fragment {
         btImgDislike.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (loadFavoriteStatus(mMediaPlaybackService.getId()) == 1) {
+                if (mMediaPlaybackService.loadFavoriteStatus(mMediaPlaybackService.getId()) == 1) {
                     setDefaultFavoriteStatus(mMediaPlaybackService.getId());
                     btImgLike.setImageResource(R.drawable.ic_like);
                     btImgDislike.setImageResource(R.drawable.ic_dislike);
@@ -267,10 +266,10 @@ public class MediaPlaybackFragment extends Fragment {
             btImgShuffle.setImageResource
                     (R.drawable.ic_shuffle_orange_24dp);
         }
-        if (loadFavoriteStatus(mMediaPlaybackService.getId()) == 2) {
+        if (mMediaPlaybackService.loadFavoriteStatus(mMediaPlaybackService.getId()) == 2) {
             btImgLike.setImageResource(R.drawable.ic_liked_black_24dp);
             btImgDislike.setImageResource(R.drawable.ic_dislike);
-        } else if (loadFavoriteStatus(mMediaPlaybackService.getId()) == 1) {
+        } else if (mMediaPlaybackService.loadFavoriteStatus(mMediaPlaybackService.getId()) == 1) {
             btImgDislike.setImageResource(R.drawable.ic_disliked_black_24dp);
             btImgLike.setImageResource(R.drawable.ic_like);
         } else {
@@ -290,10 +289,10 @@ public class MediaPlaybackFragment extends Fragment {
 
         tvNameSong.setText(mMediaPlaybackService.getNameSong());
         tvArtist.setText(mMediaPlaybackService.getArtist());
-        if (loadFavoriteStatus(mMediaPlaybackService.getId()) == 2) {
+        if (mMediaPlaybackService.loadFavoriteStatus(mMediaPlaybackService.getId()) == 2) {
             btImgLike.setImageResource(R.drawable.ic_liked_black_24dp);
             btImgDislike.setImageResource(R.drawable.ic_dislike);
-        } else if (loadFavoriteStatus(mMediaPlaybackService.getId()) == 1) {
+        } else if (mMediaPlaybackService.loadFavoriteStatus(mMediaPlaybackService.getId()) == 1) {
             btImgDislike.setImageResource(R.drawable.ic_disliked_black_24dp);
             btImgLike.setImageResource(R.drawable.ic_like);
         } else {
@@ -333,14 +332,4 @@ public class MediaPlaybackFragment extends Fragment {
         getActivity().getContentResolver().update(FavoriteSongsProvider.CONTENT_URI, values, "ID_PROVIDER = " + id, null);
     }
 
-    public int loadFavoriteStatus(int id) {
-        int isFavorite = 0;
-        Cursor c = getActivity().getContentResolver().query(FavoriteSongsProvider.CONTENT_URI, null, FavoriteSongsProvider.ID_PROVIDER + " = " + id, null, null);
-        if (c.moveToFirst()) {
-            do {
-                isFavorite = Integer.parseInt(c.getString(c.getColumnIndex(FavoriteSongsProvider.IS_FAVORITE)));
-            } while (c.moveToNext());
-        }
-        return isFavorite;
-    }
 }
