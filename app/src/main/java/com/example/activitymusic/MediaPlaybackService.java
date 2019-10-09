@@ -125,7 +125,7 @@ public class MediaPlaybackService extends Service {
         RemoteViews subNotificationLayout = new RemoteViews(getPackageName(), R.layout.sub_notification);
         RemoteViews notificationLayout = new RemoteViews(getPackageName(), R.layout.notification);
 
-        Intent notificationIntent = new Intent(this, ActivityMusic.class);
+        Intent notificationIntent = new Intent(this, MainActivityMusic.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
         Intent previousIntent = new Intent(this, MediaPlaybackService.class);

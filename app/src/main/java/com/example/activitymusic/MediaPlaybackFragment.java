@@ -40,7 +40,7 @@ public class MediaPlaybackFragment extends Fragment {
             mCheckService = true;
         }
 
-        getMusicActivity().setServiceConnectListenner2(new ActivityMusic.IServiceConnectListenner2() {
+        getMusicActivity().setServiceConnectListenner2(new MainActivityMusic.IServiceConnectListenner2() {
             @Override
             public void onConnect() {
                 mMediaPlaybackService = getMusicActivity().mMediaPlaybackService;
@@ -189,9 +189,9 @@ public class MediaPlaybackFragment extends Fragment {
         return view;
     }
 
-    protected ActivityMusic getMusicActivity() {
-        if (getActivity() instanceof ActivityMusic) {
-            return (ActivityMusic) getActivity();
+    protected MainActivityMusic getMusicActivity() {
+        if (getActivity() instanceof MainActivityMusic) {
+            return (MainActivityMusic) getActivity();
         }
         return null;
     }

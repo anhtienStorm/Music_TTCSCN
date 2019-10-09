@@ -29,7 +29,7 @@ import androidx.fragment.app.Fragment;
 import android.view.View;
 import android.widget.Toast;
 
-public class ActivityMusic extends AppCompatActivity
+public class MainActivityMusic extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     MediaPlaybackService mMediaPlaybackService;
@@ -168,7 +168,7 @@ public class ActivityMusic extends AppCompatActivity
     }
 
     public void startService() {
-        Intent it = new Intent(ActivityMusic.this, MediaPlaybackService.class);
+        Intent it = new Intent(MainActivityMusic.this, MediaPlaybackService.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startService(it);
         }
@@ -193,11 +193,11 @@ public class ActivityMusic extends AppCompatActivity
                 //Permisson don't granted
                 if (shouldShowRequestPermissionRationale(
                         Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                    Toast.makeText(ActivityMusic.this, "Permission isn't granted ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivityMusic.this, "Permission isn't granted ", Toast.LENGTH_SHORT).show();
                 }
                 // Permisson don't granted and dont show dialog again.
                 else {
-                    Toast.makeText(ActivityMusic.this, "Permisson don't granted and dont show dialog again ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivityMusic.this, "Permisson don't granted and dont show dialog again ", Toast.LENGTH_SHORT).show();
                 }
                 //Register permission
                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
@@ -211,9 +211,9 @@ public class ActivityMusic extends AppCompatActivity
         if (requestCode == 1) {
             if (grantResults.length == 1 &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(ActivityMusic.this, "Quyền đọc file: được phép", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivityMusic.this, "Quyền đọc file: được phép", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(ActivityMusic.this, "Quyền đọc file: không được phép", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivityMusic.this, "Quyền đọc file: không được phép", Toast.LENGTH_SHORT).show();
 
             }
         } else {

@@ -55,7 +55,7 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
             mCheckService = true;
             mRecyclerView.scrollToPosition(mMediaPlaybackService.getIndexofPlayingSong());
         }
-        getMusicActivity().setServiceConnectListenner1(new ActivityMusic.IServiceConnectListenner1() {
+        getMusicActivity().setServiceConnectListenner1(new MainActivityMusic.IServiceConnectListenner1() {
             @Override
             public void onConnect() {
                 mMediaPlaybackService = getMusicActivity().mMediaPlaybackService;
@@ -89,9 +89,9 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
 
     }
 
-    protected ActivityMusic getMusicActivity() {
-        if (getActivity() instanceof ActivityMusic) {
-            return (ActivityMusic) getActivity();
+    protected MainActivityMusic getMusicActivity() {
+        if (getActivity() instanceof MainActivityMusic) {
+            return (MainActivityMusic) getActivity();
         }
         return null;
     }
