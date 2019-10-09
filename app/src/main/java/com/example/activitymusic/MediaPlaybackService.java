@@ -148,25 +148,30 @@ public class MediaPlaybackService extends Service {
 
         Bitmap bitmap = loadImageFromPath(getPathSong());
 
-        notificationLayout.setOnClickPendingIntent(R.id.notify_previous, previousPendingIntent);
-        notificationLayout.setOnClickPendingIntent(R.id.notify_play, playPendingIntent);
-        notificationLayout.setOnClickPendingIntent(R.id.notify_next, nextPendingIntent);
-        notificationLayout.setImageViewBitmap(R.id.notify_img_song, bitmap == null ? BitmapFactory.decodeResource(getResources(), R.drawable.icon_default_song) : bitmap);
-        notificationLayout.setTextViewText(R.id.notify_song_name, getNameSong());
-        notificationLayout.setTextViewText(R.id.notify_artist, getArtist());
-        notificationLayout.setImageViewResource(R.id.notify_play, isPlaying() ? R.drawable.ic_pause_circle_filled_orange_24dp : R.drawable.ic_play_circle_filled_orange_24dp);
-
-        subNotificationLayout.setOnClickPendingIntent(R.id.sub_notify_previous, previousPendingIntent);
-        subNotificationLayout.setOnClickPendingIntent(R.id.sub_notify_play, playPendingIntent);
-        subNotificationLayout.setOnClickPendingIntent(R.id.sub_notify_next, nextPendingIntent);
-        subNotificationLayout.setImageViewBitmap(R.id.sub_notify_img_song, bitmap == null ? BitmapFactory.decodeResource(getResources(), R.drawable.icon_default_song) : bitmap);
-        subNotificationLayout.setImageViewResource(R.id.sub_notify_play, isPlaying() ? R.drawable.ic_pause_circle_filled_orange_24dp : R.drawable.ic_play_circle_filled_orange_24dp);
+//        notificationLayout.setOnClickPendingIntent(R.id.notify_previous, previousPendingIntent);
+//        notificationLayout.setOnClickPendingIntent(R.id.notify_play, playPendingIntent);
+//        notificationLayout.setOnClickPendingIntent(R.id.notify_next, nextPendingIntent);
+//        notificationLayout.setImageViewBitmap(R.id.notify_img_song, bitmap == null ? BitmapFactory.decodeResource(getResources(), R.drawable.icon_default_song) : bitmap);
+//        notificationLayout.setTextViewText(R.id.notify_song_name, getNameSong());
+//        notificationLayout.setTextViewText(R.id.notify_artist, getArtist());
+//        notificationLayout.setImageViewResource(R.id.notify_play, isPlaying() ? R.drawable.ic_pause_circle_filled_orange_24dp : R.drawable.ic_play_circle_filled_orange_24dp);
+//
+//        subNotificationLayout.setOnClickPendingIntent(R.id.sub_notify_previous, previousPendingIntent);
+//        subNotificationLayout.setOnClickPendingIntent(R.id.sub_notify_play, playPendingIntent);
+//        subNotificationLayout.setOnClickPendingIntent(R.id.sub_notify_next, nextPendingIntent);
+//        subNotificationLayout.setImageViewBitmap(R.id.sub_notify_img_song, bitmap == null ? BitmapFactory.decodeResource(getResources(), R.drawable.icon_default_song) : bitmap);
+//        subNotificationLayout.setImageViewResource(R.id.sub_notify_play, isPlaying() ? R.drawable.ic_pause_circle_filled_orange_24dp : R.drawable.ic_play_circle_filled_orange_24dp);
 
         Notification notification = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                 .setSmallIcon(R.drawable.icon_notification)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
-                .setCustomContentView(subNotificationLayout)
-                .setCustomBigContentView(notificationLayout)
+//                .setCustomContentView(subNotificationLayout)
+//                .setCustomBigContentView(notificationLayout)
+                .addAction(R.drawable.ic_skip_previous_black_24dp,"previous",previousPendingIntent)
+                .addAction(isPlaying() ? R.drawable.ic_pause_black_24dp : R.drawable.ic_play_black_24dp, "play", playPendingIntent)
+                .addAction(R.drawable.ic_skip_next_black_24dp,"next",nextPendingIntent)
+                .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
+                .setShowActionsInCompactView(0,1,2))
                 .setContentIntent(pendingIntent)
                 .build();
         startForeground(1, notification);

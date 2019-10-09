@@ -29,11 +29,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-public class BaseSongListFragment extends Fragment implements ListSongAdapter.ISongListAdapterClickListener {
+public class BaseSongListFragment extends Fragment implements SongListAdapter.ISongListAdapterClickListener {
 
     protected MediaPlaybackService mMediaPlaybackService;
     private RecyclerView mRecyclerView;
-    protected ListSongAdapter mAdapter;
+    protected SongListAdapter mAdapter;
     ImageView imgPlay;
     TextView tvNameSong, tvArtist;
     ImageView imgMainSong;
@@ -112,7 +112,7 @@ public class BaseSongListFragment extends Fragment implements ListSongAdapter.IS
         }
 
         mRecyclerView = view.findViewById(R.id.recycler_view);
-        mAdapter = new ListSongAdapter(mListSong, getActivity());
+        mAdapter = new SongListAdapter(mListSong, getActivity());
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(mRecyclerView.getContext(), DividerItemDecoration.VERTICAL));
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
