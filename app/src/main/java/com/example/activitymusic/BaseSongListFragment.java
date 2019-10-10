@@ -32,8 +32,8 @@ import java.util.ArrayList;
 public class BaseSongListFragment extends Fragment implements SongListAdapter.ISongListAdapterClickListener {
 
     protected MediaPlaybackService mMediaPlaybackService;
-    private RecyclerView mRecyclerView;
-    protected SongListAdapter mAdapter;
+    private RecyclerView mRecyclerViewBaseSongList;
+    protected SongListAdapter mSongListAdapter;
     ImageView imgPlay;
     TextView tvNameSong, tvArtist;
     ImageView imgMainSong;
@@ -53,14 +53,14 @@ public class BaseSongListFragment extends Fragment implements SongListAdapter.IS
         if (getMusicActivity().mMediaPlaybackService != null) {
             mMediaPlaybackService = getMusicActivity().mMediaPlaybackService;
             mCheckService = true;
-            mRecyclerView.scrollToPosition(mMediaPlaybackService.getIndexofPlayingSong());
+            mRecyclerViewBaseSongList.scrollToPosition(mMediaPlaybackService.getIndexofPlayingSong());
         }
         getMusicActivity().setServiceConnectListenner1(new MainActivityMusic.IServiceConnectListenner1() {
             @Override
             public void onConnect() {
                 mMediaPlaybackService = getMusicActivity().mMediaPlaybackService;
-                mRecyclerView.scrollToPosition(mMediaPlaybackService.getIndexofPlayingSong());
-                mAdapter.setService(mMediaPlaybackService);
+                mRecyclerViewBaseSongList.scrollToPosition(mMediaPlaybackService.getIndexofPlayingSong());
+                mSongListAdapter.setService(mMediaPlaybackService);
                 mCheckService = true;
                 if (!mMediaPlaybackService.isMusicPlay()) {
                     if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")) {
@@ -74,8 +74,8 @@ public class BaseSongListFragment extends Fragment implements SongListAdapter.IS
         });
 
         if (mCheckService) {
-            mAdapter.setService(mMediaPlaybackService);
-            mRecyclerView.scrollToPosition(mMediaPlaybackService.getIndexofPlayingSong());
+            mSongListAdapter.setService(mMediaPlaybackService);
+            mRecyclerViewBaseSongList.scrollToPosition(mMediaPlaybackService.getIndexofPlayingSong());
             update();
             if (!mMediaPlaybackService.isMusicPlay()) {
                 if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")) {
@@ -111,12 +111,12 @@ public class BaseSongListFragment extends Fragment implements SongListAdapter.IS
             ((AppCompatActivity) getActivity()).getSupportActionBar().show();
         }
 
-        mRecyclerView = view.findViewById(R.id.recycler_view);
-        mAdapter = new SongListAdapter(mListSong, getActivity());
-        mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(mRecyclerView.getContext(), DividerItemDecoration.VERTICAL));
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mAdapter.setOnClickListenner(this);
+        mRecyclerViewBaseSongList = view.findViewById(R.id.recycler_view);
+        mSongListAdapter = new SongListAdapter(mListSong, getActivity());
+        mRecyclerViewBaseSongList.setAdapter(mSongListAdapter);
+        mRecyclerViewBaseSongList.addItemDecoration(new DividerItemDecoration(mRecyclerViewBaseSongList.getContext(), DividerItemDecoration.VERTICAL));
+        mRecyclerViewBaseSongList.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mSongListAdapter.setOnClickListenner(this);
 
         imgPlay.setOnClickListener(new Button.OnClickListener() {
             @Override
@@ -145,7 +145,7 @@ public class BaseSongListFragment extends Fragment implements SongListAdapter.IS
             getView().findViewById(R.id.layoutPlayMusic).setVisibility(View.VISIBLE);
         }
         mMediaPlaybackService.playSong(mListSong, mListSong.get(position));
-        mAdapter.setService(mMediaPlaybackService);
+        mSongListAdapter.setService(mMediaPlaybackService);
         update();
         int favorite = loadFavoriteStatus(mMediaPlaybackService.getId());
         int count = loadCountOfPlayStatus(mMediaPlaybackService.getId());
@@ -179,7 +179,7 @@ public class BaseSongListFragment extends Fragment implements SongListAdapter.IS
 
     public void update() {
         if (mMediaPlaybackService.isMusicPlay()) {
-            mAdapter.notifyDataSetChanged();
+            mSongListAdapter.notifyDataSetChanged();
 
             if (loadImageFromPath(mMediaPlaybackService.getPathSong()) == null) {
                 imgMainSong.setImageResource(R.drawable.icon_default_song);
@@ -198,7 +198,7 @@ public class BaseSongListFragment extends Fragment implements SongListAdapter.IS
     }
 
     public void updateSaveSong() {
-        mAdapter.notifyDataSetChanged();
+        mSongListAdapter.notifyDataSetChanged();
 
         if (loadImageFromPath(mMediaPlaybackService.getPathSong()) == null) {
             imgMainSong.setImageResource(R.drawable.icon_default_song);
@@ -230,7 +230,7 @@ public class BaseSongListFragment extends Fragment implements SongListAdapter.IS
 
             @Override
             public boolean onQueryTextChange(String s) {
-                mAdapter.getFilter().filter(s);
+                mSongListAdapter.getFilter().filter(s);
                 return false;
             }
         });

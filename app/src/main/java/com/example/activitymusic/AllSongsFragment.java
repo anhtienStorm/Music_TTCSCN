@@ -65,15 +65,15 @@ public class AllSongsFragment extends BaseSongListFragment implements LoaderMana
 
             } while (data.moveToNext());
         }
-        mAdapter.updateList(songList);
+        mSongListAdapter.updateList(songList);
         setListSong(songList);
-        mAdapter.setTypeSongList("AllSongs");
+        mSongListAdapter.setTypeSongList("AllSongs");
     }
 
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-        if (mAdapter != null) {
-            mAdapter.updateList(new ArrayList<Song>());
+        if (mSongListAdapter != null) {
+            mSongListAdapter.updateList(new ArrayList<Song>());
         }
     }
 

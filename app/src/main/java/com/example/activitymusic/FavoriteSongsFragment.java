@@ -58,15 +58,15 @@ public class FavoriteSongsFragment extends BaseSongListFragment implements Loade
                 }
             } while (c.moveToNext());
         }
-        mAdapter.updateList(list);
+        mSongListAdapter.updateList(list);
         setListSong(list);
-        mAdapter.setTypeSongList("FavoriteSongs");
+        mSongListAdapter.setTypeSongList("FavoriteSongs");
     }
 
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-        if (mAdapter != null) {
-            mAdapter.updateList(new ArrayList<Song>());
+        if (mSongListAdapter != null) {
+            mSongListAdapter.updateList(new ArrayList<Song>());
         }
     }
 

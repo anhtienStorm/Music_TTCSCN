@@ -44,7 +44,7 @@
         android:id="@+id/total_time_timer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="180 phút"
+        android:text="120 phút"
         android:layout_below="@id/seekbar_timer"
         android:layout_alignParentRight="true"
         android:padding="4dp"

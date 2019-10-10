@@ -8,7 +8,6 @@ import android.util.Log;
 public class TimerReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d("TienNAb", "onReceive: ");
         Intent myIntent = new Intent(context, MediaPlaybackService.class);
         context.stopService(myIntent);
     }

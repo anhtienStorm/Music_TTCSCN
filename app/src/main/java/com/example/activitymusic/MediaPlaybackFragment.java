@@ -356,7 +356,7 @@ public class MediaPlaybackFragment extends Fragment {
         textViewCurrentTimeTimer = view.findViewById(R.id.current_time_timer);
         textViewTotalTimeTimer = view.findViewById(R.id.total_time_timer);
 
-        seekBarTimer.setMax(180 * 60 * 1000);
+        seekBarTimer.setMax(120 * 60 * 1000);
         if (mMediaPlaybackService.getCurrentTimeTimer()==0){
             textViewContentTimer.setText("");
         } else {
@@ -413,19 +413,21 @@ public class MediaPlaybackFragment extends Fragment {
     }
 
     public void startAlarm(){
-        Log.d("TienNAb", "startAlarm: ");
-        Calendar c = Calendar.getInstance();
         AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(getActivity(), TimerReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(),1,intent,0);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            Log.d("TienNAb", "startAlarm: "+mMediaPlaybackService.getCurrentTimeTimer());
             alarmManager.setExact(AlarmManager.RTC_WAKEUP,System.currentTimeMillis()+mMediaPlaybackService.getCurrentTimeTimer() ,pendingIntent);
         }
     }
 
     String getCurrentTime(int miliSecond){
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
-        return simpleDateFormat.format(miliSecond);
+        int minute = miliSecond/1000/60;
+        int second = (miliSecond/1000)%60;
+        if (second==0){
+            return minute+" phút";
+        } else {
+            return minute+" phút "+second+" giây";
+        }
     }
 }
