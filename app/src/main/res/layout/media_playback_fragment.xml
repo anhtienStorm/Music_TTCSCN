@@ -71,11 +71,11 @@
             android:padding="10dp"
             android:src="@drawable/ic_queue_music_black_24dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/tvOptionsMediaPlayback"
+            app:layout_constraintRight_toLeftOf="@+id/btImgOptionsMediaPlayback"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/tvOptionsMediaPlayback"
+            android:id="@+id/btImgOptionsMediaPlayback"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"

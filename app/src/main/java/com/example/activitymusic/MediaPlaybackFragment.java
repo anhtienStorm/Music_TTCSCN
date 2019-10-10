@@ -1,12 +1,18 @@
 package com.example.activitymusic;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,18 +24,22 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class MediaPlaybackFragment extends Fragment {
 
-    ImageView btImgLike, btImgPrevious, btImgPlay, btImgNext, btImgDislike, btImgLoop, btImgShuffle, imgSongSmall, imgSong, btImgListSong;
+    ImageView btImgLike, btImgPrevious, btImgPlay, btImgNext, btImgDislike, btImgLoop, btImgShuffle, imgSongSmall, imgSong, btImgListSong, btImgOptions;
     SeekBar seekBarSong;
     TextView tvNameSong, tvArtist, tvTotalTimeSong, tvTimeSong;
     MediaPlaybackService mMediaPlaybackService;
     boolean mCheckService = false;
+    private TextView textViewContentTimer, textViewCurrentTimeTimer, textViewTotalTimeTimer;
+    private SeekBar seekBarTimer;
 
     @Override
     public void onResume() {
@@ -164,6 +174,13 @@ public class MediaPlaybackFragment extends Fragment {
             }
         });
 
+        btImgOptions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialog();
+            }
+        });
+
         seekBarSong.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -213,6 +230,7 @@ public class MediaPlaybackFragment extends Fragment {
         imgSongSmall = view.findViewById(R.id.imgSongSmall);
         btImgListSong = view.findViewById(R.id.btImgListSong);
         imgSong = view.findViewById(R.id.imgSong);
+        btImgOptions = view.findViewById(R.id.btImgOptionsMediaPlayback);
     }
 
     public void updateTimeSong() {
@@ -330,4 +348,84 @@ public class MediaPlaybackFragment extends Fragment {
         getActivity().getContentResolver().update(FavoriteSongsProvider.CONTENT_URI, values, "ID_PROVIDER = " + id, null);
     }
 
+    public void showDialog() {
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View view = inflater.inflate(R.layout.switch_off_timer, null);
+        seekBarTimer = view.findViewById(R.id.seekbar_timer);
+        textViewContentTimer = view.findViewById(R.id.content_timer);
+        textViewCurrentTimeTimer = view.findViewById(R.id.current_time_timer);
+        textViewTotalTimeTimer = view.findViewById(R.id.total_time_timer);
+
+        seekBarTimer.setMax(180 * 60 * 1000);
+        if (mMediaPlaybackService.getCurrentTimeTimer()==0){
+            textViewContentTimer.setText("");
+        } else {
+            textViewContentTimer.setText("Ứng dụng sẽ tự động tắt nhạc sau "+mMediaPlaybackService.getCurrentTimeTimer() / 1000 / 60+" phút");
+        }
+
+        final AlertDialog dialogTimer = new AlertDialog.Builder(getActivity())
+                .setView(view)
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Bắt đầu hẹn giờ",null)
+                .show();
+
+        final Button positiveButton = dialogTimer.getButton(AlertDialog.BUTTON_POSITIVE);
+        if (mMediaPlaybackService.getCurrentTimeTimer()==0){
+            positiveButton.setEnabled(false);
+        } else {
+            positiveButton.setText("Kết thúc hẹn giờ");
+            positiveButton.setEnabled(true);
+        }
+
+        positiveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (positiveButton.getText().equals("Bắt đầu hẹn giờ")){
+                    mMediaPlaybackService.setCurrentTimeTimer(seekBarTimer.getProgress());
+                    dialogTimer.dismiss();
+                    startAlarm();
+                } else {
+                    mMediaPlaybackService.setCurrentTimeTimer(0);
+                    dialogTimer.dismiss();
+                }
+            }
+        });
+
+        seekBarTimer.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                textViewCurrentTimeTimer.setText(getCurrentTime(progress));
+                if (progress==0){
+                    dialogTimer.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                } else {
+                    dialogTimer.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+    }
+
+    public void startAlarm(){
+        Log.d("TienNAb", "startAlarm: ");
+        Calendar c = Calendar.getInstance();
+        AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(getActivity(), TimerReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(),1,intent,0);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            Log.d("TienNAb", "startAlarm: "+mMediaPlaybackService.getCurrentTimeTimer());
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP,System.currentTimeMillis()+mMediaPlaybackService.getCurrentTimeTimer() ,pendingIntent);
+        }
+    }
+
+    String getCurrentTime(int miliSecond){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
+        return simpleDateFormat.format(miliSecond);
+    }
 }

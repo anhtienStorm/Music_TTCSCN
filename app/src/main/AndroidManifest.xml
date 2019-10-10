@@ -25,6 +25,7 @@
         </activity>
 
         <service android:name=".MediaPlaybackService"/>
+        <receiver android:name=".TimerReceiver"/>
 
         <provider
             android:name=".FavoriteSongsProvider"

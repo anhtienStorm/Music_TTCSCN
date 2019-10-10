@@ -69,6 +69,7 @@ public class MediaPlaybackService extends Service {
         }
     };
     private HeadsetPlugReceiver mHeadsetPlugReceiver;
+    private int currentTimeTimer = 0;
 
     @Override
     public void onCreate() {
@@ -230,6 +231,14 @@ public class MediaPlaybackService extends Service {
 
     public int getmShuffle() {
         return mShuffle;
+    }
+
+    public int getCurrentTimeTimer(){
+        return currentTimeTimer;
+    }
+
+    public void setCurrentTimeTimer(int time){
+        currentTimeTimer = time;
     }
 
     public boolean isPlaying() {
