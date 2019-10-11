@@ -1,4 +1,4 @@
-package com.example.activitymusic;
+package com.example.activitymusic.Model;
 
 public class Song {
     private int id;

@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:allowBackup="true"
@@ -13,8 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivityMusic"
-            android:label="@string/app_name"
+            android:name=".Activity.MainActivityMusic"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -24,11 +24,11 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".MediaPlaybackService"/>
-        <receiver android:name=".TimerReceiver"/>
+        <service android:name=".Service.MediaPlaybackService"/>
+        <receiver android:name=".Receiver.TimerReceiver"/>
 
         <provider
-            android:name=".FavoriteSongsProvider"
+            android:name=".Provider.FavoriteSongsProvider"
             android:authorities="com.android.example.provider.FavoriteSongs"
             android:enabled="true"
             android:exported="true"

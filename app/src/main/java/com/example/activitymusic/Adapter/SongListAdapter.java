@@ -1,4 +1,4 @@
-package com.example.activitymusic;
+package com.example.activitymusic.Adapter;
 
 import android.app.Service;
 import android.content.ContentValues;
@@ -19,6 +19,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.activitymusic.Provider.FavoriteSongsProvider;
+import com.example.activitymusic.Service.MediaPlaybackService;
+import com.example.activitymusic.Model.Song;
+import com.example.activitymusic.R;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
@@ -138,7 +143,7 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.SongVi
 
 
     //interface
-    interface ISongListAdapterClickListener {
+    public interface ISongListAdapterClickListener {
         void onItemClick(int position);
     }
 

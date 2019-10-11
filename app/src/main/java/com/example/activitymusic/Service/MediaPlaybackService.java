@@ -1,4 +1,4 @@
-package com.example.activitymusic;
+package com.example.activitymusic.Service;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -22,12 +22,14 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
-import android.util.Log;
-import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 
+import com.example.activitymusic.Provider.FavoriteSongsProvider;
+import com.example.activitymusic.Activity.MainActivityMusic;
+import com.example.activitymusic.Model.Song;
+import com.example.activitymusic.R;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -451,7 +453,7 @@ public class MediaPlaybackService extends Service {
         return data == null ? null : BitmapFactory.decodeByteArray(data, 0, data.length);
     }
 
-    void listenChangeStatus(IServiceCallback callbackService) {
+    public void listenChangeStatus(IServiceCallback callbackService) {
         this.mServiceCallback = callbackService;
     }
 
@@ -531,7 +533,7 @@ public class MediaPlaybackService extends Service {
     }
 
     //interface
-    interface IServiceCallback {
+    public interface IServiceCallback {
         void onUpdate();
     }
 }

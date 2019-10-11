@@ -1,4 +1,4 @@
-package com.example.activitymusic;
+package com.example.activitymusic.Fragment;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -15,6 +15,9 @@ import androidx.annotation.Nullable;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
+
+import com.example.activitymusic.Provider.FavoriteSongsProvider;
+import com.example.activitymusic.Model.Song;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

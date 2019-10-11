@@ -1,4 +1,4 @@
-package com.example.activitymusic;
+package com.example.activitymusic.Fragment;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -12,7 +12,6 @@ import android.media.MediaMetadataRetriever;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,8 +27,13 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.example.activitymusic.Provider.FavoriteSongsProvider;
+import com.example.activitymusic.Activity.MainActivityMusic;
+import com.example.activitymusic.Service.MediaPlaybackService;
+import com.example.activitymusic.R;
+import com.example.activitymusic.Receiver.TimerReceiver;
+
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 public class MediaPlaybackFragment extends Fragment {
 

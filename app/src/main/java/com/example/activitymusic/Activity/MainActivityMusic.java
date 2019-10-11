@@ -1,4 +1,4 @@
-package com.example.activitymusic;
+package com.example.activitymusic.Activity;
 
 import android.Manifest;
 import android.app.ActivityManager;
@@ -18,6 +18,13 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import android.os.IBinder;
 import android.view.MenuItem;
 
+import com.example.activitymusic.Fragment.AllSongsFragment;
+import com.example.activitymusic.Fragment.BaseSongListFragment;
+import com.example.activitymusic.Fragment.FavoriteSongsFragment;
+import com.example.activitymusic.Fragment.HomeOnlineFragment;
+import com.example.activitymusic.Fragment.MediaPlaybackFragment;
+import com.example.activitymusic.R;
+import com.example.activitymusic.Service.MediaPlaybackService;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -32,8 +39,8 @@ import android.widget.Toast;
 public class MainActivityMusic extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    MediaPlaybackService mMediaPlaybackService;
-    Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment;
+    public MediaPlaybackService mMediaPlaybackService;
+    Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment, mHomeOnlineFragment;
     IServiceConnectListenner1 mServiceConnectListenner1;
     IServiceConnectListenner2 mServiceConnectListenner2;
     String mNameFragmentSelect;
@@ -93,22 +100,32 @@ public class MainActivityMusic extends AppCompatActivity
 
         if (savedInstanceState != null) {
             mNameFragmentSelect = savedInstanceState.getString("name_fragment_select");
-            if (mNameFragmentSelect != null) {
-                if (mNameFragmentSelect.equals("FavoriteSong")) {
-                    mSelectedFragment = mFravoriteSongsFragment;
-                    navigationView.setCheckedItem(R.id.nav_favorite);
 
-                } else {
-                    mSelectedFragment = mAllSongsFragment;
-                    navigationView.setCheckedItem(R.id.nav_list_music);
+            if (mNameFragmentSelect != null) {
+                switch (mNameFragmentSelect) {
+                    case "FavoriteSong":
+                        mSelectedFragment = mFravoriteSongsFragment;
+                        navigationView.setCheckedItem(R.id.nav_favorite);
+                        setTitle("Music Offline");
+                    case "AllSong":
+                        mSelectedFragment = mAllSongsFragment;
+                        navigationView.setCheckedItem(R.id.nav_list_music);
+                        setTitle("Music Offline");
+                    case "HomeOnline":
+                        mSelectedFragment = mHomeOnlineFragment;
+                        navigationView.setCheckedItem(R.id.nav_home);
+                        setTitle("Music Online");
                 }
             } else {
+
                 mSelectedFragment = mAllSongsFragment;
                 navigationView.setCheckedItem(R.id.nav_list_music);
+                setTitle("Music Offline");
             }
         } else {
             mSelectedFragment = mAllSongsFragment;
             navigationView.setCheckedItem(R.id.nav_list_music);
+            setTitle("Music Offline");
         }
 
         int orientation = getResources().getConfiguration().orientation;
@@ -135,16 +152,26 @@ public class MainActivityMusic extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        if (id == R.id.nav_list_music) {
-            mSelectedFragment = mAllSongsFragment;
-            getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mSelectedFragment).commit();
-            mNameFragmentSelect = "AllSong";
-        } else if (id == R.id.nav_favorite) {
-            mSelectedFragment = mFravoriteSongsFragment;
-            getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mSelectedFragment).commit();
-            mNameFragmentSelect = "FavoriteSong";
+
+        switch (id) {
+            case R.id.nav_list_music:
+                mSelectedFragment = mAllSongsFragment;
+                mNameFragmentSelect = "AllSong";
+                setTitle("Music Offline");
+                break;
+            case R.id.nav_favorite:
+                mSelectedFragment = mFravoriteSongsFragment;
+                mNameFragmentSelect = "FavoriteSong";
+                setTitle("Music Offline");
+                break;
+            case R.id.nav_home:
+                mSelectedFragment = mHomeOnlineFragment;
+                mNameFragmentSelect = "HomeOnline";
+                setTitle("Music Online");
+                break;
         }
 
+        getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mSelectedFragment).commit();
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -165,6 +192,7 @@ public class MainActivityMusic extends AppCompatActivity
         mAllSongsFragment = new AllSongsFragment();
         mFravoriteSongsFragment = new FavoriteSongsFragment();
         mMediaPlaybackFragment = new MediaPlaybackFragment();
+        mHomeOnlineFragment = new HomeOnlineFragment();
     }
 
     public void startService() {
@@ -226,11 +254,11 @@ public class MainActivityMusic extends AppCompatActivity
         findViewById(R.id.layoutPlayMusic).setVisibility(View.GONE);
     }
 
-    void setServiceConnectListenner1(IServiceConnectListenner1 serviceConnectListenner) {
+    public void setServiceConnectListenner1(IServiceConnectListenner1 serviceConnectListenner) {
         this.mServiceConnectListenner1 = serviceConnectListenner;
     }
 
-    void setServiceConnectListenner2(IServiceConnectListenner2 serviceConnectListenner) {
+    public  void setServiceConnectListenner2(IServiceConnectListenner2 serviceConnectListenner) {
         this.mServiceConnectListenner2 = serviceConnectListenner;
     }
 
@@ -243,7 +271,7 @@ public class MainActivityMusic extends AppCompatActivity
     private void update() {
         int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-            if (mMediaPlaybackFragment.getView() != null){
+            if (mMediaPlaybackFragment.getView() != null) {
                 ((MediaPlaybackFragment) mMediaPlaybackFragment).update();
             }
             ((BaseSongListFragment) mSelectedFragment).update();
@@ -254,11 +282,11 @@ public class MainActivityMusic extends AppCompatActivity
     }
 
     //interface
-    interface IServiceConnectListenner1 {
+    public interface IServiceConnectListenner1 {
         void onConnect();
     }
 
-    interface IServiceConnectListenner2 {
+    public interface IServiceConnectListenner2 {
         void onConnect();
     }
 }

@@ -1,4 +1,4 @@
-package com.example.activitymusic;
+package com.example.activitymusic.Fragment;
 
 import android.content.ContentValues;
 import android.content.res.Configuration;
@@ -26,6 +26,13 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.activitymusic.Provider.FavoriteSongsProvider;
+import com.example.activitymusic.Activity.MainActivityMusic;
+import com.example.activitymusic.Service.MediaPlaybackService;
+import com.example.activitymusic.R;
+import com.example.activitymusic.Model.Song;
+import com.example.activitymusic.Adapter.SongListAdapter;
 
 import java.util.ArrayList;
 

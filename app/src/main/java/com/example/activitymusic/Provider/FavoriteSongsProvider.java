@@ -1,4 +1,4 @@
-package com.example.activitymusic;
+package com.example.activitymusic.Provider;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;
@@ -16,15 +16,15 @@ import android.text.TextUtils;
 import java.util.HashMap;
 
 public class FavoriteSongsProvider extends ContentProvider {
-    static final String AUTHORITY = "com.android.example.provider.FavoriteSongs";
-    static final String CONTENT_PATH = "backupdata";
-    static final String URL = "content://" + AUTHORITY + "/" + CONTENT_PATH;
-    static final Uri CONTENT_URI = Uri.parse(URL);
+    public static final String AUTHORITY = "com.android.example.provider.FavoriteSongs";
+    public static final String CONTENT_PATH = "backupdata";
+    public static final String URL = "content://" + AUTHORITY + "/" + CONTENT_PATH;
+    public static final Uri CONTENT_URI = Uri.parse(URL);
 
-    static final String _ID = "_id";
-    static final String ID_PROVIDER = "id_provider";
-    static final String IS_FAVORITE = "is_favorite";
-    static final String COUNT_OF_PLAY = "count_of_play";
+    public static final String _ID = "_id";
+    public static final String ID_PROVIDER = "id_provider";
+    public static final String IS_FAVORITE = "is_favorite";
+    public static final String COUNT_OF_PLAY = "count_of_play";
 
     private static HashMap<String, String> PROJECTION_MAP;
 

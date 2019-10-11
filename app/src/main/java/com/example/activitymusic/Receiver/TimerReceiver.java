@@ -1,9 +1,10 @@
-package com.example.activitymusic;
+package com.example.activitymusic.Receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
+
+import com.example.activitymusic.Service.MediaPlaybackService;
 
 public class TimerReceiver extends BroadcastReceiver {
     @Override
