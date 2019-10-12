@@ -2,4 +2,46 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent">
 
+    <ImageView
+        android:id="@+id/img_background_banner"
+        android:scaleType="center"
+        android:layout_width="match_parent"
+        android:layout_height="200dp" />
+
+    <View
+        android:id="@+id/view_background"
+        android:background="@drawable/background_banner"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"/>
+
+    <RelativeLayout
+        android:layout_alignBottom="@+id/view_background"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        
+        <TextView
+            android:text="Title"
+            android:id="@+id/tv_title_banner"
+            android:padding="4dp"
+            android:maxLines="1"
+            android:textSize="17sp"
+            android:textColor="#fff"
+            android:layout_above="@+id/tv_content_banner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:text="Content"
+            android:id="@+id/tv_content_banner"
+            android:padding="4dp"
+            android:layout_alignParentBottom="true"
+            android:textSize="15sp"
+            android:textColor="#fff"
+            android:maxLines="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </RelativeLayout>
+
 </RelativeLayout>

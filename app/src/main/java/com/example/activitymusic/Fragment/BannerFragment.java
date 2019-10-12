@@ -38,7 +38,6 @@ public class BannerFragment extends Fragment {
             @Override
             public void onResponse(Call<List<SongOnline>> call, Response<List<SongOnline>> response) {
                 ArrayList<SongOnline> listSongOnline = (ArrayList<SongOnline>) response.body();
-//                Log.d("TienNAb", "onResponse: "+listSongOnline.get(1).getNAMESONG());
             }
 
             @Override
