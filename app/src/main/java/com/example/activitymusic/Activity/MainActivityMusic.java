@@ -23,6 +23,7 @@ import com.example.activitymusic.Fragment.BaseSongListFragment;
 import com.example.activitymusic.Fragment.FavoriteSongsFragment;
 import com.example.activitymusic.Fragment.HomeOnlineFragment;
 import com.example.activitymusic.Fragment.MediaPlaybackFragment;
+import com.example.activitymusic.Fragment.NotificationFragment;
 import com.example.activitymusic.R;
 import com.example.activitymusic.Service.MediaPlaybackService;
 import com.google.android.material.navigation.NavigationView;
@@ -40,7 +41,7 @@ public class MainActivityMusic extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public MediaPlaybackService mMediaPlaybackService;
-    Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment, mHomeOnlineFragment;
+    Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment, mHomeOnlineFragment , mNotificationFragment;
     IServiceConnectListenner1 mServiceConnectListenner1;
     IServiceConnectListenner2 mServiceConnectListenner2;
     String mNameFragmentSelect;
@@ -115,6 +116,11 @@ public class MainActivityMusic extends AppCompatActivity
                         mSelectedFragment = mHomeOnlineFragment;
                         navigationView.setCheckedItem(R.id.nav_home);
                         setTitle("Music Online");
+                    case "Notification":
+                        mSelectedFragment=mNotificationFragment;
+                        navigationView.setCheckedItem(R.id.nav_notification);
+                        setTitle("Notification");
+
                 }
             } else {
 
@@ -169,6 +175,11 @@ public class MainActivityMusic extends AppCompatActivity
                 mNameFragmentSelect = "HomeOnline";
                 setTitle("Music Online");
                 break;
+            case R.id.nav_notification:
+                mSelectedFragment = mNotificationFragment;
+                mNameFragmentSelect = "Notification";
+                setTitle("Music Notification");
+                break;
         }
 
         getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mSelectedFragment).commit();
@@ -193,6 +204,7 @@ public class MainActivityMusic extends AppCompatActivity
         mFravoriteSongsFragment = new FavoriteSongsFragment();
         mMediaPlaybackFragment = new MediaPlaybackFragment();
         mHomeOnlineFragment = new HomeOnlineFragment();
+        mNotificationFragment=new NotificationFragment();
     }
 
     public void startService() {

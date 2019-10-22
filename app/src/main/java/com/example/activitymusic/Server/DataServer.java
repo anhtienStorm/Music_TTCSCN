@@ -1,5 +1,6 @@
 package com.example.activitymusic.Server;
 
+import com.example.activitymusic.Model.Notification;
 import com.example.activitymusic.Model.SongOnline;
 
 import java.util.List;
@@ -11,4 +12,8 @@ public interface DataServer {
 
     @GET("SelectSongs.php")
     Call<List<SongOnline>> getDataSongOnline();
+
+    @GET("Notification.php")
+    Call<List<Notification>> getDataNotification();
+
 }
