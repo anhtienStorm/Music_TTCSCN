@@ -19,9 +19,11 @@ import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
@@ -61,7 +63,7 @@ public class MediaPlaybackService extends Service {
     private AudioManager.OnAudioFocusChangeListener mAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
         @Override
         public void onAudioFocusChange(int focusChange) {
-            switch (focusChange){
+            switch (focusChange) {
                 case AUDIOFOCUS_LOSS_TRANSIENT:
                     pause();
                     break;
@@ -94,7 +96,7 @@ public class MediaPlaybackService extends Service {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_HEADSET_PLUG);
 
-        this.registerReceiver(mHeadsetPlugReceiver,intentFilter);
+        this.registerReceiver(mHeadsetPlugReceiver, intentFilter);
     }
 
     @Override
@@ -155,11 +157,11 @@ public class MediaPlaybackService extends Service {
                 .setContentTitle(getNameSong())
                 .setContentText(getArtist())
                 .setLargeIcon(bitmap == null ? BitmapFactory.decodeResource(getResources(), R.drawable.icon_default_song) : bitmap)
-                .addAction(R.drawable.ic_skip_previous_black_24dp,"previous",previousPendingIntent)
+                .addAction(R.drawable.ic_skip_previous_black_24dp, "previous", previousPendingIntent)
                 .addAction(isPlaying() ? R.drawable.ic_pause_black_24dp : R.drawable.ic_play_black_24dp, "play", playPendingIntent)
-                .addAction(R.drawable.ic_skip_next_black_24dp,"next",nextPendingIntent)
+                .addAction(R.drawable.ic_skip_next_black_24dp, "next", nextPendingIntent)
                 .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
-                .setShowActionsInCompactView(0,1,2))
+                        .setShowActionsInCompactView(0, 1, 2))
                 .setContentIntent(pendingIntent)
                 .build();
         startForeground(1, notification);
@@ -221,15 +223,15 @@ public class MediaPlaybackService extends Service {
         return mShuffle;
     }
 
-    public int getCurrentTimeTimer(){
+    public int getCurrentTimeTimer() {
         return currentTimeTimer;
     }
 
-    public void setCurrentTimeTimer(int time){
+    public void setCurrentTimeTimer(int time) {
         currentTimeTimer = time;
     }
 
-    public MediaPlayer getMediaPlayer(){
+    public MediaPlayer getMediaPlayer() {
         return mMediaPlayer;
     }
 
@@ -253,7 +255,7 @@ public class MediaPlaybackService extends Service {
                     .setOnAudioFocusChangeListener(mAudioFocusChangeListener)
                     .build();
             int focusRequest = mAudioManager.requestAudioFocus(mAudioFocusRequest);
-            if (focusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED){
+            if (focusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 mMediaPlayer.start();
                 showNotification();
                 mServiceCallback.onUpdate();
@@ -324,9 +326,13 @@ public class MediaPlaybackService extends Service {
         preparePlay();
     }
 
+    public void playSongOnline(String url) {
+        Log.d("Play", "playSongOnline: ");
+        new PLaySong().execute(url);
+    }
+
     public void nextSong() {
         if (isMusicPlay()) {
-
             if (mShuffle == 0) {
                 if (mIndexofPlayingSong == mPlayingSongList.size() - 1) {
                     mIndexofPlayingSong = 0;
@@ -511,10 +517,10 @@ public class MediaPlaybackService extends Service {
 
             if (intentAction != null) {
                 String toastMessage = "null";
-                switch (intentAction){
+                switch (intentAction) {
                     case Intent.ACTION_HEADSET_PLUG:
-                        if (isMusicPlay()){
-                            switch (intent.getIntExtra("state",-1)){
+                        if (isMusicPlay()) {
+                            switch (intent.getIntExtra("state", -1)) {
                                 case 0:
                                     pause();
                                     toastMessage = "headphone disconnected";
@@ -535,5 +541,37 @@ public class MediaPlaybackService extends Service {
     //interface
     public interface IServiceCallback {
         void onUpdate();
+    }
+
+
+    class PLaySong extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... strings) {
+            return strings[0];
+        }
+
+        @Override
+        protected void onPostExecute(String baihat) {
+            super.onPostExecute(baihat);
+            try {
+                mMediaPlayer = new MediaPlayer();
+                mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mediaPlayer) {
+                        mMediaPlayer.stop();
+                        mediaPlayer.reset();
+                    }
+                });
+                mMediaPlayer.setDataSource(baihat);
+                mMediaPlayer.prepare();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            mMediaPlayer.start();
+
+
+        }
     }
 }

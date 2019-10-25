@@ -34,27 +34,26 @@ public class NotificationFragment extends Fragment {
     private NotificationAdapter mNotificationAdapter;
 
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Toast.makeText(getContext(), "Notification", Toast.LENGTH_SHORT).show();
-     View view = inflater.inflate(R.layout.notification_fragment, container, false);
-        mRecyclerViewNotification= view.findViewById(R.id.recycler_view_notification);
-        mListNotification =new ArrayList<>();
-        mNotificationAdapter=new NotificationAdapter(mListNotification,getContext());
+        View view = inflater.inflate(R.layout.notification_fragment, container, false);
+        mRecyclerViewNotification = view.findViewById(R.id.recycler_view_notification);
+        mListNotification = new ArrayList<>();
+        mNotificationAdapter = new NotificationAdapter(mListNotification, getContext());
         GetData();
         return view;
     }
 
-    private void GetData(){
+    private void GetData() {
         DataServer dataServer = APIServer.getServer();
-        Call<List<Notification>> listCall= dataServer.getDataNotification();
+        Call<List<Notification>> listCall = dataServer.getDataNotification();
         listCall.enqueue(new Callback<List<Notification>>() {
             @Override
             public void onResponse(Call<List<Notification>> call, Response<List<Notification>> response) {
-            ArrayList<Notification> notifications=(ArrayList<Notification>) response.body();
-                mNotificationAdapter=new NotificationAdapter(notifications,getActivity());
+                ArrayList<Notification> notifications = (ArrayList<Notification>) response.body();
+                mNotificationAdapter = new NotificationAdapter(notifications, getActivity());
                 mRecyclerViewNotification.setAdapter(mNotificationAdapter);
                 mRecyclerViewNotification.addItemDecoration(new DividerItemDecoration(mRecyclerViewNotification.getContext(), DividerItemDecoration.VERTICAL));
                 mRecyclerViewNotification.setLayoutManager(new LinearLayoutManager(getActivity()));

@@ -33,6 +33,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.View;
 import android.widget.Toast;
@@ -45,6 +46,7 @@ public class MainActivityMusic extends AppCompatActivity
     IServiceConnectListenner1 mServiceConnectListenner1;
     IServiceConnectListenner2 mServiceConnectListenner2;
     String mNameFragmentSelect;
+
     ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {

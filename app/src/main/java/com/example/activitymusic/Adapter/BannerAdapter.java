@@ -17,13 +17,17 @@ import com.example.activitymusic.R;
 import java.util.ArrayList;
 
 public class BannerAdapter extends PagerAdapter {
-
+    private onClickSongOnline mOnClickSongOnline;
     Context mContext;
     ArrayList<SongOnline> mSongOnlineList = new ArrayList<>();
 
     public BannerAdapter(Context context, ArrayList<SongOnline> list){
         mContext = context;
         mSongOnlineList = list;
+    }
+
+    public void setmOnClickSongOnline(onClickSongOnline mOnClickSongOnline) {
+        this.mOnClickSongOnline = mOnClickSongOnline;
     }
 
     @Override
@@ -38,7 +42,7 @@ public class BannerAdapter extends PagerAdapter {
 
     @NonNull
     @Override
-    public Object instantiateItem(@NonNull ViewGroup container, int position) {
+    public Object instantiateItem(@NonNull ViewGroup container, final int position) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View view = inflater.inflate(R.layout.row_baner,null);
 
@@ -51,7 +55,12 @@ public class BannerAdapter extends PagerAdapter {
         Glide.with(mContext).load(mSongOnlineList.get(position).getIMAGE()).into(imgIconBanner);
         textViewTitleBanner.setText(mSongOnlineList.get(position).getNAMESONG());
         textViewContentBanner.setText(mSongOnlineList.get(position).getSINGER());
-
+        imgBackgroundBanner.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mOnClickSongOnline.onClick(position);
+            }
+        });
         container.addView(view);
         return view;
     }
@@ -60,4 +69,9 @@ public class BannerAdapter extends PagerAdapter {
     public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
         container.removeView((View) object);
     }
+     public  interface  onClickSongOnline{
+        void onClick(int position );
+    }
+
+
 }
