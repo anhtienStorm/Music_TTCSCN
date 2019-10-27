@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 
+import com.example.activitymusic.Model.SongOnline;
 import com.example.activitymusic.Provider.FavoriteSongsProvider;
 import com.example.activitymusic.Activity.MainActivityMusic;
 import com.example.activitymusic.Model.Song;
@@ -50,6 +51,8 @@ public class MediaPlaybackService extends Service {
     private final Binder mBinder = new MediaPlaybackServiceBinder();
     private ArrayList<Song> mPlayingSongList;
     private Song mPLayingSong;
+    private ArrayList<SongOnline> mListSongOnline;
+    private int mStatus;// off =0; on=1
     private int mIndexofPlayingSong;
     private IServiceCallback mServiceCallback;
     private int mLoopStatus = 0;
@@ -326,9 +329,10 @@ public class MediaPlaybackService extends Service {
         preparePlay();
     }
 
-    public void playSongOnline(String url) {
-        Log.d("Play", "playSongOnline: ");
-        new PLaySong().execute(url);
+    public void playSongOnline(SongOnline songOnline, ArrayList<SongOnline> listSongOline) {
+        mListSongOnline=listSongOline;
+
+        new PLaySong().execute(songOnline.getLINKSONG());
     }
 
     public void nextSong() {

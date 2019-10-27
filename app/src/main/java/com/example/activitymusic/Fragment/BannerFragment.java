@@ -53,7 +53,6 @@ public class BannerFragment extends Fragment {
         mView = inflater.inflate(R.layout.banner_fragment, container, false);
         initview();
         getData();
-        Log.d("Banner", "onCreateView: ");
         if(getMusicactivity().mMediaPlaybackService!=null){
             mediaPlaybackService=getMusicactivity().mMediaPlaybackService;
         }
@@ -92,8 +91,7 @@ public class BannerFragment extends Fragment {
                 mBannerAdapter.setmOnClickSongOnline(new BannerAdapter.onClickSongOnline() {
                     @Override
                     public void onClick(int position) {
-                        Log.d("visible", "onResponse: ");
-                        mediaPlaybackService.playSongOnline(songOnlineList.get(position).getLINKSONG());
+                        mediaPlaybackService.playSongOnline(songOnlineList.get(position), songOnlineList);
 
                     }
                 });
