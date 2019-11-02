@@ -9,7 +9,7 @@
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_treble_clef"
-        android:label="@string/app_name"
+        android:label="Music TTCSCN"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">

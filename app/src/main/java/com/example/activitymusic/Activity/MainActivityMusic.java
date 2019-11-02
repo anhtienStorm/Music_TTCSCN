@@ -33,6 +33,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.View;
@@ -42,7 +43,7 @@ public class MainActivityMusic extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public MediaPlaybackService mMediaPlaybackService;
-    Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment, mHomeOnlineFragment , mNotificationFragment;
+    Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment, mHomeOnlineFragment, mNotificationFragment;
     IServiceConnectListenner1 mServiceConnectListenner1;
     IServiceConnectListenner2 mServiceConnectListenner2;
     String mNameFragmentSelect;
@@ -119,7 +120,7 @@ public class MainActivityMusic extends AppCompatActivity
                         navigationView.setCheckedItem(R.id.nav_home);
                         setTitle("Music Online");
                     case "Notification":
-                        mSelectedFragment=mNotificationFragment;
+                        mSelectedFragment = mNotificationFragment;
                         navigationView.setCheckedItem(R.id.nav_notification);
                         setTitle("Notification");
 
@@ -206,7 +207,7 @@ public class MainActivityMusic extends AppCompatActivity
         mFravoriteSongsFragment = new FavoriteSongsFragment();
         mMediaPlaybackFragment = new MediaPlaybackFragment();
         mHomeOnlineFragment = new HomeOnlineFragment();
-        mNotificationFragment=new NotificationFragment();
+        mNotificationFragment = new NotificationFragment();
     }
 
     public void startService() {
@@ -272,7 +273,7 @@ public class MainActivityMusic extends AppCompatActivity
         this.mServiceConnectListenner1 = serviceConnectListenner;
     }
 
-    public  void setServiceConnectListenner2(IServiceConnectListenner2 serviceConnectListenner) {
+    public void setServiceConnectListenner2(IServiceConnectListenner2 serviceConnectListenner) {
         this.mServiceConnectListenner2 = serviceConnectListenner;
     }
 
@@ -283,16 +284,18 @@ public class MainActivityMusic extends AppCompatActivity
     }
 
     private void update() {
-        int orientation = getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+//        int orientation = getResources().getConfiguration().orientation;
+//        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
             if (mMediaPlaybackFragment.getView() != null) {
                 ((MediaPlaybackFragment) mMediaPlaybackFragment).update();
             }
-            ((BaseSongListFragment) mSelectedFragment).update();
-        } else {
-            ((BaseSongListFragment) mSelectedFragment).update();
-            ((MediaPlaybackFragment) mMediaPlaybackFragment).update();
-        }
+            if (mAllSongsFragment.getView() != null || mFravoriteSongsFragment.getView() != null){
+                ((BaseSongListFragment) mSelectedFragment).update();
+            }
+//        } else {
+//            ((BaseSongListFragment) mSelectedFragment).update();
+//            ((MediaPlaybackFragment) mMediaPlaybackFragment).update();
+//        }
     }
 
     //interface

@@ -31,9 +31,9 @@ import retrofit2.Response;
 
 public class BannerFragment extends Fragment {
 
-   private View mView, mViewHome;
-   ProgressBar  mProgressBar;
-   MediaPlaybackService mediaPlaybackService;
+    private View mView, mViewHome;
+    ProgressBar mProgressBar;
+    MediaPlaybackService mediaPlaybackService;
     ViewPager mViewPager;
     CircleIndicator mCircleIndicator;
     BannerAdapter mBannerAdapter;
@@ -41,22 +41,24 @@ public class BannerFragment extends Fragment {
     Handler mHandler;
     int mCurrentItem;
     HomeOnlineFragment homeOnlineFragment;
- protected MainActivityMusic getMusicactivity(){
-     if(getActivity() instanceof  MainActivityMusic){
-         return (MainActivityMusic) getActivity();
-     }
-     return  null;
- }
+
+    protected MainActivityMusic getMusicactivity() {
+        if (getActivity() instanceof MainActivityMusic) {
+            return (MainActivityMusic) getActivity();
+        }
+        return null;
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.banner_fragment, container, false);
         initview();
         getData();
-        if(getMusicactivity().mMediaPlaybackService!=null){
-            mediaPlaybackService=getMusicactivity().mMediaPlaybackService;
+        if (getMusicactivity().mMediaPlaybackService != null) {
+            mediaPlaybackService = getMusicactivity().mMediaPlaybackService;
         }
-        homeOnlineFragment=new HomeOnlineFragment();
+        homeOnlineFragment = new HomeOnlineFragment();
         homeOnlineFragment.setConnectRefreshLayout(new HomeOnlineFragment.connectRefreshLayout() {
             @Override
             public void refreshLayout() {
@@ -67,17 +69,17 @@ public class BannerFragment extends Fragment {
         return mView;
     }
 
-    void initview(){
+    void initview() {
         mViewPager = mView.findViewById(R.id.viewpager_banner);
         mCircleIndicator = mView.findViewById(R.id.indicator_banner);
     }
 
     public void setmViewHome(View mViewHome) {
         this.mViewHome = mViewHome;
-        mProgressBar= mViewHome.findViewById(R.id.ProgressBar);
+        mProgressBar = mViewHome.findViewById(R.id.ProgressBar);
     }
 
-    private void getData(){
+    private void getData() {
         DataServer dataServer = APIServer.getServer();
         Call<List<SongOnline>> callback = dataServer.getDataSongOnline();
         callback.enqueue(new Callback<List<SongOnline>>() {
@@ -87,12 +89,12 @@ public class BannerFragment extends Fragment {
                 mProgressBar.setVisibility(View.GONE);
 
                 final ArrayList<SongOnline> songOnlineList = (ArrayList<SongOnline>) response.body();
-                mBannerAdapter = new BannerAdapter(getActivity(),songOnlineList);
+                mBannerAdapter = new BannerAdapter(getActivity(), songOnlineList);
                 mBannerAdapter.setmOnClickSongOnline(new BannerAdapter.onClickSongOnline() {
                     @Override
                     public void onClick(int position) {
                         mediaPlaybackService.playSongOnline(songOnlineList.get(position), songOnlineList);
-
+                        getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.sub_fragment_a, new MediaPlaybackFragment()).commit();
                     }
                 });
                 mViewPager.setAdapter(mBannerAdapter);
@@ -103,14 +105,14 @@ public class BannerFragment extends Fragment {
                     public void run() {
                         mCurrentItem = mViewPager.getCurrentItem();
                         mCurrentItem++;
-                        if (mCurrentItem >= mViewPager.getAdapter().getCount()){
+                        if (mCurrentItem >= mViewPager.getAdapter().getCount()) {
                             mCurrentItem = 0;
                         }
-                        mViewPager.setCurrentItem(mCurrentItem,true);
-                        mHandler.postDelayed(mRunnable,5000);
+                        mViewPager.setCurrentItem(mCurrentItem, true);
+                        mHandler.postDelayed(mRunnable, 5000);
                     }
                 };
-                mHandler.postDelayed(mRunnable,5000);
+                mHandler.postDelayed(mRunnable, 5000);
 
             }
 

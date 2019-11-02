@@ -52,7 +52,8 @@ public class MediaPlaybackService extends Service {
     private ArrayList<Song> mPlayingSongList;
     private Song mPLayingSong;
     private ArrayList<SongOnline> mListSongOnline;
-    private int mStatus;// off =0; on=1
+    private SongOnline mPlayingSongOnline;
+    boolean mIsPlayOnline = false;
     private int mIndexofPlayingSong;
     private IServiceCallback mServiceCallback;
     private int mLoopStatus = 0;
@@ -152,7 +153,12 @@ public class MediaPlaybackService extends Service {
             nextPendingIntent = PendingIntent.getForegroundService(this, 0, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         }
 
-        Bitmap bitmap = loadImageFromPath(getPathSong());
+        Bitmap bitmap = null;
+        if (mIsPlayOnline) {
+            bitmap = BitmapFactory.decodeFile(mPlayingSongOnline.getIMAGE());
+        } else {
+            bitmap = loadImageFromPath(getPathSong());
+        }
 
         Notification notification = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                 .setSmallIcon(R.drawable.icon_notification)
@@ -191,10 +197,16 @@ public class MediaPlaybackService extends Service {
     }
 
     public String getNameSong() {
+        if (mIsPlayOnline) {
+            return mListSongOnline.get(mIndexofPlayingSong).getNAMESONG();
+        }
         return mPLayingSong.getNameSong();
     }
 
     public String getArtist() {
+        if (mIsPlayOnline) {
+            return mListSongOnline.get(mIndexofPlayingSong).getSINGER();
+        }
         return mPLayingSong.getSinger();
     }
 
@@ -212,6 +224,10 @@ public class MediaPlaybackService extends Service {
 
     public Song getPlayingSong() {
         return mPLayingSong;
+    }
+
+    public SongOnline getPlayingSongOnline() {
+        return mPlayingSongOnline;
     }
 
     public int getIndexofPlayingSong() {
@@ -261,7 +277,11 @@ public class MediaPlaybackService extends Service {
             if (focusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 mMediaPlayer.start();
                 showNotification();
-                mServiceCallback.onUpdate();
+                if (mIsPlayOnline) {
+
+                } else {
+                    mServiceCallback.onUpdate();
+                }
             }
         }
     }
@@ -282,18 +302,28 @@ public class MediaPlaybackService extends Service {
     }
 
     public void preparePlay() {
-        Uri uri = Uri.parse(mPLayingSong.getPathSong());
-
         if (mMediaPlayer != null) {
             if (mMediaPlayer.isPlaying()) {
                 mMediaPlayer.stop();
             }
         }
-
-        try {
-            mMediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (mIsPlayOnline) {
+            if (isMusicPlay()) {
+                if (isPlaying()) {
+                    pause();
+                    new PLaySong().execute(mPlayingSongOnline.getLINKSONG());
+                } else
+                    new PLaySong().execute(mPlayingSongOnline.getLINKSONG());
+            } else
+                new PLaySong().execute(mPlayingSongOnline.getLINKSONG());
+            mServiceCallback.onUpdate();
+        } else {
+            try {
+                Uri uri = Uri.parse(mPLayingSong.getPathSong());
+                mMediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         if (mMediaPlayer == null) {
@@ -304,8 +334,13 @@ public class MediaPlaybackService extends Service {
                 nextSong();
             }
         } else {
-            mIndexofPlayingSong = mPlayingSongList.indexOf(mPLayingSong);
-            play();
+            if (mIsPlayOnline) {
+                mIndexofPlayingSong = mListSongOnline.indexOf(mPlayingSongOnline);
+                mServiceCallback.onUpdate();
+            } else {
+                mIndexofPlayingSong = mPlayingSongList.indexOf(mPLayingSong);
+                play();
+            }
 
             mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
@@ -324,70 +359,42 @@ public class MediaPlaybackService extends Service {
     }
 
     public void playSong(final ArrayList<Song> listSong, final Song song) {
+        mIsPlayOnline = false;
         this.mPlayingSongList = listSong;
         this.mPLayingSong = song;
         preparePlay();
     }
 
     public void playSongOnline(SongOnline songOnline, ArrayList<SongOnline> listSongOline) {
-        mListSongOnline=listSongOline;
-
-        new PLaySong().execute(songOnline.getLINKSONG());
+        mIsPlayOnline = true;
+        mListSongOnline = listSongOline;
+        mPlayingSongOnline = songOnline;
+        preparePlay();
     }
 
     public void nextSong() {
         if (isMusicPlay()) {
-            if (mShuffle == 0) {
-                if (mIndexofPlayingSong == mPlayingSongList.size() - 1) {
-                    mIndexofPlayingSong = 0;
-                    mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
+            if (mIsPlayOnline) {
+                if (mShuffle == 0) {
+                    if (mIndexofPlayingSong == mListSongOnline.size() - 1) {
+                        mIndexofPlayingSong = 0;
+                        mPlayingSongOnline = mListSongOnline.get(mIndexofPlayingSong);
+                    } else {
+                        mIndexofPlayingSong += 1;
+                        mPlayingSongOnline = mListSongOnline.get(mIndexofPlayingSong);
+                    }
                 } else {
-                    mIndexofPlayingSong += 1;
-                    mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
+                    Random rd = new Random();
+                    mIndexofPlayingSong = rd.nextInt(mListSongOnline.size());
+                    mPlayingSongOnline = mListSongOnline.get(mIndexofPlayingSong);
                 }
-            } else {
-                Random rd = new Random();
-                mIndexofPlayingSong = rd.nextInt(mPlayingSongList.size());
-                mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
-            }
-            preparePlay();
-        }
-    }
-
-    public void nextSongNoloop() {
-        if (isMusicPlay()) {
-
-            if (mShuffle == 0) {
-                if (mIndexofPlayingSong == mPlayingSongList.size() - 1) {
-                    stop();
-                    playSong(mPlayingSongList, mPLayingSong);
-                    preparePlay();
-                    pause();
-                } else {
-                    mIndexofPlayingSong += 1;
-                    mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
-                    preparePlay();
-                }
-            } else {
-                Random rd = new Random();
-                mIndexofPlayingSong = rd.nextInt(mPlayingSongList.size());
-                mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
-                preparePlay();
-            }
-        }
-    }
-
-    public void previousSong() {
-        if (isMusicPlay()) {
-            if (getCurrentDuration() > 3000) {
-                preparePlay();
             } else {
                 if (mShuffle == 0) {
-                    if (mIndexofPlayingSong == 0) {
-                        mIndexofPlayingSong = mPlayingSongList.size() - 1;
+                    if (mIndexofPlayingSong == mPlayingSongList.size() - 1) {
+                        mIndexofPlayingSong = 0;
                         mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
                     } else {
-                        mIndexofPlayingSong -= 1;
+                        mIndexofPlayingSong += 1;
                         mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
                     }
                 } else {
@@ -395,7 +402,95 @@ public class MediaPlaybackService extends Service {
                     mIndexofPlayingSong = rd.nextInt(mPlayingSongList.size());
                     mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
                 }
-                preparePlay();
+            }
+            preparePlay();
+        }
+    }
+
+    public void nextSongNoloop() {
+        if (isMusicPlay()) {
+            if (mIsPlayOnline) {
+                if (mShuffle == 0) {
+                    if (mIndexofPlayingSong == mListSongOnline.size() - 1) {
+                        stop();
+                        playSongOnline(mPlayingSongOnline, mListSongOnline);
+                        preparePlay();
+                        pause();
+                    } else {
+                        mIndexofPlayingSong += 1;
+                        mPlayingSongOnline = mListSongOnline.get(mIndexofPlayingSong);
+                        preparePlay();
+                    }
+                } else {
+                    Random rd = new Random();
+                    mIndexofPlayingSong = rd.nextInt(mListSongOnline.size());
+                    mPlayingSongOnline = mListSongOnline.get(mIndexofPlayingSong);
+                    preparePlay();
+                }
+            } else {
+                if (mShuffle == 0) {
+                    if (mIndexofPlayingSong == mPlayingSongList.size() - 1) {
+                        stop();
+                        playSong(mPlayingSongList, mPLayingSong);
+                        preparePlay();
+                        pause();
+                    } else {
+                        mIndexofPlayingSong += 1;
+                        mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
+                        preparePlay();
+                    }
+                } else {
+                    Random rd = new Random();
+                    mIndexofPlayingSong = rd.nextInt(mPlayingSongList.size());
+                    mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
+                    preparePlay();
+                }
+            }
+        }
+    }
+
+    public void previousSong() {
+        if (mIsPlayOnline) {
+            if (isMusicPlay()) {
+                if (getCurrentDuration() > 3000) {
+                    preparePlay();
+                } else {
+                    if (mShuffle == 0) {
+                        if (mIndexofPlayingSong == 0) {
+                            mIndexofPlayingSong = mListSongOnline.size() - 1;
+                            mPlayingSongOnline = mListSongOnline.get(mIndexofPlayingSong);
+                        } else {
+                            mIndexofPlayingSong -= 1;
+                            mPlayingSongOnline = mListSongOnline.get(mIndexofPlayingSong);
+                        }
+                    } else {
+                        Random rd = new Random();
+                        mIndexofPlayingSong = rd.nextInt(mListSongOnline.size());
+                        mPlayingSongOnline = mListSongOnline.get(mIndexofPlayingSong);
+                    }
+                    preparePlay();
+                }
+            }
+        } else {
+            if (isMusicPlay()) {
+                if (getCurrentDuration() > 3000) {
+                    preparePlay();
+                } else {
+                    if (mShuffle == 0) {
+                        if (mIndexofPlayingSong == 0) {
+                            mIndexofPlayingSong = mPlayingSongList.size() - 1;
+                            mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
+                        } else {
+                            mIndexofPlayingSong -= 1;
+                            mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
+                        }
+                    } else {
+                        Random rd = new Random();
+                        mIndexofPlayingSong = rd.nextInt(mPlayingSongList.size());
+                        mPLayingSong = mPlayingSongList.get(mIndexofPlayingSong);
+                    }
+                    preparePlay();
+                }
             }
         }
     }
@@ -453,6 +548,9 @@ public class MediaPlaybackService extends Service {
     }
 
     public Bitmap loadImageFromPath(String path) {
+//        if (mIsPlayOnline){
+//            return null;
+//        }
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
         try {
             mediaMetadataRetriever.setDataSource(path);
@@ -561,21 +659,19 @@ public class MediaPlaybackService extends Service {
             try {
                 mMediaPlayer = new MediaPlayer();
                 mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mediaPlayer) {
-                        mMediaPlayer.stop();
-                        mediaPlayer.reset();
-                    }
-                });
+//                mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+//                    @Override
+//                    public void onCompletion(MediaPlayer mediaPlayer) {
+//                        mMediaPlayer.stop();
+//                        mediaPlayer.reset();
+//                    }
+//                });
                 mMediaPlayer.setDataSource(baihat);
                 mMediaPlayer.prepare();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            mMediaPlayer.start();
-
-
+            play();
         }
     }
 }

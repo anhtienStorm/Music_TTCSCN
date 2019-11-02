@@ -41,7 +41,7 @@ public class HomeOnlineFragment extends Fragment {
                     public void run() {
                         mSwipeRefreshLayout.setRefreshing(false);
                     }
-                }, 3000);
+                }, 10000);
             }
         });
         return view;
