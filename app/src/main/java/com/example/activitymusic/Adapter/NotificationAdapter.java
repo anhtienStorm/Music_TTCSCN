@@ -29,7 +29,7 @@ public class NotificationAdapter extends  RecyclerView.Adapter<NotificationAdapt
 
     private Context mContext;
     private List<Notification> mListNotification;
-
+    private  onRefreshLayout onRefreshLayout;
     public NotificationAdapter(List<Notification> listNotification,Context context) {
         mListNotification=listNotification;
         Log.d("notification", "onBindViewHolder: "+mListNotification.size());
@@ -55,6 +55,7 @@ public class NotificationAdapter extends  RecyclerView.Adapter<NotificationAdapt
             public void onResponse(Call<List<SongOnline>> call, Response<List<SongOnline>> response) {
                 ArrayList<SongOnline> songOnlineList = (ArrayList<SongOnline>) response.body();
                 Glide.with(mContext).load(songOnlineList.get(Integer.parseInt(notification.getID())).getIMAGE()).into(holder.mImageView);
+                onRefreshLayout.onRefresh();
             }
 
             @Override
@@ -84,4 +85,14 @@ public class NotificationAdapter extends  RecyclerView.Adapter<NotificationAdapt
              mDate= itemView.findViewById(R.id.dateNotification);
         }
     }
+
+    public void setOnRefreshLayout(NotificationAdapter.onRefreshLayout onRefreshLayout) {
+        this.onRefreshLayout = onRefreshLayout;
+    }
+
+    public  interface  onRefreshLayout{
+        void onRefresh();
+
+    }
+
 }

@@ -2,6 +2,9 @@ package com.example.activitymusic.Activity;
 
 import android.Manifest;
 import android.app.ActivityManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +15,7 @@ import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
 import androidx.core.view.GravityCompat;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 
@@ -22,6 +26,7 @@ import com.example.activitymusic.Fragment.AllSongsFragment;
 import com.example.activitymusic.Fragment.BaseSongListFragment;
 import com.example.activitymusic.Fragment.FavoriteSongsFragment;
 import com.example.activitymusic.Fragment.HomeOnlineFragment;
+import com.example.activitymusic.Fragment.ListPlayListFragment;
 import com.example.activitymusic.Fragment.MediaPlaybackFragment;
 import com.example.activitymusic.Fragment.NotificationFragment;
 import com.example.activitymusic.R;
@@ -38,14 +43,17 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.view.View;
 import android.widget.Toast;
 
+import pub.devrel.easypermissions.EasyPermissions;
+
 public class MainActivityMusic extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public MediaPlaybackService mMediaPlaybackService;
-    Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment, mHomeOnlineFragment , mNotificationFragment;
+    Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment, mHomeOnlineFragment , mNotificationFragment, mListPlayList;
     IServiceConnectListenner1 mServiceConnectListenner1;
     IServiceConnectListenner2 mServiceConnectListenner2;
     String mNameFragmentSelect;
+    String CHANNEL_ID="Update Notification";
 
     ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
@@ -122,6 +130,10 @@ public class MainActivityMusic extends AppCompatActivity
                         mSelectedFragment=mNotificationFragment;
                         navigationView.setCheckedItem(R.id.nav_notification);
                         setTitle("Notification");
+                    case "PlayList":
+                        mSelectedFragment=mListPlayList;
+                        navigationView.setCheckedItem(R.id.nav_playlist);
+                        setTitle("PlayList");
 
                 }
             } else {
@@ -144,8 +156,31 @@ public class MainActivityMusic extends AppCompatActivity
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_b, mMediaPlaybackFragment).commit();
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mSelectedFragment).commit();
         }
+        // Notification
+
+
     }
 
+    public  void onNotificationChane(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel musicServiceChannel = new NotificationChannel(
+                    CHANNEL_ID,
+                    "AllSongsProvider Service Channel",
+                    NotificationManager.IMPORTANCE_LOW
+            );
+            musicServiceChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            musicServiceChannel.enableVibration(false);
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(musicServiceChannel);
+            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                    .setSmallIcon(R.drawable.icon_notification)
+                    .setContentTitle("My notification")
+                    .setContentText("Much longer text that cannot fit one line...")
+                    .setStyle(new NotificationCompat.BigTextStyle()
+                            .bigText("Much longer text that cannot fit one line..."))
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        }
+    }
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -182,6 +217,12 @@ public class MainActivityMusic extends AppCompatActivity
                 mNameFragmentSelect = "Notification";
                 setTitle("Music Notification");
                 break;
+            case R.id.nav_playlist:
+                mSelectedFragment = mListPlayList;
+                mNameFragmentSelect = "PlayList";
+                setTitle("Music PlayList");
+                break;
+
         }
 
         getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mSelectedFragment).commit();
@@ -207,6 +248,7 @@ public class MainActivityMusic extends AppCompatActivity
         mMediaPlaybackFragment = new MediaPlaybackFragment();
         mHomeOnlineFragment = new HomeOnlineFragment();
         mNotificationFragment=new NotificationFragment();
+        mListPlayList =new ListPlayListFragment("view");
     }
 
     public void startService() {
@@ -251,6 +293,7 @@ public class MainActivityMusic extends AppCompatActivity
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == 1) {
+            EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, MainActivityMusic.this );
             if (grantResults.length == 1 &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(MainActivityMusic.this, "Quyền đọc file: được phép", Toast.LENGTH_SHORT).show();

@@ -19,6 +19,7 @@ import com.example.activitymusic.Model.SongOnline;
 import com.example.activitymusic.R;
 import com.example.activitymusic.Server.APIServer;
 import com.example.activitymusic.Server.DataServer;
+import com.example.activitymusic.Server.interfaceRefreshLayout;
 import com.example.activitymusic.Service.MediaPlaybackService;
 
 import java.util.ArrayList;
@@ -31,63 +32,63 @@ import retrofit2.Response;
 
 public class BannerFragment extends Fragment {
 
-   private View mView, mViewHome;
-   ProgressBar  mProgressBar;
-   MediaPlaybackService mediaPlaybackService;
+    private View mView;
+    MediaPlaybackService mediaPlaybackService;
     ViewPager mViewPager;
     CircleIndicator mCircleIndicator;
     BannerAdapter mBannerAdapter;
     Runnable mRunnable;
     Handler mHandler;
     int mCurrentItem;
+    private interfaceRefreshLayout mRefreshLayout;
     HomeOnlineFragment homeOnlineFragment;
- protected MainActivityMusic getMusicactivity(){
-     if(getActivity() instanceof  MainActivityMusic){
-         return (MainActivityMusic) getActivity();
-     }
-     return  null;
- }
+
+    protected MainActivityMusic getMusicactivity() {
+        if (getActivity() instanceof MainActivityMusic) {
+            return (MainActivityMusic) getActivity();
+        }
+        return null;
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.banner_fragment, container, false);
         initview();
         getData();
-        if(getMusicactivity().mMediaPlaybackService!=null){
-            mediaPlaybackService=getMusicactivity().mMediaPlaybackService;
+        if (getMusicactivity().mMediaPlaybackService != null) {
+            mediaPlaybackService = getMusicactivity().mMediaPlaybackService;
         }
-        homeOnlineFragment=new HomeOnlineFragment();
+        homeOnlineFragment = new HomeOnlineFragment();
         homeOnlineFragment.setConnectRefreshLayout(new HomeOnlineFragment.connectRefreshLayout() {
             @Override
             public void refreshLayout() {
                 initview();
                 getData();
             }
+
+
         });
         return mView;
     }
 
-    void initview(){
+    void initview() {
         mViewPager = mView.findViewById(R.id.viewpager_banner);
         mCircleIndicator = mView.findViewById(R.id.indicator_banner);
     }
 
-    public void setmViewHome(View mViewHome) {
-        this.mViewHome = mViewHome;
-        mProgressBar= mViewHome.findViewById(R.id.ProgressBar);
-    }
 
-    private void getData(){
+    private void getData() {
         DataServer dataServer = APIServer.getServer();
         Call<List<SongOnline>> callback = dataServer.getDataSongOnline();
         callback.enqueue(new Callback<List<SongOnline>>() {
             @Override
             public void onResponse(Call<List<SongOnline>> call, Response<List<SongOnline>> response) {
 
-                mProgressBar.setVisibility(View.GONE);
+
 
                 final ArrayList<SongOnline> songOnlineList = (ArrayList<SongOnline>) response.body();
-                mBannerAdapter = new BannerAdapter(getActivity(),songOnlineList);
+                mBannerAdapter = new BannerAdapter(getActivity(), songOnlineList);
                 mBannerAdapter.setmOnClickSongOnline(new BannerAdapter.onClickSongOnline() {
                     @Override
                     public void onClick(int position) {
@@ -96,6 +97,7 @@ public class BannerFragment extends Fragment {
                     }
                 });
                 mViewPager.setAdapter(mBannerAdapter);
+                mRefreshLayout.refreshLayout();
                 mCircleIndicator.setViewPager(mViewPager);
                 mHandler = new Handler();
                 mRunnable = new Runnable() {
@@ -103,14 +105,14 @@ public class BannerFragment extends Fragment {
                     public void run() {
                         mCurrentItem = mViewPager.getCurrentItem();
                         mCurrentItem++;
-                        if (mCurrentItem >= mViewPager.getAdapter().getCount()){
+                        if (mCurrentItem >= mViewPager.getAdapter().getCount()) {
                             mCurrentItem = 0;
                         }
-                        mViewPager.setCurrentItem(mCurrentItem,true);
-                        mHandler.postDelayed(mRunnable,5000);
+                        mViewPager.setCurrentItem(mCurrentItem, true);
+                        mHandler.postDelayed(mRunnable, 5000);
                     }
                 };
-                mHandler.postDelayed(mRunnable,5000);
+                mHandler.postDelayed(mRunnable, 5000);
 
             }
 
@@ -119,5 +121,9 @@ public class BannerFragment extends Fragment {
 
             }
         });
+    }
+
+    public void setmRefreshLayout(interfaceRefreshLayout mRefreshLayout) {
+        this.mRefreshLayout = mRefreshLayout;
     }
 }

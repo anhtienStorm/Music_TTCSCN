@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Build;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -45,6 +46,7 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.SongVi
     public SongListAdapter(ArrayList<Song> listSong, Context context) {
         this.mListSong = listSong;
         this.mContext = context;
+        Log.d("TienNVh 2", "onCreateView: " ) ;
     }
 
     public void updateList(List<Song> songs) {
@@ -60,6 +62,7 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.SongVi
     @NonNull
     @Override
     public SongViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
         return new SongViewHolder(LayoutInflater.from(mContext).inflate(R.layout.recyclerview_items, parent, false));
     }
 
