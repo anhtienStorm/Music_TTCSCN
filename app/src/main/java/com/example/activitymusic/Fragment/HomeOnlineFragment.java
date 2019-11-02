@@ -31,7 +31,6 @@ public class HomeOnlineFragment extends Fragment {
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.SwipeRefreshLayout);
         mProgressBar = view.findViewById(R.id.ProgressBar);
-
         bannerFragment = new BannerFragment();
         playListFragment = new PlayListFragment();
         getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.banner_fragment, bannerFragment).commit();

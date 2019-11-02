@@ -19,7 +19,6 @@ import com.example.activitymusic.Model.SongOnline;
 import com.example.activitymusic.R;
 import com.example.activitymusic.Server.APIServer;
 import com.example.activitymusic.Server.DataServer;
-import com.example.activitymusic.Server.interfaceRefreshLayout;
 import com.example.activitymusic.Service.MediaPlaybackService;
 
 import java.util.ArrayList;
@@ -66,8 +65,6 @@ public class BannerFragment extends Fragment {
                 initview();
                 getData();
             }
-
-
         });
         return mView;
     }
@@ -93,7 +90,7 @@ public class BannerFragment extends Fragment {
                     @Override
                     public void onClick(int position) {
                         mediaPlaybackService.playSongOnline(songOnlineList.get(position), songOnlineList);
-
+                        getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.sub_fragment_a, new MediaPlaybackFragment()).commit();
                     }
                 });
                 mViewPager.setAdapter(mBannerAdapter);
