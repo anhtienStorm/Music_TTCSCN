@@ -31,8 +31,7 @@ import retrofit2.Response;
 
 public class BannerFragment extends Fragment {
 
-    private View mView, mViewHome;
-    ProgressBar mProgressBar;
+    private View mView;
     MediaPlaybackService mediaPlaybackService;
     ViewPager mViewPager;
     CircleIndicator mCircleIndicator;
@@ -40,6 +39,7 @@ public class BannerFragment extends Fragment {
     Runnable mRunnable;
     Handler mHandler;
     int mCurrentItem;
+    private interfaceRefreshLayout mRefreshLayout;
     HomeOnlineFragment homeOnlineFragment;
 
     protected MainActivityMusic getMusicactivity() {
@@ -74,10 +74,6 @@ public class BannerFragment extends Fragment {
         mCircleIndicator = mView.findViewById(R.id.indicator_banner);
     }
 
-    public void setmViewHome(View mViewHome) {
-        this.mViewHome = mViewHome;
-        mProgressBar = mViewHome.findViewById(R.id.ProgressBar);
-    }
 
     private void getData() {
         DataServer dataServer = APIServer.getServer();
@@ -86,7 +82,7 @@ public class BannerFragment extends Fragment {
             @Override
             public void onResponse(Call<List<SongOnline>> call, Response<List<SongOnline>> response) {
 
-                mProgressBar.setVisibility(View.GONE);
+
 
                 final ArrayList<SongOnline> songOnlineList = (ArrayList<SongOnline>) response.body();
                 mBannerAdapter = new BannerAdapter(getActivity(), songOnlineList);
@@ -98,6 +94,7 @@ public class BannerFragment extends Fragment {
                     }
                 });
                 mViewPager.setAdapter(mBannerAdapter);
+                mRefreshLayout.refreshLayout();
                 mCircleIndicator.setViewPager(mViewPager);
                 mHandler = new Handler();
                 mRunnable = new Runnable() {
@@ -121,5 +118,9 @@ public class BannerFragment extends Fragment {
 
             }
         });
+    }
+
+    public void setmRefreshLayout(interfaceRefreshLayout mRefreshLayout) {
+        this.mRefreshLayout = mRefreshLayout;
     }
 }
