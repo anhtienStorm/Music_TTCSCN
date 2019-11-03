@@ -1,5 +1,6 @@
 package com.example.activitymusic.Service;
 
+import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -22,24 +23,39 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import com.example.activitymusic.Model.SongOnline;
 import com.example.activitymusic.Provider.FavoriteSongsProvider;
 import com.example.activitymusic.Activity.MainActivityMusic;
 import com.example.activitymusic.Model.Song;
 import com.example.activitymusic.R;
+import com.example.activitymusic.Server.APIServer;
+import com.example.activitymusic.Server.DataServer;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.BufferedInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Type;
+import java.net.URL;
+import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Random;
+
+import pub.devrel.easypermissions.EasyPermissions;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static android.media.AudioManager.AUDIOFOCUS_LOSS;
 import static android.media.AudioManager.AUDIOFOCUS_LOSS_TRANSIENT;
@@ -47,6 +63,7 @@ import static android.media.AudioManager.AUDIOFOCUS_LOSS_TRANSIENT;
 
 public class MediaPlaybackService extends Service {
     public static final String CHANNEL_ID = "MusicServiceChannel";
+    public static final String DOWNLOAD_ID = "MusicDownloadChannel";
     private MediaPlayer mMediaPlayer = null;
     private final Binder mBinder = new MediaPlaybackServiceBinder();
     private ArrayList<Song> mPlayingSongList;
@@ -93,6 +110,17 @@ public class MediaPlaybackService extends Service {
             musicServiceChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
             musicServiceChannel.enableVibration(false);
             NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(musicServiceChannel);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel musicServiceChannel = new NotificationChannel(
+                    "MusicDownloadChannel",
+                    "Notification Download",
+                    NotificationManager.IMPORTANCE_LOW
+            );
+            musicServiceChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            musicServiceChannel.enableVibration(false);
+            NotificationManager manager =getSystemService(NotificationManager.class);
             manager.createNotificationChannel(musicServiceChannel);
         }
         mSharedPreferences = getSharedPreferences(sharePrefFile, MODE_PRIVATE);
@@ -673,5 +701,118 @@ public class MediaPlaybackService extends Service {
             }
             play();
         }
+    }
+    NotificationManagerCompat notificationManager;
+    NotificationCompat.Builder builder;
+
+    public boolean isSDCardPresent() {
+        if (Environment.getExternalStorageState().equals(
+
+                Environment.MEDIA_MOUNTED)) {
+            return true;
+        }
+        return false;
+    }
+
+   public void onDownloadSongOnline(String Url, Context context){
+        if (isSDCardPresent()) {
+            if (EasyPermissions.hasPermissions(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                new DownloadFile(Url).execute(Url);
+            } else {
+                EasyPermissions.requestPermissions(context, "This app needs access to your file storage so that it can write files.", 300, Manifest.permission.READ_EXTERNAL_STORAGE);
+            }
+
+        } else {
+            Toast.makeText(context, "SD Card not found", Toast.LENGTH_LONG).show();
+        }
+
+    }
+    private class DownloadFile extends AsyncTask<String, Integer, String> {
+
+        private String mUrl;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Toast.makeText(getApplication(), "Bắt đầu tải xuống ...", Toast.LENGTH_SHORT).show();
+            notificationManager = NotificationManagerCompat.from(getApplication());
+            builder = new NotificationCompat.Builder(getApplication(), DOWNLOAD_ID);
+            builder.setContentTitle("Music Download")
+                    .setContentText("Download in progress")
+                    .setAutoCancel(true)
+                    .setSmallIcon(R.drawable.ic_file_download_black_24dp)
+                    .setPriority(NotificationCompat.PRIORITY_LOW);
+        }
+
+        public DownloadFile(String mUrl) {
+            this.mUrl = mUrl;
+        }
+
+        @Override
+        protected String doInBackground(String... urlParams) {
+            int count;
+            try {
+
+                URL url = new URL(mUrl);
+                URLConnection conexion = url.openConnection();
+                conexion.connect();
+                int lenghtOfFile = conexion.getContentLength();
+
+                String nameSong = mUrl.substring(44);
+                InputStream input = new BufferedInputStream(url.openStream(), 8192);
+                OutputStream output = new FileOutputStream("/sdcard/Music/" + nameSong);
+
+                byte data[] = new byte[1024];
+
+                long total = 0;
+
+                while ((count = input.read(data)) != -1) {
+                    total += count;
+                    // publishing the progress....
+                    publishProgress((int) (total * 100 / lenghtOfFile));
+                    output.write(data, 0, count);
+                }
+                output.flush();
+                output.close();
+                input.close();
+            } catch (Exception e) {
+                Log.d("Looi", e.getMessage());
+            }
+            return null;
+        }
+
+        protected void onProgressUpdate(Integer... progress) {
+
+            builder.setProgress(100, progress[0], false);
+            notificationManager.notify(2, builder.build());
+        }
+
+        @Override
+        protected void onPostExecute(String message) {
+            notificationManager.cancel(2);
+//          builder.setContentText("Download complete") ;
+//           notificationManager.notify(3, builder.build());
+//            Log.d(TAG, "onPostExecute: ok ");
+
+        }
+    }
+
+   public void onRemoveSongPlayList(  Call<String> callback, final Context context) {
+        callback.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                String result = response.body();
+                if (result.equals("true")) {
+                    Toast.makeText(context, "Thành công", Toast.LENGTH_SHORT).show();
+                } else
+                    Toast.makeText(context, "Thất bại", Toast.LENGTH_SHORT).show();
+
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Toast.makeText(context, "Mất kết nối Internet", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

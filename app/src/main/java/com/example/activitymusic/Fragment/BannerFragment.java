@@ -19,6 +19,7 @@ import com.example.activitymusic.Model.SongOnline;
 import com.example.activitymusic.R;
 import com.example.activitymusic.Server.APIServer;
 import com.example.activitymusic.Server.DataServer;
+import com.example.activitymusic.Server.interfaceRefreshLayout;
 import com.example.activitymusic.Service.MediaPlaybackService;
 
 import java.util.ArrayList;
@@ -77,12 +78,10 @@ public class BannerFragment extends Fragment {
 
     private void getData() {
         DataServer dataServer = APIServer.getServer();
-        Call<List<SongOnline>> callback = dataServer.getDataSongOnline();
+        Call<List<SongOnline>> callback = dataServer.getDataSongNewOnline();
         callback.enqueue(new Callback<List<SongOnline>>() {
             @Override
             public void onResponse(Call<List<SongOnline>> call, Response<List<SongOnline>> response) {
-
-
 
                 final ArrayList<SongOnline> songOnlineList = (ArrayList<SongOnline>) response.body();
                 mBannerAdapter = new BannerAdapter(getActivity(), songOnlineList);

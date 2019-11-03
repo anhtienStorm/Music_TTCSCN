@@ -17,6 +17,13 @@ public interface DataServer {
     @GET("SelectSongs.php")
     Call<List<SongOnline>> getDataSongOnline();
 
+    @GET("SelectTop10.php")
+    Call<List<SongOnline>> getDataSongTop10Online();
+
+    @GET("SelectSongNew.php")
+    Call<List<SongOnline>> getDataSongNewOnline();
+
+
     @GET("Notification.php")
     Call<List<Notification>> getDataNotification();
 
@@ -25,12 +32,28 @@ public interface DataServer {
     Call<List<PlayList>> getDataPlayList();
 
     @FormUrlEncoded
+    @POST("SelectPlayListSong.php")
+    Call<List<SongOnline>> getDataPlayListSong(@Field("NAME_PLAYLIST") String NAME_PLAYLIST);
+
+    @FormUrlEncoded
     @POST("AddPlayList.php")
     Call<String> InsertPlayList(@Field("ID_SONG") int ID_SONG, @Field("NAME_PLAYLIST") String NAME_PLAYLIST);
 
     @FormUrlEncoded
     @POST("RemoveSongPlayList.php")
     Call<String> RemoveSongPlayList(@Field("ID_SONG") int ID_SONG, @Field("NAME_PLAYLIST") String NAME_PLAYLIST);
+
+    @FormUrlEncoded
+    @POST("RenamePlayList.php")
+    Call<String> RenamePlayList(  @Field("NAME_PLAYLIST") String NAME_PLAYLIST , @Field("NAME_PLAYLIST_NEW") String NAME_PLAYLIST_NEW );
+
+    @FormUrlEncoded
+    @POST("DeletePlayList.php")
+    Call<String> DeletePlayList(  @Field("NAME_PLAYLIST") String NAME_PLAYLIST);
+
+    @FormUrlEncoded
+    @POST("CountSongPlayList.php")
+    Call<Integer> CountSongPlayList(  @Field("NAME_PLAYLIST") String NAME_PLAYLIST);
 
 
 }

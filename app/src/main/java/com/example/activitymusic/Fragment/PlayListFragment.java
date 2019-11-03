@@ -79,10 +79,10 @@ public class PlayListFragment extends Fragment {
                 mRecyclerViewBasePlayList.setLayoutManager(layoutManager);
                 mPlayListAdapter.setConnectHomeOnlineAndAdapter(new PlayListAdapter.connectHomeOnlineAndAdapter() {
                     @Override
-                    public void connectAdapter(int index) {
+                    public void connectAdapter( PlayList playList) {
                         listSongPlayListFragment = new ListSongPlayListFragment();
-                        listSongPlayListFragment.setmPlayList(playLists.get(index));
-                        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, listSongPlayListFragment).commit();
+                        listSongPlayListFragment.setmPlayList(playList);
+                        getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.sub_fragment_a, listSongPlayListFragment).commit();
                     }
                 });
                 mRefreshLayout.refreshLayout();

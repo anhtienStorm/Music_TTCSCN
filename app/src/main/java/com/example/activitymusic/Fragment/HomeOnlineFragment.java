@@ -22,7 +22,8 @@ public class HomeOnlineFragment extends Fragment {
     connectRefreshLayout connectRefreshLayout;
     ProgressBar mProgressBar;
     PlayListFragment playListFragment;
-
+    ListSongPlayingOnline mListSongPlayingOnline,mListSongPlaySuggestion;
+    ListSongTop10 mListSongTop10;
 
     @Nullable
     @Override
@@ -33,16 +34,29 @@ public class HomeOnlineFragment extends Fragment {
         mProgressBar = view.findViewById(R.id.ProgressBar);
         bannerFragment = new BannerFragment();
         playListFragment = new PlayListFragment();
-        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.banner_fragment, bannerFragment).commit();
-        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.play_list_fragment, playListFragment).commit();
+        mListSongPlayingOnline =new ListSongPlayingOnline("Danh sách phát" , "view");
+        mListSongPlaySuggestion=new ListSongPlayingOnline("Gợi Ý", "view");
+        mListSongTop10 =new ListSongTop10();
+        getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.banner_fragment, bannerFragment).commit();
+        getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.play_list_fragment, playListFragment).commit();
+        getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.playing_list_fragment, mListSongPlayingOnline).commit();
+        getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.top_10_song_fragment, mListSongTop10).commit();
+        getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.goi_y_song_fragment, mListSongPlaySuggestion).commit();
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 bannerFragment = new BannerFragment();
                 playListFragment = new PlayListFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.banner_fragment, bannerFragment).commit();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.play_list_fragment, playListFragment).commit();
+                mListSongPlayingOnline =new ListSongPlayingOnline("Danh sách phát", "view");
+                mListSongPlaySuggestion=new ListSongPlayingOnline("Gợi Ý", "view");
+                mListSongTop10 =new ListSongTop10();
+                getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.banner_fragment, bannerFragment).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.play_list_fragment, playListFragment).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.playing_list_fragment, mListSongPlayingOnline).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.top_10_song_fragment, mListSongTop10).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.goi_y_song_fragment, mListSongPlaySuggestion).commit();
+
                 startRefreshing();
             }
         });
@@ -65,6 +79,7 @@ public class HomeOnlineFragment extends Fragment {
                 stopRefreshing();
             }
         });
+
     }
 
     void stopRefreshing() {

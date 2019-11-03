@@ -1,6 +1,7 @@
 package com.example.activitymusic.Fragment;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -18,6 +19,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -33,13 +37,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
+import com.example.activitymusic.Activity.MainActivityMusic;
 import com.example.activitymusic.Adapter.PlayListAdapter;
 import com.example.activitymusic.Adapter.SongOnlineListAdapter;
 import com.example.activitymusic.Model.PlayList;
+import com.example.activitymusic.Model.SongOnline;
 import com.example.activitymusic.R;
 import com.example.activitymusic.Server.APIServer;
 import com.example.activitymusic.Server.DataServer;
 import com.example.activitymusic.Server.interfaceRefreshLayout;
+import com.example.activitymusic.Service.MediaPlaybackService;
 
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
@@ -59,14 +66,19 @@ import retrofit2.Response;
 public class ListSongPlayListFragment extends Fragment {
 
     private PlayList mPlayList;
-    private ArrayList<PlayList> mPlayListSong = new ArrayList<>();
+    private ArrayList<SongOnline> mPlayListSong = new ArrayList<>();
     private TextView mNamePlayList, mAmount, mRepeat;
     private ImageView mIconplaylist, mBackgroundplaylist;
     private RecyclerView mRecyclerViewListSongPlayList;
     private SongOnlineListAdapter mSongOnlineListAdapter;
-    private static String CHANNEL_ID = "Notification Download";
     private ProgressBar mProgressBar;
-
+    private MediaPlaybackService mediaPlaybackService;
+    protected MainActivityMusic getMusicactivity() {
+        if (getActivity() instanceof MainActivityMusic) {
+            return (MainActivityMusic) getActivity();
+        }
+        return null;
+    }
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -74,16 +86,8 @@ public class ListSongPlayListFragment extends Fragment {
         inintView(view);
         getData();
         update();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel musicServiceChannel = new NotificationChannel(
-                    CHANNEL_ID,
-                    "Notification Download",
-                    NotificationManager.IMPORTANCE_LOW
-            );
-            musicServiceChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-            musicServiceChannel.enableVibration(false);
-            NotificationManager manager = getActivity().getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(musicServiceChannel);
+        if (getMusicactivity().mMediaPlaybackService != null) {
+            mediaPlaybackService = getMusicactivity().mMediaPlaybackService;
         }
         mRepeat.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,6 +112,7 @@ public class ListSongPlayListFragment extends Fragment {
 
     void update() {
         mNamePlayList.setText(mPlayList.getNAMEPLAYLIST());
+        onCountSongPlayList(mPlayList.getNAMEPLAYLIST());
         Glide.with(getContext()).load(mPlayList.getIMAGE()).into(mBackgroundplaylist);
         Glide.with(getContext()).load(mPlayList.getIMAGE()).into(mIconplaylist);
 
@@ -120,46 +125,45 @@ public class ListSongPlayListFragment extends Fragment {
             @Override
             public void onResponse(Call<List<PlayList>> call, Response<List<PlayList>> response) {
                 ArrayList<PlayList> lists = (ArrayList<PlayList>) response.body();
+                if(mPlayListSong.size()==0)
                 for (int i = 0; i < lists.size(); i++) {
 
                     if (lists.get(i).getNAMEPLAYLIST().equals(mPlayList.getNAMEPLAYLIST())) {
-                        mPlayListSong.add(lists.get(i));
+                        mPlayListSong.add(new SongOnline(lists.get(i).getID() ,lists.get(i).getNAMESONG() , lists.get(i).getSINGER() ,
+                                lists.get(i).getIMAGE(), lists.get(i).getLINKSONG(),lists.get(i).getVIEW() ,lists.get(i).getIDTL()));
                     }
                 }
-                mSongOnlineListAdapter = new SongOnlineListAdapter(mPlayListSong, getActivity());
+                mSongOnlineListAdapter = new SongOnlineListAdapter(mPlayListSong, getActivity(), "view");
 
                 mRecyclerViewListSongPlayList.setAdapter(mSongOnlineListAdapter);
                 mRecyclerViewListSongPlayList.setLayoutManager(new LinearLayoutManager(getContext()));
                 mSongOnlineListAdapter.setActionDownloadSong(new SongOnlineListAdapter.actionDownloadSong() {
                     @Override
                     public void onDownloadSong(String Url) {
-                        if (isSDCardPresent()) {
-                            if (EasyPermissions.hasPermissions(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                                new DownloadFile(Url).execute(Url);
-                            } else {
-                                EasyPermissions.requestPermissions(getActivity(), "This app needs access to your file storage so that it can write files.", 300, Manifest.permission.READ_EXTERNAL_STORAGE);
-                            }
-
-                        } else {
-                            Toast.makeText(getActivity(), "SD Card not found", Toast.LENGTH_LONG).show();
-
-                        }
+                        mediaPlaybackService.onDownloadSongOnline(Url, getActivity());
                     }
 
                     @Override
                     public void onRemovePlayList(String id_Song) {
-                        onRemoveSongPlayList(Integer.parseInt(id_Song),mPlayList.getNAMEPLAYLIST());
+                        DataServer dataServer = APIServer.getServer();
+                        Call<String> callback = dataServer.RemoveSongPlayList(Integer.parseInt(id_Song), mPlayList.getNAMEPLAYLIST());
+                        mediaPlaybackService.onRemoveSongPlayList(callback, getActivity());
                     }
 
                     @Override
-                    public void onAddPlayListSongsList(String id_Song) {
-
+                    public void onAddPlayingListSongsList(String id_Song) {// add playlist
+                        Toast.makeText(getContext(), "Đang thêm vào danh sách phát", Toast.LENGTH_SHORT).show();
+                        DataServer dataServer = APIServer.getServer();
+                        Call<String> callback = dataServer.InsertPlayList(Integer.parseInt(id_Song), "Danh sách phát");
+                        mediaPlaybackService.onRemoveSongPlayList(callback, getActivity());
+                        Toast.makeText(getContext(), "Thêm thành công", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
-                    public void onAddPlayingListSongsList(String id_Song) {
-
-                    }
+                    public void onAddPlayListSongsList(String id_Song, String status) {
+                        ListPlayListFragment listPlayListFragment = new ListPlayListFragment(id_Song);
+                        getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.sub_fragment_a, listPlayListFragment).commit();
+                      }
                 });
                 mProgressBar.setVisibility(View.GONE);
 
@@ -172,112 +176,23 @@ public class ListSongPlayListFragment extends Fragment {
         });
     }
 
-    void onRemoveSongPlayList(int ID_SONG, String NAME_PLAYLIST){
-        DataServer dataServer = APIServer.getServer();
-        Call<String> callback = dataServer.RemoveSongPlayList(ID_SONG, NAME_PLAYLIST);
-        callback.enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                String result = response.body();
-                if (result.equals("true")) {
-                    Toast.makeText(getContext(), "Thành công", Toast.LENGTH_SHORT).show();
-                } else
-                    Toast.makeText(getContext(), "Thất bại", Toast.LENGTH_SHORT).show();
-
-            }
-
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                Toast.makeText(getActivity(), "Mất kết nối Internet", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
     public void setmPlayList(PlayList mPlayList) {
         this.mPlayList = mPlayList;
     }
+   void onCountSongPlayList(String namPlayList){
+       DataServer dataServer = APIServer.getServer();
+       Call<Integer> callback = dataServer.CountSongPlayList(namPlayList);
+       callback.enqueue(new Callback<Integer>() {
+           @Override
+           public void onResponse(Call<Integer> call, Response<Integer> response) {
+              mAmount.setText(response.body() + " bài hát");
+           }
 
-
-    public boolean isSDCardPresent() {
-        if (Environment.getExternalStorageState().equals(
-
-                Environment.MEDIA_MOUNTED)) {
-            return true;
-        }
-        return false;
-    }
-
-    NotificationManagerCompat notificationManager;
-    NotificationCompat.Builder builder;
-
-    private class DownloadFile extends AsyncTask<String, Integer, String> {
-
-        private String mUrl;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            Toast.makeText(getContext(), "Bắt đầu tải xuống ...", Toast.LENGTH_SHORT).show();
-            notificationManager = NotificationManagerCompat.from(getContext());
-            builder = new NotificationCompat.Builder(getContext(), CHANNEL_ID);
-            builder.setContentTitle("Music Download")
-                    .setContentText("Download in progress")
-                    .setAutoCancel(true)
-                    .setSmallIcon(R.drawable.ic_file_download_black_24dp)
-                    .setPriority(NotificationCompat.PRIORITY_LOW);
-        }
-
-        public DownloadFile(String mUrl) {
-            this.mUrl = mUrl;
-        }
-
-        @Override
-        protected String doInBackground(String... urlParams) {
-            int count;
-            try {
-
-                URL url = new URL(mUrl);
-                URLConnection conexion = url.openConnection();
-                conexion.connect();
-                int lenghtOfFile = conexion.getContentLength();
-
-                String nameSong = mUrl.substring(44);
-                InputStream input = new BufferedInputStream(url.openStream(), 8192);
-                OutputStream output = new FileOutputStream("/sdcard/" + nameSong);
-
-                byte data[] = new byte[1024];
-
-                long total = 0;
-
-                while ((count = input.read(data)) != -1) {
-                    total += count;
-                    // publishing the progress....
-                    publishProgress((int) (total * 100 / lenghtOfFile));
-                    output.write(data, 0, count);
-                }
-                output.flush();
-                output.close();
-                input.close();
-            } catch (Exception e) {
-                Log.d("Looi", e.getMessage());
-            }
-            return null;
-        }
-
-        protected void onProgressUpdate(Integer... progress) {
-
-            builder.setProgress(100, progress[0], false);
-            notificationManager.notify(2, builder.build());
-        }
-
-        @Override
-        protected void onPostExecute(String message) {
-            notificationManager.cancel(2);
-//          builder.setContentText("Download complete") ;
-//           notificationManager.notify(3, builder.build());
-//            Log.d(TAG, "onPostExecute: ok ");
-
-        }
-    }
+           @Override
+           public void onFailure(Call<Integer> call, Throwable t) {
+               Toast.makeText(getContext(), "Mất kết nối Internet", Toast.LENGTH_SHORT).show();
+           }
+       });
+   }
 
 }
