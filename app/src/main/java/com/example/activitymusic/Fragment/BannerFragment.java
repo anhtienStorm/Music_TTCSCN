@@ -89,7 +89,7 @@ public class BannerFragment extends Fragment {
                     @Override
                     public void onClick(int position) {
                         mediaPlaybackService.playSongOnline(songOnlineList.get(position), songOnlineList);
-                        getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.sub_fragment_a, new MediaPlaybackFragment()).commit();
+                        getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.sub_fragment_a, ((MainActivityMusic)getActivity()).mMediaPlaybackFragment).commit();
                     }
                 });
                 mViewPager.setAdapter(mBannerAdapter);
