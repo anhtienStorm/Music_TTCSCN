@@ -36,6 +36,7 @@ import com.example.activitymusic.R;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -53,13 +54,14 @@ public class MediaPlaybackService extends Service {
     private Song mPLayingSong;
     private ArrayList<SongOnline> mListSongOnline;
     private SongOnline mPlayingSongOnline;
-    boolean mIsPlayOnline = false;
+    public boolean mIsPlayOnline = false;
     private int mIndexofPlayingSong;
     private IServiceCallback mServiceCallback;
     private int mLoopStatus = 0;
     private int mShuffle = 0;
     private SharedPreferences mSharedPreferences;
     private String sharePrefFile = "SongSharedPreferences";
+    public Bitmap mImgSong;
 
     private AudioManager mAudioManager;
     private AudioAttributes mAudioAttributes = null;
@@ -154,10 +156,14 @@ public class MediaPlaybackService extends Service {
         }
 
         Bitmap bitmap = null;
-        if (mIsPlayOnline) {
-            bitmap = BitmapFactory.decodeFile(mPlayingSongOnline.getIMAGE());
+        if (mIsPlayOnline){
+            bitmap = mImgSong;
         } else {
-            bitmap = loadImageFromPath(getPathSong());
+            if (loadImageFromPath(getPathSong()) == null){
+                bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.icon_default_song);
+            } else {
+                bitmap = loadImageFromPath(getPathSong());
+            }
         }
 
         Notification notification = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
@@ -165,7 +171,7 @@ public class MediaPlaybackService extends Service {
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setContentTitle(getNameSong())
                 .setContentText(getArtist())
-                .setLargeIcon(bitmap == null ? BitmapFactory.decodeResource(getResources(), R.drawable.icon_default_song) : bitmap)
+                .setLargeIcon(bitmap)
                 .addAction(R.drawable.ic_skip_previous_black_24dp, "previous", previousPendingIntent)
                 .addAction(isPlaying() ? R.drawable.ic_pause_black_24dp : R.drawable.ic_play_black_24dp, "play", playPendingIntent)
                 .addAction(R.drawable.ic_skip_next_black_24dp, "next", nextPendingIntent)
@@ -198,14 +204,14 @@ public class MediaPlaybackService extends Service {
 
     public String getNameSong() {
         if (mIsPlayOnline) {
-            return mListSongOnline.get(mIndexofPlayingSong).getNAMESONG();
+            return mPlayingSongOnline.getNAMESONG();
         }
         return mPLayingSong.getNameSong();
     }
 
     public String getArtist() {
         if (mIsPlayOnline) {
-            return mListSongOnline.get(mIndexofPlayingSong).getSINGER();
+            return mPlayingSongOnline.getSINGER();
         }
         return mPLayingSong.getSinger();
     }
@@ -254,6 +260,20 @@ public class MediaPlaybackService extends Service {
         return mMediaPlayer;
     }
 
+    public void getImgSong(){
+////        BitmapDrawable bitmapDrawable = (BitmapDrawable) BaseSongListFragment.imgMainSong.getDrawable();
+////        return bitmapDrawable.getBitmap();
+//        Bitmap bitmap = null;
+//        try {
+//            InputStream in = new java.net.URL(mPlayingSongOnline.getIMAGE()).openStream();
+//            bitmap = BitmapFactory.decodeStream(in);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        return bitmap;
+        new LoadImageFromUrl().execute(mPlayingSongOnline.getIMAGE());
+    }
+
     public boolean isPlaying() {
         if (mMediaPlayer.isPlaying())
             return true;
@@ -277,11 +297,7 @@ public class MediaPlaybackService extends Service {
             if (focusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 mMediaPlayer.start();
                 showNotification();
-                if (mIsPlayOnline) {
-
-                } else {
-                    mServiceCallback.onUpdate();
-                }
+                mServiceCallback.onUpdate();
             }
         }
     }
@@ -289,10 +305,10 @@ public class MediaPlaybackService extends Service {
     public void pause() {
         mMediaPlayer.pause();
         showNotification();
+        mServiceCallback.onUpdate();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             stopForeground(STOP_FOREGROUND_DETACH);
         }
-        mServiceCallback.onUpdate();
     }
 
     public void stop() {
@@ -307,15 +323,10 @@ public class MediaPlaybackService extends Service {
                 mMediaPlayer.stop();
             }
         }
+
         if (mIsPlayOnline) {
-            if (isMusicPlay()) {
-                if (isPlaying()) {
-                    pause();
-                    new PLaySong().execute(mPlayingSongOnline.getLINKSONG());
-                } else
-                    new PLaySong().execute(mPlayingSongOnline.getLINKSONG());
-            } else
-                new PLaySong().execute(mPlayingSongOnline.getLINKSONG());
+            mMediaPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(mPlayingSongOnline.getLINKSONG()));
+            getImgSong();
             mServiceCallback.onUpdate();
         } else {
             try {
@@ -336,12 +347,10 @@ public class MediaPlaybackService extends Service {
         } else {
             if (mIsPlayOnline) {
                 mIndexofPlayingSong = mListSongOnline.indexOf(mPlayingSongOnline);
-                mServiceCallback.onUpdate();
             } else {
                 mIndexofPlayingSong = mPlayingSongList.indexOf(mPLayingSong);
-                play();
             }
-
+            play();
             mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {
@@ -547,10 +556,16 @@ public class MediaPlaybackService extends Service {
         }
     }
 
+    public void setPreviousExitSong(String id) {
+        for (int i = 0; i < mListSongOnline.size(); i++) {
+            Log.d("tiennab", "setPreviousExitSong: " + id);
+            if (mListSongOnline.get(i).getID().equals(id)) {
+                mPlayingSongOnline = mListSongOnline.get(i);
+            }
+        }
+    }
+
     public Bitmap loadImageFromPath(String path) {
-//        if (mIsPlayOnline){
-//            return null;
-//        }
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
         try {
             mediaMetadataRetriever.setDataSource(path);
@@ -582,25 +597,43 @@ public class MediaPlaybackService extends Service {
 
     private void saveData() {
         SharedPreferences.Editor editor = mSharedPreferences.edit();
-        editor.putInt("SONG_ID", mPLayingSong.getId());
         Gson gson = new Gson();
-        String json = gson.toJson(mPlayingSongList);
+        String json = null;
+        if (mIsPlayOnline) {
+            editor.putString("SONG_ID", mPlayingSongOnline.getID());
+            json = gson.toJson(mListSongOnline);
+        } else {
+            editor.putInt("SONG_ID", mPLayingSong.getId());
+            json = gson.toJson(mPlayingSongList);
+        }
         editor.putString("SONG_LIST", json);
         editor.putInt("LoopStatus", mLoopStatus);
         editor.putInt("ShuffleStatus", mShuffle);
+        editor.putBoolean("IS_PLAY_ONLINE", mIsPlayOnline);
         editor.apply();
     }
 
     public void loadData() {
         Gson gson = new Gson();
+        mIsPlayOnline = mSharedPreferences.getBoolean("IS_PLAY_ONLINE", false);
         String json = mSharedPreferences.getString("SONG_LIST", null);
-        Type type = new TypeToken<ArrayList<Song>>() {
-        }.getType();
-        mPlayingSongList = gson.fromJson(json, type);
-        if (mPlayingSongList == null) {
-            mPlayingSongList = new ArrayList<>();
+        if (mIsPlayOnline) {
+            Type type = new TypeToken<ArrayList<SongOnline>>() {
+            }.getType();
+            mListSongOnline = gson.fromJson(json, type);
+            if (mListSongOnline == null) {
+                mListSongOnline = new ArrayList<>();
+            }
+            setPreviousExitSong(mSharedPreferences.getString("SONG_ID", null));
+        } else {
+            Type type = new TypeToken<ArrayList<Song>>() {
+            }.getType();
+            mPlayingSongList = gson.fromJson(json, type);
+            if (mPlayingSongList == null) {
+                mPlayingSongList = new ArrayList<>();
+            }
+            setPreviousExitSong(mSharedPreferences.getInt("SONG_ID", 0));
         }
-        setPreviousExitSong(mSharedPreferences.getInt("SONG_ID", 0));
         mLoopStatus = mSharedPreferences.getInt("LoopStatus", 0);
         mShuffle = mSharedPreferences.getInt("ShuffleStatus", 0);
     }
@@ -646,32 +679,59 @@ public class MediaPlaybackService extends Service {
     }
 
 
-    class PLaySong extends AsyncTask<String, Void, String> {
+//    class PLaySong extends AsyncTask<String, Void, String> {
+//
+//        @Override
+//        protected String doInBackground(String... strings) {
+//            return strings[0];
+//        }
+//
+//        @Override
+//        protected void onPostExecute(String baihat) {
+//            super.onPostExecute(baihat);
+//            try {
+//                //mMediaPlayer = new MediaPlayer();
+////                mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+////                mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+////                    @Override
+////                    public void onCompletion(MediaPlayer mediaPlayer) {
+////                        if (mLoopStatus == 0) {
+////                            nextSongNoloop();
+////                        } else if (mLoopStatus == 1) {
+////                            nextSong();
+////                        } else {
+////                            playSong(mPlayingSongList, mPLayingSong);
+////                        }
+////                    }
+////                });
+////                mMediaPlayer.setDataSource(baihat);
+//                mMediaPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(baihat));
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+////            play();
+//        }
+//    }
 
-        @Override
-        protected String doInBackground(String... strings) {
-            return strings[0];
-        }
+    public class LoadImageFromUrl extends AsyncTask<String, Void, Bitmap> {
 
-        @Override
-        protected void onPostExecute(String baihat) {
-            super.onPostExecute(baihat);
+        protected Bitmap doInBackground(String... urls) {
+            String imageURL = urls[0];
+            Bitmap bimage = null;
             try {
-                mMediaPlayer = new MediaPlayer();
-                mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-//                mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-//                    @Override
-//                    public void onCompletion(MediaPlayer mediaPlayer) {
-//                        mMediaPlayer.stop();
-//                        mediaPlayer.reset();
-//                    }
-//                });
-                mMediaPlayer.setDataSource(baihat);
-                mMediaPlayer.prepare();
+                InputStream in = new java.net.URL(imageURL).openStream();
+                bimage = BitmapFactory.decodeStream(in);
+
             } catch (Exception e) {
+                Log.e("Error Message", e.getMessage());
                 e.printStackTrace();
             }
-            play();
+            return bimage;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            mImgSong = result;
+            showNotification();
         }
     }
 }

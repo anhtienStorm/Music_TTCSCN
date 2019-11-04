@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,6 +28,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.activitymusic.Provider.FavoriteSongsProvider;
 import com.example.activitymusic.Activity.MainActivityMusic;
 import com.example.activitymusic.Service.MediaPlaybackService;
@@ -43,7 +45,7 @@ public class BaseSongListFragment extends Fragment implements SongListAdapter.IS
     protected SongListAdapter mSongListAdapter;
     ImageView imgPlay;
     TextView tvNameSong, tvArtist;
-    ImageView imgMainSong;
+    public static ImageView imgMainSong;
     boolean mCheckService = false;
     private ArrayList<Song> mListSong = new ArrayList<>();
 
@@ -188,16 +190,19 @@ public class BaseSongListFragment extends Fragment implements SongListAdapter.IS
         if (mMediaPlaybackService.isMusicPlay()) {
             mSongListAdapter.notifyDataSetChanged();
 
-            if (loadImageFromPath(mMediaPlaybackService.getPathSong()) == null) {
-                imgMainSong.setImageResource(R.drawable.icon_default_song);
-            } else {
-                imgMainSong.setImageBitmap(loadImageFromPath(mMediaPlaybackService.getPathSong()));
-            }
-
-            tvNameSong.setText(mMediaPlaybackService.getNameSong());
-            tvArtist.setText(mMediaPlaybackService.getArtist());
             if (mMediaPlaybackService.isPlaying()) {
                 imgPlay.setImageResource(R.drawable.ic_pause_black_24dp);
+                tvNameSong.setText(mMediaPlaybackService.getNameSong());
+                tvArtist.setText(mMediaPlaybackService.getArtist());
+                if (mMediaPlaybackService.mIsPlayOnline){
+                    Glide.with(getContext()).load(mMediaPlaybackService.getPlayingSongOnline().getIMAGE()).error(R.drawable.icon_default_song).into(imgMainSong);
+                } else {
+                    if (loadImageFromPath(mMediaPlaybackService.getPathSong()) == null) {
+                        imgMainSong.setImageResource(R.drawable.icon_default_song);
+                    } else {
+                        imgMainSong.setImageBitmap(loadImageFromPath(mMediaPlaybackService.getPathSong()));
+                    }
+                }
             } else {
                 imgPlay.setImageResource(R.drawable.ic_play_black_24dp);
             }
@@ -207,10 +212,14 @@ public class BaseSongListFragment extends Fragment implements SongListAdapter.IS
     public void updateSaveSong() {
         mSongListAdapter.notifyDataSetChanged();
 
-        if (loadImageFromPath(mMediaPlaybackService.getPathSong()) == null) {
-            imgMainSong.setImageResource(R.drawable.icon_default_song);
+        if (mMediaPlaybackService.mIsPlayOnline){
+            Glide.with(getContext()).load(mMediaPlaybackService.getPlayingSongOnline().getIMAGE()).error(R.drawable.icon_default_song).into(imgMainSong);
         } else {
-            imgMainSong.setImageBitmap(loadImageFromPath(mMediaPlaybackService.getPathSong()));
+            if (loadImageFromPath(mMediaPlaybackService.getPathSong()) == null) {
+                imgMainSong.setImageResource(R.drawable.icon_default_song);
+            } else {
+                imgMainSong.setImageBitmap(loadImageFromPath(mMediaPlaybackService.getPathSong()));
+            }
         }
 
         tvNameSong.setText(mMediaPlaybackService.getNameSong());

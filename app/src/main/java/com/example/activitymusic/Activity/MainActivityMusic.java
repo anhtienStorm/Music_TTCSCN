@@ -20,6 +20,7 @@ import androidx.core.view.GravityCompat;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 
 import android.os.IBinder;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.example.activitymusic.Fragment.AllSongsFragment;
@@ -50,7 +51,7 @@ public class MainActivityMusic extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public MediaPlaybackService mMediaPlaybackService;
-    Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment, mHomeOnlineFragment , mNotificationFragment, mListPlayList;
+    public Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment, mHomeOnlineFragment , mNotificationFragment, mListPlayList;
     IServiceConnectListenner1 mServiceConnectListenner1;
     IServiceConnectListenner2 mServiceConnectListenner2;
     String mNameFragmentSelect;
@@ -329,7 +330,10 @@ public class MainActivityMusic extends AppCompatActivity
     private void update() {
 //        int orientation = getResources().getConfiguration().orientation;
 //        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-            if (mMediaPlaybackFragment.getView() != null) {
+        Log.d("tiennab", "update: "+mMediaPlaybackFragment);
+        Log.d("tiennab", "update: "+mMediaPlaybackFragment.getView());
+        if (mMediaPlaybackFragment.getView() != null) {
+                Log.d("tiennab", "update: ");
                 ((MediaPlaybackFragment) mMediaPlaybackFragment).update();
             }
             if (mAllSongsFragment.getView() != null || mFravoriteSongsFragment.getView() != null){

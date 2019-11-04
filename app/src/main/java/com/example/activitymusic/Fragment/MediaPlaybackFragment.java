@@ -27,6 +27,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.example.activitymusic.Provider.FavoriteSongsProvider;
 import com.example.activitymusic.Activity.MainActivityMusic;
 import com.example.activitymusic.Service.MediaPlaybackService;
@@ -252,21 +253,37 @@ public class MediaPlaybackFragment extends Fragment {
 
     public void update() {
         if (mMediaPlaybackService.isMusicPlay()) {
-            if (loadImageFromPath(mMediaPlaybackService.getPathSong()) == null) {
-                imgSongSmall.setImageResource(R.drawable.icon_default_song);
-                imgSong.setImageResource(R.drawable.icon_default_song);
-            } else {
-                imgSong.setImageBitmap(loadImageFromPath(mMediaPlaybackService.getPathSong()));
-                imgSongSmall.setImageBitmap(loadImageFromPath(mMediaPlaybackService.getPathSong()));
-            }
 
-            tvNameSong.setText(mMediaPlaybackService.getNameSong());
-            tvArtist.setText(mMediaPlaybackService.getArtist());
             tvTotalTimeSong.setText(mMediaPlaybackService.getTotalTime());
             seekBarSong.setMax(mMediaPlaybackService.getDuration());
             updateTimeSong();
             if (mMediaPlaybackService.isPlaying()) {
                 btImgPlay.setImageResource(R.drawable.ic_pause_circle_filled_orange_24dp);
+                tvNameSong.setText(mMediaPlaybackService.getNameSong());
+                tvArtist.setText(mMediaPlaybackService.getArtist());
+                if (mMediaPlaybackService.mIsPlayOnline){
+                    Glide.with(getContext()).load(mMediaPlaybackService.getPlayingSongOnline().getIMAGE()).error(R.drawable.icon_default_song).into(imgSong);
+                    Glide.with(getContext()).load(mMediaPlaybackService.getPlayingSongOnline().getIMAGE()).error(R.drawable.icon_default_song).into(imgSongSmall);
+                } else {
+                    if (loadImageFromPath(mMediaPlaybackService.getPathSong()) == null) {
+                        imgSongSmall.setImageResource(R.drawable.icon_default_song);
+                        imgSong.setImageResource(R.drawable.icon_default_song);
+                    } else {
+                        imgSong.setImageBitmap(loadImageFromPath(mMediaPlaybackService.getPathSong()));
+                        imgSongSmall.setImageBitmap(loadImageFromPath(mMediaPlaybackService.getPathSong()));
+                    }
+
+                    if (mMediaPlaybackService.loadFavoriteStatus(mMediaPlaybackService.getId()) == 2) {
+                        btImgLike.setImageResource(R.drawable.ic_liked_black_24dp);
+                        btImgDislike.setImageResource(R.drawable.ic_dislike);
+                    } else if (mMediaPlaybackService.loadFavoriteStatus(mMediaPlaybackService.getId()) == 1) {
+                        btImgDislike.setImageResource(R.drawable.ic_disliked_black_24dp);
+                        btImgLike.setImageResource(R.drawable.ic_like);
+                    } else {
+                        btImgLike.setImageResource(R.drawable.ic_like);
+                        btImgDislike.setImageResource(R.drawable.ic_dislike);
+                    }
+                }
             } else {
                 btImgPlay.setImageResource(R.drawable.ic_play_circle_filled_orange_24dp);
             }
@@ -286,39 +303,35 @@ public class MediaPlaybackFragment extends Fragment {
             btImgShuffle.setImageResource
                     (R.drawable.ic_shuffle_orange_24dp);
         }
-        if (mMediaPlaybackService.loadFavoriteStatus(mMediaPlaybackService.getId()) == 2) {
-            btImgLike.setImageResource(R.drawable.ic_liked_black_24dp);
-            btImgDislike.setImageResource(R.drawable.ic_dislike);
-        } else if (mMediaPlaybackService.loadFavoriteStatus(mMediaPlaybackService.getId()) == 1) {
-            btImgDislike.setImageResource(R.drawable.ic_disliked_black_24dp);
-            btImgLike.setImageResource(R.drawable.ic_like);
-        } else {
-            btImgLike.setImageResource(R.drawable.ic_like);
-            btImgDislike.setImageResource(R.drawable.ic_dislike);
-        }
     }
 
     public void updateSaveSong() {
-        if (loadImageFromPath(mMediaPlaybackService.getPathSong()) == null) {
-            imgSongSmall.setImageResource(R.drawable.icon_default_song);
-            imgSong.setImageResource(R.drawable.icon_default_song);
+        if (mMediaPlaybackService.mIsPlayOnline){
+            Glide.with(getContext()).load(mMediaPlaybackService.getPlayingSongOnline().getIMAGE()).error(R.drawable.icon_default_song).into(imgSong);
+            Glide.with(getContext()).load(mMediaPlaybackService.getPlayingSongOnline().getIMAGE()).error(R.drawable.icon_default_song).into(imgSongSmall);
         } else {
-            imgSong.setImageBitmap(loadImageFromPath(mMediaPlaybackService.getPathSong()));
-            imgSongSmall.setImageBitmap(loadImageFromPath(mMediaPlaybackService.getPathSong()));
+            if (loadImageFromPath(mMediaPlaybackService.getPathSong()) == null) {
+                imgSongSmall.setImageResource(R.drawable.icon_default_song);
+                imgSong.setImageResource(R.drawable.icon_default_song);
+            } else {
+                imgSong.setImageBitmap(loadImageFromPath(mMediaPlaybackService.getPathSong()));
+                imgSongSmall.setImageBitmap(loadImageFromPath(mMediaPlaybackService.getPathSong()));
+            }
+
+            if (mMediaPlaybackService.loadFavoriteStatus(mMediaPlaybackService.getId()) == 2) {
+                btImgLike.setImageResource(R.drawable.ic_liked_black_24dp);
+                btImgDislike.setImageResource(R.drawable.ic_dislike);
+            } else if (mMediaPlaybackService.loadFavoriteStatus(mMediaPlaybackService.getId()) == 1) {
+                btImgDislike.setImageResource(R.drawable.ic_disliked_black_24dp);
+                btImgLike.setImageResource(R.drawable.ic_like);
+            } else {
+                btImgLike.setImageResource(R.drawable.ic_like);
+                btImgDislike.setImageResource(R.drawable.ic_dislike);
+            }
         }
 
         tvNameSong.setText(mMediaPlaybackService.getNameSong());
         tvArtist.setText(mMediaPlaybackService.getArtist());
-        if (mMediaPlaybackService.loadFavoriteStatus(mMediaPlaybackService.getId()) == 2) {
-            btImgLike.setImageResource(R.drawable.ic_liked_black_24dp);
-            btImgDislike.setImageResource(R.drawable.ic_dislike);
-        } else if (mMediaPlaybackService.loadFavoriteStatus(mMediaPlaybackService.getId()) == 1) {
-            btImgDislike.setImageResource(R.drawable.ic_disliked_black_24dp);
-            btImgLike.setImageResource(R.drawable.ic_like);
-        } else {
-            btImgLike.setImageResource(R.drawable.ic_like);
-            btImgDislike.setImageResource(R.drawable.ic_dislike);
-        }
     }
 
     public Bitmap loadImageFromPath(String path) {
