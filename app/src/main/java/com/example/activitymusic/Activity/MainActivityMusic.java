@@ -55,7 +55,6 @@ public class MainActivityMusic extends AppCompatActivity
     IServiceConnectListenner1 mServiceConnectListenner1;
     IServiceConnectListenner2 mServiceConnectListenner2;
     String mNameFragmentSelect;
-    String CHANNEL_ID="Update Notification";
 
     ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
@@ -158,31 +157,11 @@ public class MainActivityMusic extends AppCompatActivity
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_b, mMediaPlaybackFragment).commit();
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mSelectedFragment).commit();
         }
-        // Notification
 
 
     }
 
-    public  void onNotificationChane(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel musicServiceChannel = new NotificationChannel(
-                    CHANNEL_ID,
-                    "AllSongsProvider Service Channel",
-                    NotificationManager.IMPORTANCE_LOW
-            );
-            musicServiceChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-            musicServiceChannel.enableVibration(false);
-            NotificationManager manager = getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(musicServiceChannel);
-            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                    .setSmallIcon(R.drawable.icon_notification)
-                    .setContentTitle("My notification")
-                    .setContentText("Much longer text that cannot fit one line...")
-                    .setStyle(new NotificationCompat.BigTextStyle()
-                            .bigText("Much longer text that cannot fit one line..."))
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-        }
-    }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);

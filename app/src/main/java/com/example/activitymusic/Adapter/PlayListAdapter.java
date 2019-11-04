@@ -41,14 +41,14 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
 
     @Override
     public void onBindViewHolder(@NonNull PlayListViewHolder holder, final int position) {
-        PlayList playList = mPlayLists.get(position);
+        final PlayList playList = mPlayLists.get(position);
         holder.mName.setText(playList.getNAMEPLAYLIST());
         holder.mArtists.setText("Various Artists");
         Glide.with(mContext).load(playList.getIMAGE()).into(holder.mIcon);
         holder.mConstraintLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                connectHomeOnlineAndAdapter.connectAdapter(position);
+                connectHomeOnlineAndAdapter.connectAdapter(playList);
             }
         });
     }
@@ -75,6 +75,6 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
     }
 
     public interface connectHomeOnlineAndAdapter {
-        void connectAdapter(int index);
+        void connectAdapter( PlayList playList);
     }
 }

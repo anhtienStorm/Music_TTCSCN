@@ -83,4 +83,13 @@ public class SongOnline {
         this.iDTL = iDTL;
     }
 
+    public SongOnline(String iD, String nAMESONG, String sINGER, String iMAGE, String lINKSONG, String vIEW, String iDTL) {
+        this.iD = iD;
+        this.nAMESONG = nAMESONG;
+        this.sINGER = sINGER;
+        this.iMAGE = iMAGE;
+        this.lINKSONG = lINKSONG;
+        this.vIEW = vIEW;
+        this.iDTL = iDTL;
+    }
 }

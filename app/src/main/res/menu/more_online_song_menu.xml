@@ -11,7 +11,7 @@
     <item
         android:id="@+id/remove_playlist_song"
         android:icon="@drawable/ic_recent_black_24dp"
-        android:title="Xoá vào playlist" />
+        android:title="Xoá khỏi playlist" />
     <item
         android:id="@+id/download_song"
         android:icon="@drawable/ic_recent_black_24dp"

@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.activitymusic.Model.PlayList;
@@ -30,10 +31,9 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 
-import pub.devrel.easypermissions.EasyPermissions;
-
 public class SongOnlineListAdapter extends RecyclerView.Adapter<SongOnlineListAdapter.SongOnlineViewHolder> {
-    private ArrayList<PlayList> mListSongOnline = new ArrayList<>();
+    private ArrayList<SongOnline> mPlayListSongOnline = new ArrayList<>();
+    private String mStatus;
     private Context mContext;
     private actionDownloadSong actionDownloadSong;
 
@@ -41,31 +41,44 @@ public class SongOnlineListAdapter extends RecyclerView.Adapter<SongOnlineListAd
         this.actionDownloadSong = actionDownloadSong;
     }
 
-    public SongOnlineListAdapter(ArrayList<PlayList> mListSongOnline, Context mContext) {
-        this.mListSongOnline = mListSongOnline;
+    public SongOnlineListAdapter(ArrayList<SongOnline> mListSongOnline, Context mContext , String mStatus) {
+        this.mPlayListSongOnline = mListSongOnline;
         this.mContext = mContext;
+        this.mStatus=mStatus;
         Log.d("TienNVh", "SongOnlineListAdapter: " + mListSongOnline.size());
     }
 
     @NonNull
     @Override
     public SongOnlineViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Log.d("TienNVh", "SongOnlineListAdapter:1 " + mListSongOnline.size());
+        Log.d("TienNVh", "SongOnlineListAdapter:1 " + mPlayListSongOnline.size());
         return new SongOnlineViewHolder(LayoutInflater.from(mContext).inflate(R.layout.items_song_online, parent, false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull final SongOnlineViewHolder holder, int position) {
-        final PlayList songOnline = mListSongOnline.get(position);
+        final SongOnline songOnline = mPlayListSongOnline.get(position);
         holder.mIndex.setText(position + "");
         holder.mNamesong.setText(songOnline.getNAMESONG());
         holder.mSinger.setText(songOnline.getSINGER());
+        holder.mConstraintLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mStatus.equals("view")){
+                    // Phat nhac
+                }else {
+                    actionDownloadSong.onAddPlayListSongsList(songOnline.getID(),mStatus);
+                }
+            }
+        });
+        if(!mStatus.equals("view"))
+            holder.mMore.setVisibility(View.GONE);
+
         holder.mMore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 PopupMenu popupMenu = new PopupMenu(mContext, holder.mMore);
                 popupMenu.inflate(R.menu.more_online_song_menu);
-
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
@@ -74,7 +87,7 @@ public class SongOnlineListAdapter extends RecyclerView.Adapter<SongOnlineListAd
                                 actionDownloadSong.onAddPlayingListSongsList(songOnline.getID());
                                 return true;
                             case R.id.add_playlist_song:
-                                actionDownloadSong.onAddPlayListSongsList(songOnline.getID());
+                                actionDownloadSong.onAddPlayListSongsList(songOnline.getID(), "view");
                                 return true;
                             case R.id.download_song:
                                 actionDownloadSong.onDownloadSong(songOnline.getLINKSONG());
@@ -95,20 +108,21 @@ public class SongOnlineListAdapter extends RecyclerView.Adapter<SongOnlineListAd
 
     @Override
     public int getItemCount() {
-        return mListSongOnline.size();
+        return mPlayListSongOnline.size();
     }
 
     public class SongOnlineViewHolder extends RecyclerView.ViewHolder {
 
         TextView mIndex, mNamesong, mSinger;
         ImageView mMore;
-
+        ConstraintLayout mConstraintLayout;
         public SongOnlineViewHolder(@NonNull View itemView) {
             super(itemView);
             mIndex = itemView.findViewById(R.id.index_song_online);
             mNamesong = itemView.findViewById(R.id.name_song_online);
             mSinger = itemView.findViewById(R.id.singer_song_online);
             mMore = itemView.findViewById(R.id.more_song_online);
+            mConstraintLayout=itemView.findViewById(R.id.constraintLayoutSongOnline);
 
         }
     }
@@ -117,7 +131,8 @@ public class SongOnlineListAdapter extends RecyclerView.Adapter<SongOnlineListAd
     public interface actionDownloadSong {
         void onDownloadSong(String Url);
         void onRemovePlayList(String id_Song);
-        void onAddPlayListSongsList(String id_Song);
+        void onAddPlayListSongsList(String id_Song, String status);
         void onAddPlayingListSongsList(String id_Song);// ds hien tai
+
     }
 }
