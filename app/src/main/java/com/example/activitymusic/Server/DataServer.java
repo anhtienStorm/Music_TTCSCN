@@ -55,5 +55,7 @@ public interface DataServer {
     @POST("CountSongPlayList.php")
     Call<Integer> CountSongPlayList(  @Field("NAME_PLAYLIST") String NAME_PLAYLIST);
 
-
+    @FormUrlEncoded
+    @POST("UpdateViewSong.php")
+    Call<String> UpdateViewSong(  @Field("ID_SONG") int ID_SONG);
 }

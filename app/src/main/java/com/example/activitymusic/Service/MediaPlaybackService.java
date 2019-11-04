@@ -792,10 +792,14 @@ public class MediaPlaybackService extends Service {
             notificationManager.cancel(2);
 //          builder.setContentText("Download complete") ;
 //           notificationManager.notify(3, builder.build());
-//            Log.d(TAG, "onPostExecute: ok ");
 
         }
     }
+
+// Update View
+ // DataServer dataServer = APIServer.getServer();
+ //Call<String> callback = dataServer.UpdateViewSong(Integer.parseInt(id_Song));
+// sau dó gọi hàm onRemoveSongPlayList
 
    public void onRemoveSongPlayList(  Call<String> callback, final Context context) {
         callback.enqueue(new Callback<String>() {

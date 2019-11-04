@@ -2,15 +2,20 @@ package com.example.activitymusic.Activity;
 
 import android.Manifest;
 import android.app.ActivityManager;
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -20,6 +25,8 @@ import androidx.core.view.GravityCompat;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 
 import android.os.IBinder;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.example.activitymusic.Fragment.AllSongsFragment;
@@ -30,6 +37,7 @@ import com.example.activitymusic.Fragment.ListPlayListFragment;
 import com.example.activitymusic.Fragment.MediaPlaybackFragment;
 import com.example.activitymusic.Fragment.NotificationFragment;
 import com.example.activitymusic.R;
+import com.example.activitymusic.Service.AlarmService;
 import com.example.activitymusic.Service.MediaPlaybackService;
 import com.google.android.material.navigation.NavigationView;
 
@@ -54,6 +62,8 @@ public class MainActivityMusic extends AppCompatActivity
     IServiceConnectListenner1 mServiceConnectListenner1;
     IServiceConnectListenner2 mServiceConnectListenner2;
     String mNameFragmentSelect;
+    AlarmManager alarmManager;
+    PendingIntent pendingIntent;
 
     ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
@@ -157,8 +167,13 @@ public class MainActivityMusic extends AppCompatActivity
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mSelectedFragment).commit();
         }
 
+        alarmManager=(AlarmManager) getSystemService(ALARM_SERVICE);
+        final Intent intent = new Intent(MainActivityMusic.this, AlarmService.class);
+        pendingIntent = PendingIntent.getBroadcast(MainActivityMusic.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, 5000, pendingIntent);
 
     }
+
 
 
     @Override

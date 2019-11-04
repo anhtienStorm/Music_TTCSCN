@@ -9,6 +9,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -43,8 +44,8 @@ public class ListSongTop10 extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.list_song_top10, container, false);
-        mRecyclerViewListSong = view.findViewById(R.id.recyclerviewSongTop10);
+        View view = inflater.inflate(R.layout.play_list_fragment, container, false);
+        mRecyclerViewListSong = view.findViewById(R.id.recyclerviewPlaylist);
         getData();
 
         if (getMusicactivity().mMediaPlaybackService != null) {
@@ -63,7 +64,10 @@ public class ListSongTop10 extends Fragment {
                 final ArrayList<SongOnline> lists = (ArrayList<SongOnline>) response.body();
                 mSongTop10Adapter = new SongTop10Adapter( getActivity(),lists);
                 mRecyclerViewListSong.setAdapter(mSongTop10Adapter);
-                mRecyclerViewListSong.setLayoutManager(new LinearLayoutManager(getContext()));
+                GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
+                gridLayoutManager.setOrientation(RecyclerView.VERTICAL);
+                mRecyclerViewListSong.setLayoutManager(gridLayoutManager);
+              //  mRecyclerViewListSong.setLayoutManager(new LinearLayoutManager(getContext()));
 
 
             }
