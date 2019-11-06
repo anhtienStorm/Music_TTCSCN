@@ -15,6 +15,9 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,6 +32,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.bumptech.glide.Glide;
 import com.example.activitymusic.Fragment.AllSongsFragment;
 import com.example.activitymusic.Fragment.BaseSongListFragment;
 import com.example.activitymusic.Fragment.FavoriteSongsFragment;
@@ -50,6 +54,9 @@ import androidx.fragment.app.FragmentManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import pub.devrel.easypermissions.EasyPermissions;
@@ -58,7 +65,10 @@ public class MainActivityMusic extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public MediaPlaybackService mMediaPlaybackService;
-    Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment, mHomeOnlineFragment , mNotificationFragment, mListPlayList;
+    public Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment, mHomeOnlineFragment, mNotificationFragment, mListPlayList;
+    ImageView imgPlay;
+    TextView tvNameSong, tvArtist;
+    ImageView imgMainSong;
     IServiceConnectListenner1 mServiceConnectListenner1;
     IServiceConnectListenner2 mServiceConnectListenner2;
     String mNameFragmentSelect;
@@ -83,6 +93,14 @@ public class MainActivityMusic extends AppCompatActivity
                 }
 
             });
+            if (!mMediaPlaybackService.isMusicPlay()) {
+                if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")) {
+                    mMediaPlaybackService.loadData();
+                    updateSaveSong();
+                } else {
+                    findViewById(R.id.layoutPlayMusic).setVisibility(View.GONE);
+                }
+            }
         }
 
         @Override
@@ -108,6 +126,7 @@ public class MainActivityMusic extends AppCompatActivity
 
         initPermission();   //xin cap quyen doc bo nho
         createFragment();
+        initView();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -141,7 +160,7 @@ public class MainActivityMusic extends AppCompatActivity
                         navigationView.setCheckedItem(R.id.nav_notification);
                         setTitle("Notification");
                     case "PlayList":
-                        mSelectedFragment=mListPlayList;
+                        mSelectedFragment = mListPlayList;
                         navigationView.setCheckedItem(R.id.nav_playlist);
                         setTitle("PlayList");
 
@@ -167,13 +186,27 @@ public class MainActivityMusic extends AppCompatActivity
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mSelectedFragment).commit();
         }
 
-        alarmManager=(AlarmManager) getSystemService(ALARM_SERVICE);
+        imgPlay.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mMediaPlaybackService.isMusicPlay()) {
+                    if (mMediaPlaybackService.isPlaying()) {
+                        mMediaPlaybackService.pause();
+                    } else {
+                        mMediaPlaybackService.play();
+                    }
+                } else {
+                    mMediaPlaybackService.preparePlay();
+                }
+            }
+        });
+
+        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         final Intent intent = new Intent(MainActivityMusic.this, AlarmService.class);
         pendingIntent = PendingIntent.getBroadcast(MainActivityMusic.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         alarmManager.set(AlarmManager.RTC_WAKEUP, 5000, pendingIntent);
 
     }
-
 
 
     @Override
@@ -242,8 +275,16 @@ public class MainActivityMusic extends AppCompatActivity
         mFravoriteSongsFragment = new FavoriteSongsFragment();
         mMediaPlaybackFragment = new MediaPlaybackFragment();
         mHomeOnlineFragment = new HomeOnlineFragment();
-        mNotificationFragment=new NotificationFragment();
-        mListPlayList =new ListPlayListFragment("view");
+        mNotificationFragment = new NotificationFragment();
+        mListPlayList = new ListPlayListFragment("view");
+    }
+
+    public void initView() {
+        imgPlay = findViewById(R.id.btMainPlay);
+        tvNameSong = findViewById(R.id.tvMainNameSong);
+        tvNameSong.setSelected(true);
+        tvArtist = findViewById(R.id.tvMainArtist);
+        imgMainSong = findViewById(R.id.imgMainSong);
     }
 
     public void startService() {
@@ -288,7 +329,7 @@ public class MainActivityMusic extends AppCompatActivity
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == 1) {
-            EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, MainActivityMusic.this );
+            EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, MainActivityMusic.this);
             if (grantResults.length == 1 &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(MainActivityMusic.this, "Quyền đọc file: được phép", Toast.LENGTH_SHORT).show();
@@ -320,19 +361,66 @@ public class MainActivityMusic extends AppCompatActivity
         outState.putString("name_fragment_select", mNameFragmentSelect);
     }
 
-    private void update() {
-//        int orientation = getResources().getConfiguration().orientation;
-//        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-            if (mMediaPlaybackFragment.getView() != null) {
-                ((MediaPlaybackFragment) mMediaPlaybackFragment).update();
+    public void update() {
+        updateUI();
+        if (mMediaPlaybackFragment.getView() != null) {
+            ((MediaPlaybackFragment) mMediaPlaybackFragment).update();
+        }
+    }
+
+    void updateUI() {
+        if (mMediaPlaybackService.isMusicPlay()) {
+            if (mAllSongsFragment.getView() != null || mFravoriteSongsFragment.getView() != null) {
+                ((BaseSongListFragment) mSelectedFragment).mSongListAdapter.notifyDataSetChanged();
             }
-            if (mAllSongsFragment.getView() != null || mFravoriteSongsFragment.getView() != null){
-                ((BaseSongListFragment) mSelectedFragment).update();
+
+            if (mMediaPlaybackService.isPlaying()) {
+                imgPlay.setImageResource(R.drawable.ic_pause_black_24dp);
+                tvNameSong.setText(mMediaPlaybackService.getNameSong());
+                tvArtist.setText(mMediaPlaybackService.getArtist());
+                if (mMediaPlaybackService.mIsPlayOnline) {
+                    Glide.with(this).load(mMediaPlaybackService.getPlayingSongOnline().getIMAGE()).error(R.drawable.icon_default_song).into(imgMainSong);
+                } else {
+                    if (loadImageFromPath(mMediaPlaybackService.getPathSong()) == null) {
+                        imgMainSong.setImageResource(R.drawable.icon_default_song);
+                    } else {
+                        imgMainSong.setImageBitmap(loadImageFromPath(mMediaPlaybackService.getPathSong()));
+                    }
+                }
+            } else {
+                imgPlay.setImageResource(R.drawable.ic_play_black_24dp);
             }
-//        } else {
-//            ((BaseSongListFragment) mSelectedFragment).update();
-//            ((MediaPlaybackFragment) mMediaPlaybackFragment).update();
-//        }
+        }
+    }
+
+    void updateSaveSong() {
+        if (mAllSongsFragment.getView() != null || mFravoriteSongsFragment.getView() != null) {
+            ((BaseSongListFragment) mSelectedFragment).mSongListAdapter.notifyDataSetChanged();
+        }
+
+        if (mMediaPlaybackService.mIsPlayOnline) {
+            Glide.with(this).load(mMediaPlaybackService.getPlayingSongOnline().getIMAGE()).error(R.drawable.icon_default_song).into(imgMainSong);
+        } else {
+            if (loadImageFromPath(mMediaPlaybackService.getPathSong()) == null) {
+                imgMainSong.setImageResource(R.drawable.icon_default_song);
+            } else {
+                imgMainSong.setImageBitmap(loadImageFromPath(mMediaPlaybackService.getPathSong()));
+            }
+        }
+
+        tvNameSong.setText(mMediaPlaybackService.getNameSong());
+        tvArtist.setText(mMediaPlaybackService.getArtist());
+    }
+
+    public Bitmap loadImageFromPath(String path) {
+        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+        try {
+            mediaMetadataRetriever.setDataSource(path);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        byte[] data = mediaMetadataRetriever.getEmbeddedPicture();
+        return data == null ? null : BitmapFactory.decodeByteArray(data, 0, data.length);
     }
 
     //interface

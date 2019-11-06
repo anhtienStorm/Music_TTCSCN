@@ -27,6 +27,7 @@
 
         <service android:name=".Service.MediaPlaybackService"/>
         <receiver android:name=".Receiver.TimerReceiver"/>
+        <receiver android:name=".Service.AlarmService"/>
 
         <provider
             android:name=".Provider.FavoriteSongsProvider"

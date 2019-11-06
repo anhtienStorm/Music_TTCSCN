@@ -42,10 +42,7 @@ public class BaseSongListFragment extends Fragment implements SongListAdapter.IS
 
     protected MediaPlaybackService mMediaPlaybackService;
     private RecyclerView mRecyclerViewBaseSongList;
-    protected SongListAdapter mSongListAdapter;
-    ImageView imgPlay;
-    TextView tvNameSong, tvArtist;
-    public static ImageView imgMainSong;
+    public SongListAdapter mSongListAdapter;
     boolean mCheckService = false;
     private ArrayList<Song> mListSong = new ArrayList<>();
 
@@ -60,40 +57,26 @@ public class BaseSongListFragment extends Fragment implements SongListAdapter.IS
         super.onResume();
 
         if (getMusicActivity().mMediaPlaybackService != null) {
+            ((MainActivityMusic) getActivity()).update();
             mMediaPlaybackService = getMusicActivity().mMediaPlaybackService;
             mCheckService = true;
-            mRecyclerViewBaseSongList.scrollToPosition(mMediaPlaybackService.getIndexofPlayingSong());
+            mRecyclerViewBaseSongList.smoothScrollToPosition(mMediaPlaybackService.getIndexofPlayingSong());
         }
         getMusicActivity().setServiceConnectListenner1(new MainActivityMusic.IServiceConnectListenner1() {
             @Override
             public void onConnect() {
                 mMediaPlaybackService = getMusicActivity().mMediaPlaybackService;
-                mRecyclerViewBaseSongList.scrollToPosition(mMediaPlaybackService.getIndexofPlayingSong());
+                mRecyclerViewBaseSongList.smoothScrollToPosition(mMediaPlaybackService.getIndexofPlayingSong());
                 mSongListAdapter.setService(mMediaPlaybackService);
                 mCheckService = true;
-                if (!mMediaPlaybackService.isMusicPlay()) {
-                    if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")) {
-                        mMediaPlaybackService.loadData();
-                        updateSaveSong();
-                    } else {
-                        getView().findViewById(R.id.layoutPlayMusic).setVisibility(View.GONE);
-                    }
-                }
+                ((MainActivityMusic) getActivity()).update();
             }
         });
 
         if (mCheckService) {
             mSongListAdapter.setService(mMediaPlaybackService);
-            mRecyclerViewBaseSongList.scrollToPosition(mMediaPlaybackService.getIndexofPlayingSong());
-            update();
-            if (!mMediaPlaybackService.isMusicPlay()) {
-                if (mMediaPlaybackService.getSharedPreferences().contains("SONG_LIST")) {
-                    mMediaPlaybackService.loadData();
-                    updateSaveSong();
-                } else {
-                    getView().findViewById(R.id.layoutPlayMusic).setVisibility(View.GONE);
-                }
-            }
+            mRecyclerViewBaseSongList.smoothScrollToPosition(mMediaPlaybackService.getIndexofPlayingSong());
+            ((MainActivityMusic) getActivity()).update();
         }
 
     }
@@ -110,15 +93,8 @@ public class BaseSongListFragment extends Fragment implements SongListAdapter.IS
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.base_song_list_fragment, container, false);
 
-        initView(view);
-        int orientation = getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            view.findViewById(R.id.layoutPlayMusic).setVisibility(View.GONE);
-            ((AppCompatActivity) getActivity()).getSupportActionBar().show();
-        } else {
-            view.findViewById(R.id.layoutPlayMusic).setVisibility(View.VISIBLE);
-            ((AppCompatActivity) getActivity()).getSupportActionBar().show();
-        }
+        ((AppCompatActivity) getActivity()).getSupportActionBar().show();
+        getActivity().findViewById(R.id.layoutPlayMusic).setVisibility(View.VISIBLE);
 
         mRecyclerViewBaseSongList = view.findViewById(R.id.recycler_view);
         mSongListAdapter = new SongListAdapter(mListSong, getActivity());
@@ -127,35 +103,13 @@ public class BaseSongListFragment extends Fragment implements SongListAdapter.IS
         mRecyclerViewBaseSongList.setLayoutManager(new LinearLayoutManager(getActivity()));
         mSongListAdapter.setOnClickListenner(this);
 
-        imgPlay.setOnClickListener(new Button.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mMediaPlaybackService.isMusicPlay()) {
-                    if (mMediaPlaybackService.isPlaying()) {
-                        mMediaPlaybackService.pause();
-                    } else {
-                        mMediaPlaybackService.play();
-                    }
-                } else {
-                    mMediaPlaybackService.preparePlay();
-                }
-            }
-        });
-
         return view;
     }
 
     @Override
     public void onItemClick(int position) {
-        int orientation = getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            getView().findViewById(R.id.layoutPlayMusic).setVisibility(View.GONE);
-        } else {
-            getView().findViewById(R.id.layoutPlayMusic).setVisibility(View.VISIBLE);
-        }
         mMediaPlaybackService.playSong(mListSong, mListSong.get(position));
         mSongListAdapter.setService(mMediaPlaybackService);
-        update();
         int favorite = loadFavoriteStatus(mMediaPlaybackService.getId());
         int count = loadCountOfPlayStatus(mMediaPlaybackService.getId());
 
@@ -178,53 +132,6 @@ public class BaseSongListFragment extends Fragment implements SongListAdapter.IS
         mListSong = listSong;
     }
 
-    public void initView(View view) {
-        imgPlay = view.findViewById(R.id.btMainPlay);
-        tvNameSong = view.findViewById(R.id.tvMainNameSong);
-        tvNameSong.setSelected(true);
-        tvArtist = view.findViewById(R.id.tvMainArtist);
-        imgMainSong = view.findViewById(R.id.imgMainSong);
-    }
-
-    public void update() {
-        if (mMediaPlaybackService.isMusicPlay()) {
-            mSongListAdapter.notifyDataSetChanged();
-
-            if (mMediaPlaybackService.isPlaying()) {
-                imgPlay.setImageResource(R.drawable.ic_pause_black_24dp);
-                tvNameSong.setText(mMediaPlaybackService.getNameSong());
-                tvArtist.setText(mMediaPlaybackService.getArtist());
-                if (mMediaPlaybackService.mIsPlayOnline){
-                    Glide.with(getContext()).load(mMediaPlaybackService.getPlayingSongOnline().getIMAGE()).error(R.drawable.icon_default_song).into(imgMainSong);
-                } else {
-                    if (loadImageFromPath(mMediaPlaybackService.getPathSong()) == null) {
-                        imgMainSong.setImageResource(R.drawable.icon_default_song);
-                    } else {
-                        imgMainSong.setImageBitmap(loadImageFromPath(mMediaPlaybackService.getPathSong()));
-                    }
-                }
-            } else {
-                imgPlay.setImageResource(R.drawable.ic_play_black_24dp);
-            }
-        }
-    }
-
-    public void updateSaveSong() {
-        mSongListAdapter.notifyDataSetChanged();
-
-        if (mMediaPlaybackService.mIsPlayOnline){
-            Glide.with(getContext()).load(mMediaPlaybackService.getPlayingSongOnline().getIMAGE()).error(R.drawable.icon_default_song).into(imgMainSong);
-        } else {
-            if (loadImageFromPath(mMediaPlaybackService.getPathSong()) == null) {
-                imgMainSong.setImageResource(R.drawable.icon_default_song);
-            } else {
-                imgMainSong.setImageBitmap(loadImageFromPath(mMediaPlaybackService.getPathSong()));
-            }
-        }
-
-        tvNameSong.setText(mMediaPlaybackService.getNameSong());
-        tvArtist.setText(mMediaPlaybackService.getArtist());
-    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -250,17 +157,6 @@ public class BaseSongListFragment extends Fragment implements SongListAdapter.IS
                 return false;
             }
         });
-    }
-
-    public Bitmap loadImageFromPath(String path){
-        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
-        try {
-            mediaMetadataRetriever.setDataSource(path);
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-        byte[] data = mediaMetadataRetriever.getEmbeddedPicture();
-        return data == null ? null : BitmapFactory.decodeByteArray(data, 0, data.length);
     }
 
     public void increaseCountOfPlay(int id) {
