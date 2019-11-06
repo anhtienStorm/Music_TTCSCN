@@ -58,7 +58,7 @@ public class MainActivityMusic extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public MediaPlaybackService mMediaPlaybackService;
-    Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment, mHomeOnlineFragment , mNotificationFragment, mListPlayList;
+    public Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment, mHomeOnlineFragment , mNotificationFragment, mListPlayList;
     IServiceConnectListenner1 mServiceConnectListenner1;
     IServiceConnectListenner2 mServiceConnectListenner2;
     String mNameFragmentSelect;
