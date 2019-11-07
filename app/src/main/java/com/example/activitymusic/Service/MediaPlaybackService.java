@@ -585,7 +585,6 @@ public class MediaPlaybackService extends Service {
 
     public void setPreviousExitSong(String id) {
         for (int i = 0; i < mListSongOnline.size(); i++) {
-            Log.d("tiennab", "setPreviousExitSong: " + id);
             if (mListSongOnline.get(i).getID().equals(id)) {
                 mPlayingSongOnline = mListSongOnline.get(i);
             }

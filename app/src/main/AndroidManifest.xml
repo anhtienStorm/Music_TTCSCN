@@ -33,6 +33,9 @@
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <receiver android:name=".Receiver.TimerReceiver" />
+        <service android:name=".Service.MediaPlaybackService"/>
+        <receiver android:name=".Receiver.TimerReceiver"/>
+        <receiver android:name=".Service.AlarmService"/>
 
         <provider
             android:name=".Provider.FavoriteSongsProvider"

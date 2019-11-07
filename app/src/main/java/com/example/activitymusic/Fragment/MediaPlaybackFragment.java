@@ -87,6 +87,7 @@ public class MediaPlaybackFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.media_playback_fragment, container, false);
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+        getActivity().findViewById(R.id.layoutPlayMusic).setVisibility(View.GONE);
 
         initView(view);
         int orientation = getResources().getConfiguration().orientation;
