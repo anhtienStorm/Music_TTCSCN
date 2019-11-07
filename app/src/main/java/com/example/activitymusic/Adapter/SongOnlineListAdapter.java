@@ -19,6 +19,7 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.activitymusic.Activity.MainActivityMusic;
 import com.example.activitymusic.Model.PlayList;
 import com.example.activitymusic.Model.SongOnline;
 import com.example.activitymusic.R;
@@ -32,10 +33,11 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 
 public class SongOnlineListAdapter extends RecyclerView.Adapter<SongOnlineListAdapter.SongOnlineViewHolder> {
-    private ArrayList<SongOnline> mPlayListSongOnline = new ArrayList<>();
+    public ArrayList<SongOnline> mPlayListSongOnline = new ArrayList<>();
     private String mStatus;
     private Context mContext;
     private actionDownloadSong actionDownloadSong;
+    private IClickItemListenner mClickItemListenner;
 
     public void setActionDownloadSong(SongOnlineListAdapter.actionDownloadSong actionDownloadSong) {
         this.actionDownloadSong = actionDownloadSong;
@@ -56,22 +58,21 @@ public class SongOnlineListAdapter extends RecyclerView.Adapter<SongOnlineListAd
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final SongOnlineViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final SongOnlineViewHolder holder, final int position) {
         final SongOnline songOnline = mPlayListSongOnline.get(position);
         holder.mIndex.setText(position + "");
         holder.mNamesong.setText(songOnline.getNAMESONG());
         holder.mSinger.setText(songOnline.getSINGER());
-
-        holder.mConstraintLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(mStatus.equals("view")){
-                    // Phat nhac
-                }else {
-                    actionDownloadSong.onAddPlayListSongsList(songOnline.getID(),mStatus);
-                }
-            }
-        });
+//        holder.mConstraintLayout.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+////                if(mStatus.equals("view")){
+////                    mClickItemListenner.onClick(position);
+////                }else {
+////                    actionDownloadSong.onAddPlayListSongsList(songOnline.getID(),mStatus);
+////                }
+//            }
+//        });
         if(!mStatus.equals("view"))
             holder.mMore.setVisibility(View.GONE);
 
@@ -112,7 +113,7 @@ public class SongOnlineListAdapter extends RecyclerView.Adapter<SongOnlineListAd
         return mPlayListSongOnline.size();
     }
 
-    public class SongOnlineViewHolder extends RecyclerView.ViewHolder {
+    public class SongOnlineViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView mIndex, mNamesong, mSinger;
         ImageView mMore;
@@ -124,7 +125,16 @@ public class SongOnlineListAdapter extends RecyclerView.Adapter<SongOnlineListAd
             mSinger = itemView.findViewById(R.id.singer_song_online);
             mMore = itemView.findViewById(R.id.more_song_online);
             mConstraintLayout=itemView.findViewById(R.id.constraintLayoutSongOnline);
+            itemView.setOnClickListener(this);
+        }
 
+        @Override
+        public void onClick(View view) {
+            if(mStatus.equals("view")){
+                mClickItemListenner.onClick(getAdapterPosition());
+            }else {
+                actionDownloadSong.onAddPlayListSongsList(mPlayListSongOnline.get(getAdapterPosition()).getID(),mStatus);
+            }
         }
     }
 
@@ -134,6 +144,13 @@ public class SongOnlineListAdapter extends RecyclerView.Adapter<SongOnlineListAd
         void onRemovePlayList(String id_Song);
         void onAddPlayListSongsList(String id_Song, String status);
         void onAddPlayingListSongsList(String id_Song);// ds hien tai
+    }
 
+    public interface IClickItemListenner {
+        void onClick(int position);
+    }
+
+    public void setOnClickItemListenner(IClickItemListenner clickItemListenner) {
+        mClickItemListenner = clickItemListenner;
     }
 }

@@ -62,6 +62,13 @@ public class ListSongTop10 extends Fragment {
             public void onResponse(Call<List<SongOnline>> call, Response<List<SongOnline>> response) {
                 final ArrayList<SongOnline> lists = (ArrayList<SongOnline>) response.body();
                 mSongTop10Adapter = new SongTop10Adapter( getActivity(),lists);
+                mSongTop10Adapter.setOnClickItemListenner(new SongTop10Adapter.IClickItemListenner() {
+                    @Override
+                    public void onClick(int position) {
+                        ((MainActivityMusic)getActivity()).mMediaPlaybackService.playSongOnline(lists.get(position), lists);
+                        getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.sub_fragment_a, ((MainActivityMusic)getActivity()).mMediaPlaybackFragment).commit();
+                    }
+                });
                 mRecyclerViewListSong.setAdapter(mSongTop10Adapter);
                 GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
                 gridLayoutManager.setOrientation(RecyclerView.VERTICAL);

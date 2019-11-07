@@ -71,7 +71,6 @@ public class MainActivityMusic extends AppCompatActivity
 
     public MediaPlaybackService mMediaPlaybackService;
     public Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment, mHomeOnlineFragment , mNotificationFragment, mListPlayList;
-    public Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment, mHomeOnlineFragment, mNotificationFragment, mListPlayList;
     ImageView imgPlay;
     TextView tvNameSong, tvArtist;
     ImageView imgMainSong;
@@ -228,12 +227,6 @@ public class MainActivityMusic extends AppCompatActivity
                 }
             }
         });
-
-        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        final Intent intent = new Intent(MainActivityMusic.this, AlarmService.class);
-        pendingIntent = PendingIntent.getBroadcast(MainActivityMusic.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, 5000, pendingIntent);
-
     }
 
 

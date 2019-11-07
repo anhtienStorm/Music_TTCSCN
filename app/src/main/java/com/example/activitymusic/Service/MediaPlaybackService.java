@@ -288,16 +288,6 @@ public class MediaPlaybackService extends Service {
     }
 
     public void getImgSong(){
-////        BitmapDrawable bitmapDrawable = (BitmapDrawable) BaseSongListFragment.imgMainSong.getDrawable();
-////        return bitmapDrawable.getBitmap();
-//        Bitmap bitmap = null;
-//        try {
-//            InputStream in = new java.net.URL(mPlayingSongOnline.getIMAGE()).openStream();
-//            bitmap = BitmapFactory.decodeStream(in);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        return bitmap;
         new LoadImageFromUrl().execute(mPlayingSongOnline.getIMAGE());
     }
 

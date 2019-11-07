@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.activitymusic.Activity.MainActivityMusic;
+import com.example.activitymusic.Adapter.SearchOnlineAdapter;
 import com.example.activitymusic.Adapter.SongOnlineListAdapter;
 import com.example.activitymusic.Model.PlayList;
 import com.example.activitymusic.Model.SongOnline;
@@ -32,7 +33,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ListSongPlayingOnline extends Fragment {
+public class ListSongPlayingOnline extends Fragment /*implements SongOnlineListAdapter.IClickItemListenner*/ {
 
     private SongOnlineListAdapter mSongOnlineListAdapter;
     private RecyclerView mRecyclerViewListSong;
@@ -80,6 +81,13 @@ public class ListSongPlayingOnline extends Fragment {
             public void onResponse(Call<List<SongOnline>> call, Response<List<SongOnline>> response) {
                 final ArrayList<SongOnline> lists = (ArrayList<SongOnline>) response.body();
                 mSongOnlineListAdapter = new SongOnlineListAdapter(lists, getActivity(),mStatus);
+                mSongOnlineListAdapter.setOnClickItemListenner(new SongOnlineListAdapter.IClickItemListenner() {
+                    @Override
+                    public void onClick(int position) {
+                        ((MainActivityMusic)getActivity()).mMediaPlaybackService.playSongOnline(mSongOnlineListAdapter.mPlayListSongOnline.get(position), mSongOnlineListAdapter.mPlayListSongOnline);
+                        getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.sub_fragment_a, ((MainActivityMusic)getActivity()).mMediaPlaybackFragment).commit();
+                    }
+                });
                 mRecyclerViewListSong.setAdapter(mSongOnlineListAdapter);
                 mRecyclerViewListSong.setLayoutManager(new LinearLayoutManager(getContext()));
                 mSongOnlineListAdapter.setActionDownloadSong(new SongOnlineListAdapter.actionDownloadSong() {
@@ -113,12 +121,7 @@ public class ListSongPlayingOnline extends Fragment {
                             onActionPlayList(callback);
                             getFragmentManager().popBackStack();
                         }
-
                     }
-
-
-
-
                 });
               progressBar.setVisibility(View.GONE);
 
@@ -152,4 +155,9 @@ public class ListSongPlayingOnline extends Fragment {
         });
     }
 
+//    @Override
+//    public void onClick(int position) {
+////        ((MainActivityMusic)getActivity()).mMediaPlaybackService.playSongOnline(mSongOnlineListAdapter.mPlayListSongOnline.get(position), mSongOnlineListAdapter.mPlayListSongOnline);
+////        getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.sub_fragment_a, ((MainActivityMusic)getActivity()).mMediaPlaybackFragment).commit();
+//    }
 }

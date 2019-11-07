@@ -134,6 +134,13 @@ public class ListSongPlayListFragment extends Fragment {
                     }
                 }
                 mSongOnlineListAdapter = new SongOnlineListAdapter(mPlayListSong, getActivity(), "view");
+                mSongOnlineListAdapter.setOnClickItemListenner(new SongOnlineListAdapter.IClickItemListenner() {
+                    @Override
+                    public void onClick(int position) {
+                        ((MainActivityMusic)getActivity()).mMediaPlaybackService.playSongOnline(mSongOnlineListAdapter.mPlayListSongOnline.get(position), mSongOnlineListAdapter.mPlayListSongOnline);
+                        getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.sub_fragment_a, ((MainActivityMusic)getActivity()).mMediaPlaybackFragment).commit();
+                    }
+                });
 
                 mRecyclerViewListSongPlayList.setAdapter(mSongOnlineListAdapter);
                 mRecyclerViewListSongPlayList.setLayoutManager(new LinearLayoutManager(getContext()));

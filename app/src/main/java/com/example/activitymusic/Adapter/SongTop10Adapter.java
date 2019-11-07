@@ -18,7 +18,8 @@ import java.util.ArrayList;
 
 public class SongTop10Adapter extends RecyclerView.Adapter<SongTop10Adapter.SongTop10ViewHolder> {
     Context mContext;
-    ArrayList<SongOnline> mListSongOnline=new ArrayList<>();
+    public ArrayList<SongOnline> mListSongOnline=new ArrayList<>();
+    private IClickItemListenner mClickItemListenner;
 
     public SongTop10Adapter(Context mContext, ArrayList<SongOnline> mListSongOnline) {
         this.mContext = mContext;
@@ -46,7 +47,7 @@ public class SongTop10Adapter extends RecyclerView.Adapter<SongTop10Adapter.Song
         return mListSongOnline.size();
     }
 
-    public class SongTop10ViewHolder extends RecyclerView.ViewHolder {
+    public class SongTop10ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView imageSong;
         TextView mNameSong, mNameSinger;
 
@@ -55,9 +56,20 @@ public class SongTop10Adapter extends RecyclerView.Adapter<SongTop10Adapter.Song
             imageSong= itemView.findViewById(R.id.imPlayListSong);
             mNameSong=itemView.findViewById(R.id.namePlayList);
             mNameSinger=itemView.findViewById(R.id.artists);
-
-
-
+            itemView.setOnClickListener(this);
         }
+
+        @Override
+        public void onClick(View view) {
+            mClickItemListenner.onClick(getAdapterPosition());
+        }
+    }
+
+    public interface IClickItemListenner {
+        void onClick(int position);
+    }
+
+    public void setOnClickItemListenner(IClickItemListenner clickItemListenner) {
+        mClickItemListenner = clickItemListenner;
     }
 }
