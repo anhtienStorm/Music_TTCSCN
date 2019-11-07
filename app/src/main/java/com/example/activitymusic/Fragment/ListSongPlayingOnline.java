@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -37,6 +38,7 @@ public class ListSongPlayingOnline extends Fragment {
     private RecyclerView mRecyclerViewListSong;
     private MediaPlaybackService mediaPlaybackService;
     private String NAME_PLAYLIST;
+    private ProgressBar progressBar;
     private String mStatus;
     protected MainActivityMusic getMusicactivity() {
         if (getActivity() instanceof MainActivityMusic) {
@@ -56,10 +58,16 @@ public class ListSongPlayingOnline extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.list_playing_online_fragment, container, false);
         mRecyclerViewListSong = view.findViewById(R.id.RecyclerViewListPlayingOnline);
+        progressBar=view.findViewById(R.id.ProgressBarlistonline);
         getData();
 
         if (getMusicactivity().mMediaPlaybackService != null) {
             mediaPlaybackService = getMusicactivity().mMediaPlaybackService;
+        }
+        if(!mStatus.equals("view")){
+            progressBar.setVisibility(View.VISIBLE);
+        }else {
+            progressBar.setVisibility(View.GONE);
         }
         return view;
     }
@@ -108,7 +116,7 @@ public class ListSongPlayingOnline extends Fragment {
 
                     }
                 });
-                // mProgressBar.setVisibility(View.GONE);
+              progressBar.setVisibility(View.GONE);
 
             }
 

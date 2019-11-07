@@ -1,12 +1,16 @@
 package com.example.activitymusic.Activity;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.app.job.JobService;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -20,6 +24,7 @@ import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.view.GravityCompat;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -37,7 +42,7 @@ import com.example.activitymusic.Fragment.ListPlayListFragment;
 import com.example.activitymusic.Fragment.MediaPlaybackFragment;
 import com.example.activitymusic.Fragment.NotificationFragment;
 import com.example.activitymusic.R;
-import com.example.activitymusic.Service.AlarmService;
+import com.example.activitymusic.Service.JobSchedulerService;
 import com.example.activitymusic.Service.MediaPlaybackService;
 import com.google.android.material.navigation.NavigationView;
 
@@ -58,7 +63,7 @@ public class MainActivityMusic extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public MediaPlaybackService mMediaPlaybackService;
-    Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment, mHomeOnlineFragment , mNotificationFragment, mListPlayList;
+    public Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment, mHomeOnlineFragment , mNotificationFragment, mListPlayList;
     IServiceConnectListenner1 mServiceConnectListenner1;
     IServiceConnectListenner2 mServiceConnectListenner2;
     String mNameFragmentSelect;
@@ -101,6 +106,8 @@ public class MainActivityMusic extends AppCompatActivity
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -167,10 +174,26 @@ public class MainActivityMusic extends AppCompatActivity
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mSelectedFragment).commit();
         }
 
-        alarmManager=(AlarmManager) getSystemService(ALARM_SERVICE);
-        final Intent intent = new Intent(MainActivityMusic.this, AlarmService.class);
-        pendingIntent = PendingIntent.getBroadcast(MainActivityMusic.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, 5000, pendingIntent);
+//        alarmManager=(AlarmManager) getSystemService(ALARM_SERVICE);
+//        final Intent intent = new Intent(MainActivityMusic.this, AlarmService.class);
+//        pendingIntent = PendingIntent.getBroadcast(MainActivityMusic.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+//        alarmManager.set(AlarmManager.RTC_WAKEUP, 5000, pendingIntent);
+        ComponentName componentName = new ComponentName(this, JobSchedulerService.class);
+        JobInfo info = new JobInfo.Builder(1, componentName)
+                .setRequiresCharging(true)
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
+                .setPersisted(true)
+                .setPeriodic(15 * 60 * 1000)
+                .build();
+
+        JobScheduler jobScheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
+        int resultCode = jobScheduler.schedule(info);
+        if (resultCode == JobScheduler.RESULT_SUCCESS) {
+            Log.d("Tiennvh", "Job scheduled");
+        } else {
+            Log.d("Tiennvh", "Job scheduling failed");
+        }
+
 
     }
 
@@ -196,6 +219,7 @@ public class MainActivityMusic extends AppCompatActivity
                 mSelectedFragment = mAllSongsFragment;
                 mNameFragmentSelect = "AllSong";
                 setTitle("Music Offline");
+
                 break;
             case R.id.nav_favorite:
                 mSelectedFragment = mFravoriteSongsFragment;

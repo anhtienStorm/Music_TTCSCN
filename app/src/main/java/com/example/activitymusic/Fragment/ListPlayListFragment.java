@@ -71,7 +71,6 @@ public class ListPlayListFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if (mStatus.equals("view")) {
-                    Toast.makeText(getContext(), "Create", Toast.LENGTH_SHORT).show();
                     final Dialog dialog = new Dialog(getActivity());
                     dialog.setTitle("Hot thoai");
                     dialog.setContentView(R.layout.diglog_create_playlist);
@@ -90,9 +89,11 @@ public class ListPlayListFragment extends Fragment {
                         @Override
                         public void onClick(View view) {
                             Log.d("Edit", "onClick: " + inputNamePlayList.getText().toString());
-                            DataServer dataServer = APIServer.getServer();
-                            Call<String> callback = dataServer.InsertPlayList(2, inputNamePlayList.getText().toString());//
-                            onActionPlayList(callback);
+                            ListSongPlayingOnline listSongPlayingOnline=new ListSongPlayingOnline("danh sách phát",inputNamePlayList.getText().toString());
+                            getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.sub_fragment_a, listSongPlayingOnline).commit();
+//                            DataServer dataServer = APIServer.getServer();
+//                            Call<String> callback = dataServer.InsertPlayList(2, inputNamePlayList.getText().toString());//
+//                            onActionPlayList(callback);
                             dialog.cancel();
                         }
                     });

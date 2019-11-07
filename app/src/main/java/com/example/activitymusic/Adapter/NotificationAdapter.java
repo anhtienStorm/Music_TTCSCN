@@ -54,8 +54,12 @@ public class NotificationAdapter extends  RecyclerView.Adapter<NotificationAdapt
             @Override
             public void onResponse(Call<List<SongOnline>> call, Response<List<SongOnline>> response) {
                 ArrayList<SongOnline> songOnlineList = (ArrayList<SongOnline>) response.body();
-                Glide.with(mContext).load(songOnlineList.get(Integer.parseInt(notification.getID())).getIMAGE()).into(holder.mImageView);
-                onRefreshLayout.onRefresh();
+                for(int i=0;i <songOnlineList.size();i++){
+                    if(Integer.parseInt(notification.getIDSONG())==Integer.parseInt(songOnlineList.get(i).getID())){
+                        Glide.with(mContext).load(songOnlineList.get(i).getIMAGE()).into(holder.mImageView);
+                        onRefreshLayout.onRefresh();
+                    }
+                }
             }
 
             @Override

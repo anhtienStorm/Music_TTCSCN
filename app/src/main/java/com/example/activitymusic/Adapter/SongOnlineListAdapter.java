@@ -61,6 +61,7 @@ public class SongOnlineListAdapter extends RecyclerView.Adapter<SongOnlineListAd
         holder.mIndex.setText(position + "");
         holder.mNamesong.setText(songOnline.getNAMESONG());
         holder.mSinger.setText(songOnline.getSINGER());
+
         holder.mConstraintLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

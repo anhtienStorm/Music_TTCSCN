@@ -17,6 +17,9 @@ public class SongOnline {
     @SerializedName("IMAGE")
     @Expose
     private String iMAGE;
+    @SerializedName("IMAGE_BG")
+    @Expose
+    private String iMAGE_BG;
     @SerializedName("LINK_SONG")
     @Expose
     private String lINKSONG;
@@ -37,6 +40,14 @@ public class SongOnline {
 
     public String getNAMESONG() {
         return nAMESONG;
+    }
+
+    public String getiMAGE_BG() {
+        return iMAGE_BG;
+    }
+
+    public void setiMAGE_BG(String iMAGE_BG) {
+        this.iMAGE_BG = iMAGE_BG;
     }
 
     public void setNAMESONG(String nAMESONG) {

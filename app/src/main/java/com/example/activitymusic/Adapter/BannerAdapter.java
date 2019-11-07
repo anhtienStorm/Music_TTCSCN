@@ -51,7 +51,8 @@ public class BannerAdapter extends PagerAdapter {
         TextView textViewTitleBanner = view.findViewById(R.id.tv_title_banner);
         TextView textViewContentBanner = view.findViewById(R.id.tv_content_banner);
 
-        Glide.with(mContext).load(mSongOnlineList.get(position).getIMAGE()).into(imgBackgroundBanner);
+
+        Glide.with(mContext).load(mSongOnlineList.get(position).getiMAGE_BG()).into(imgBackgroundBanner);
         Glide.with(mContext).load(mSongOnlineList.get(position).getIMAGE()).into(imgIconBanner);
         textViewTitleBanner.setText(mSongOnlineList.get(position).getNAMESONG());
         textViewContentBanner.setText(mSongOnlineList.get(position).getSINGER());

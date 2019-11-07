@@ -3,9 +3,10 @@
     package="com.example.activitymusic">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -17,6 +18,7 @@
         <activity
             android:name=".Activity.MainActivityMusic"
             android:launchMode="singleTop"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,8 +27,12 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".Service.MediaPlaybackService"/>
-        <receiver android:name=".Receiver.TimerReceiver"/>
+        <service android:name=".Service.MediaPlaybackService" />
+        <service
+            android:name=".Service.JobSchedulerService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <receiver android:name=".Receiver.TimerReceiver" />
 
         <provider
             android:name=".Provider.FavoriteSongsProvider"
@@ -35,6 +41,7 @@
             android:exported="true"
             android:readPermission="com.android.example.provider.READ_DATABASE"
             android:writePermission="com.android.example.provider.WRITE_DATABASE" />
+
     </application>
 
 </manifest>
