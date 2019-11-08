@@ -400,10 +400,10 @@ public class MediaPlaybackService extends Service {
         mListSongOnline = listSongOline;
         mPlayingSongOnline = songOnline;
         preparePlay();
-//        DataServer dataServer = APIServer.getServer();
-//        Call<String> callback = dataServer.UpdateViewSong(Integer.parseInt(songOnline.getID()));
-//        onRemoveSongPlayList(callback, getBaseContext());
-//
+        DataServer dataServer = APIServer.getServer();
+        Call<String> callback = dataServer.UpdateViewSong(Integer.parseInt(songOnline.getID()));
+        onRemoveSongPlayList(callback, getBaseContext());
+
 //        Call<String> callback2 = dataServer.InsertPlayList(Integer.parseInt(songOnline.getID()),"danh sách phát");
 //        onRemoveSongPlayList(callback2, getBaseContext());
 
