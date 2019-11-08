@@ -105,7 +105,8 @@ public class HomeOnlineFragment extends Fragment {
         bannerFragment.setmRefreshLayout(new interfaceRefreshLayout() {
             @Override
             public void refreshLayout() {
-          // có thể bỏ đi
+
+
             }
         });
         playListFragment.setmRefreshLayout(new interfaceRefreshLayout() {

@@ -4,7 +4,14 @@
     android:id="@+id/media_playback_fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <ProgressBar
 
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="8dp"
+        android:padding="150dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+         />
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout2"
         android:layout_width="match_parent"

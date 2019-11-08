@@ -192,13 +192,9 @@ public class MainActivityMusic extends AppCompatActivity
             getSupportFragmentManager().beginTransaction().replace(R.id.sub_fragment_a, mSelectedFragment).commit();
         }
 
-//        alarmManager=(AlarmManager) getSystemService(ALARM_SERVICE);
-//        final Intent intent = new Intent(MainActivityMusic.this, AlarmService.class);
-//        pendingIntent = PendingIntent.getBroadcast(MainActivityMusic.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-//        alarmManager.set(AlarmManager.RTC_WAKEUP, 5000, pendingIntent);
+
         ComponentName componentName = new ComponentName(this, JobSchedulerService.class);
         JobInfo info = new JobInfo.Builder(1, componentName)
-                .setRequiresCharging(true)
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
                 .setPersisted(true)
                 .setPeriodic(15 * 60 * 1000)
