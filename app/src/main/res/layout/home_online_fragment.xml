@@ -61,7 +61,7 @@
                             android:layout_height="30dp"
                             android:layout_marginTop="20dp"
                             android:paddingLeft="10dp"
-                            android:text="PLAYLIST NGHE GẦN ĐÂY >"
+                            android:text="PLAYLIST >"
                             android:textColor="#050505"
                             android:textStyle="bold" />
 

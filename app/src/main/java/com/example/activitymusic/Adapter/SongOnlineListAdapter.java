@@ -58,7 +58,7 @@ public class SongOnlineListAdapter extends RecyclerView.Adapter<SongOnlineListAd
     @Override
     public void onBindViewHolder(@NonNull final SongOnlineViewHolder holder, int position) {
         final SongOnline songOnline = mPlayListSongOnline.get(position);
-        holder.mIndex.setText(position + "");
+        holder.mIndex.setText(position +1 + "");
         holder.mNamesong.setText(songOnline.getNAMESONG());
         holder.mSinger.setText(songOnline.getSINGER());
 

@@ -90,7 +90,7 @@ public class ListSongPlayingOnline extends Fragment {
 
                     @Override
                     public void onRemovePlayList(String id_Song) {
-                        // not action
+
                     }
 
                     @Override
@@ -115,9 +115,6 @@ public class ListSongPlayingOnline extends Fragment {
                         }
 
                     }
-
-
-
 
                 });
               progressBar.setVisibility(View.GONE);

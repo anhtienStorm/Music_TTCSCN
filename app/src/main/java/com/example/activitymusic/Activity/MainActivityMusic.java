@@ -71,15 +71,13 @@ public class MainActivityMusic extends AppCompatActivity
 
     public MediaPlaybackService mMediaPlaybackService;
     public Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment, mHomeOnlineFragment , mNotificationFragment, mListPlayList;
-    public Fragment mSelectedFragment, mAllSongsFragment, mFravoriteSongsFragment, mMediaPlaybackFragment, mHomeOnlineFragment, mNotificationFragment, mListPlayList;
     ImageView imgPlay;
     TextView tvNameSong, tvArtist;
     ImageView imgMainSong;
     IServiceConnectListenner1 mServiceConnectListenner1;
     IServiceConnectListenner2 mServiceConnectListenner2;
     String mNameFragmentSelect;
-    AlarmManager alarmManager;
-    PendingIntent pendingIntent;
+
 
     ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
@@ -229,10 +227,7 @@ public class MainActivityMusic extends AppCompatActivity
             }
         });
 
-        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        final Intent intent = new Intent(MainActivityMusic.this, AlarmService.class);
-        pendingIntent = PendingIntent.getBroadcast(MainActivityMusic.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, 5000, pendingIntent);
+
 
     }
 
@@ -337,7 +332,7 @@ public class MainActivityMusic extends AppCompatActivity
     // cap quyen doc bo nho
     public void initPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 
                 //Permisson don't granted
                 if (shouldShowRequestPermissionRationale(

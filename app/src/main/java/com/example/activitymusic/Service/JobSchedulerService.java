@@ -69,10 +69,10 @@ public class JobSchedulerService extends JobService {
             @Override
             public void run() {
                 for (int i = 1; i > 0; i++) {
-                    Log.d(TAG, "run: " + i);
                     if (jobCancelled) {
                         return;
                     }
+
                     DataServer dataServer = APIServer.getServer();
                     Call<List<Notification>> callback = dataServer.getDataNotification();
                     callback.enqueue(new Callback<List<Notification>>() {
@@ -81,6 +81,7 @@ public class JobSchedulerService extends JobService {
                             ArrayList<Notification> notifications = (ArrayList<Notification>) response.body();
                             String id_notification = mSharedPreferences.getString("IDNotification", "0");
                             Log.d(TAG, "onResponse: " + id_notification);
+                            if(notifications!=null)
                             for (int i = 0; i < notifications.size(); i++) {
                                 if (Integer.parseInt(id_notification) < Integer.parseInt(notifications.get(i).getID())) {
                                     onShowNotification(notifications.get(i));
@@ -112,8 +113,7 @@ public class JobSchedulerService extends JobService {
 
     @Override
     public boolean onStopJob(JobParameters jobParameters) {
-        Log.d(TAG, "onStopJob: ");
-        jobCancelled = false;
+        jobCancelled = true;
         return true;
     }
 
@@ -132,9 +132,7 @@ public class JobSchedulerService extends JobService {
                 .setContentIntent(pendingIntent)
                 .setSmallIcon(R.drawable.icon_notification)
                 .setPriority(NotificationCompat.PRIORITY_LOW);
-
         notificationManager.notify(Integer.parseInt(notification.getID()), builder.build());
-
 
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putString("IDNotification", notification.getID());
