@@ -347,19 +347,33 @@ public class MainActivityMusic extends AppCompatActivity
                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
 
             }
+
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+                //Permisson don't granted
+                if (shouldShowRequestPermissionRationale(
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    Toast.makeText(MainActivityMusic.this, "Permission isn't granted ", Toast.LENGTH_SHORT).show();
+                }
+                // Permisson don't granted and dont show dialog again.
+                else {
+                    Toast.makeText(MainActivityMusic.this, "Permisson don't granted and dont show dialog again ", Toast.LENGTH_SHORT).show();
+                }
+                //Register permission
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
+
+            }
         }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == 1) {
-            EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, MainActivityMusic.this);
+        if (requestCode == 1 || requestCode == 2) {
             if (grantResults.length == 1 &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(MainActivityMusic.this, "Quyền đọc file: được phép", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(MainActivityMusic.this, "Quyền đọc file: không được phép", Toast.LENGTH_SHORT).show();
-
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);

@@ -291,6 +291,10 @@ public class MediaPlaybackService extends Service {
         new LoadImageFromUrl().execute(mPlayingSongOnline.getIMAGE());
     }
 
+    public ArrayList<SongOnline> getListSongOnline(){
+        return mListSongOnline;
+    }
+
     public boolean isPlaying() {
         if (mMediaPlayer.isPlaying())
             return true;
@@ -396,12 +400,12 @@ public class MediaPlaybackService extends Service {
         mListSongOnline = listSongOline;
         mPlayingSongOnline = songOnline;
         preparePlay();
-        DataServer dataServer = APIServer.getServer();
-        Call<String> callback = dataServer.UpdateViewSong(Integer.parseInt(songOnline.getID()));
-        onRemoveSongPlayList(callback, getBaseContext());
-
-        Call<String> callback2 = dataServer.InsertPlayList(Integer.parseInt(songOnline.getID()),"danh sách phát");
-        onRemoveSongPlayList(callback2, getBaseContext());
+//        DataServer dataServer = APIServer.getServer();
+//        Call<String> callback = dataServer.UpdateViewSong(Integer.parseInt(songOnline.getID()));
+//        onRemoveSongPlayList(callback, getBaseContext());
+//
+//        Call<String> callback2 = dataServer.InsertPlayList(Integer.parseInt(songOnline.getID()),"danh sách phát");
+//        onRemoveSongPlayList(callback2, getBaseContext());
 
     }
 

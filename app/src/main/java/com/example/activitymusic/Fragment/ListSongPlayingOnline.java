@@ -59,11 +59,63 @@ public class ListSongPlayingOnline extends Fragment {
         View view = inflater.inflate(R.layout.list_playing_online_fragment, container, false);
         mRecyclerViewListSong = view.findViewById(R.id.RecyclerViewListPlayingOnline);
         progressBar=view.findViewById(R.id.ProgressBarlistonline);
-        getData();
+        //getData();
 
         if (getMusicactivity().mMediaPlaybackService != null) {
             mediaPlaybackService = getMusicactivity().mMediaPlaybackService;
         }
+
+        if (mediaPlaybackService.mIsPlayOnline){
+            mSongOnlineListAdapter = new SongOnlineListAdapter(mediaPlaybackService.getListSongOnline(), getActivity(),mStatus);
+        } else {
+            mSongOnlineListAdapter = new SongOnlineListAdapter(new ArrayList<SongOnline>(), getActivity(),mStatus);
+        }
+        mSongOnlineListAdapter.setOnClickItemListenner(new SongOnlineListAdapter.IClickItemListenner() {
+            @Override
+            public void onClick(int position) {
+                ((MainActivityMusic)getActivity()).mMediaPlaybackService.playSongOnline(mSongOnlineListAdapter.mPlayListSongOnline.get(position), mSongOnlineListAdapter.mPlayListSongOnline);
+                getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.sub_fragment_a, ((MainActivityMusic)getActivity()).mMediaPlaybackFragment).commit();
+            }
+        });
+        mRecyclerViewListSong.setAdapter(mSongOnlineListAdapter);
+        mRecyclerViewListSong.setLayoutManager(new LinearLayoutManager(getContext()));
+        mSongOnlineListAdapter.setActionDownloadSong(new SongOnlineListAdapter.actionDownloadSong() {
+            @Override
+            public void onDownloadSong(String Url) {
+                mediaPlaybackService.onDownloadSongOnline(Url, getActivity());
+            }
+
+            @Override
+            public void onRemovePlayList(String id_Song) {
+                Toast.makeText(getContext(), "Không hỗ trợ !", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onAddPlayingListSongsList(String id_Song) {
+//                Toast.makeText(getContext(), "Đang thêm vào danh sách phát", Toast.LENGTH_SHORT).show();
+//                DataServer dataServer = APIServer.getServer();
+//                Call<String> callback = dataServer.InsertPlayList(Integer.parseInt(id_Song), "Danh sách phát");
+//                mediaPlaybackService.onRemoveSongPlayList(callback, getActivity());
+                Toast.makeText(getContext(), "Không hỗ trợ !", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onAddPlayListSongsList(String id_Song , String status) {
+                if(status.equals("view")) {
+                    ListPlayListFragment listPlayListFragment = new ListPlayListFragment(id_Song);
+                    getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.sub_fragment_a, listPlayListFragment).commit();
+                }else {
+                    DataServer dataServer = APIServer.getServer();
+                    Call<String> callback = dataServer.InsertPlayList(Integer.parseInt(id_Song) ,mStatus);
+                    onActionPlayList(callback);
+                    getFragmentManager().popBackStack();
+                }
+
+            }
+
+        });
+        progressBar.setVisibility(View.GONE);
+
         if(!mStatus.equals("view")){
             progressBar.setVisibility(View.VISIBLE);
         }else {
@@ -79,45 +131,6 @@ public class ListSongPlayingOnline extends Fragment {
             @Override
             public void onResponse(Call<List<SongOnline>> call, Response<List<SongOnline>> response) {
                 final ArrayList<SongOnline> lists = (ArrayList<SongOnline>) response.body();
-                mSongOnlineListAdapter = new SongOnlineListAdapter(lists, getActivity(),mStatus);
-                mRecyclerViewListSong.setAdapter(mSongOnlineListAdapter);
-                mRecyclerViewListSong.setLayoutManager(new LinearLayoutManager(getContext()));
-                mSongOnlineListAdapter.setActionDownloadSong(new SongOnlineListAdapter.actionDownloadSong() {
-                    @Override
-                    public void onDownloadSong(String Url) {
-                        mediaPlaybackService.onDownloadSongOnline(Url, getActivity());
-                    }
-
-                    @Override
-                    public void onRemovePlayList(String id_Song) {
-
-                    }
-
-                    @Override
-                    public void onAddPlayingListSongsList(String id_Song) {
-                        Toast.makeText(getContext(), "Đang thêm vào danh sách phát", Toast.LENGTH_SHORT).show();
-                        DataServer dataServer = APIServer.getServer();
-                        Call<String> callback = dataServer.InsertPlayList(Integer.parseInt(id_Song), "Danh sách phát");
-                        mediaPlaybackService.onRemoveSongPlayList(callback, getActivity());
-                    }
-
-                    @Override
-                    public void onAddPlayListSongsList(String id_Song , String status) {
-                        Log.d("TienNvh", "onAddPlayListSongsList: "+status);
-                        if(status.equals("view")) {
-                            ListPlayListFragment listPlayListFragment = new ListPlayListFragment(id_Song);
-                            getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.sub_fragment_a, listPlayListFragment).commit();
-                        }else {
-                            DataServer dataServer = APIServer.getServer();
-                            Call<String> callback = dataServer.InsertPlayList(Integer.parseInt(id_Song) ,mStatus);
-                            onActionPlayList(callback);
-                            getFragmentManager().popBackStack();
-                        }
-
-                    }
-
-                });
-              progressBar.setVisibility(View.GONE);
 
             }
 

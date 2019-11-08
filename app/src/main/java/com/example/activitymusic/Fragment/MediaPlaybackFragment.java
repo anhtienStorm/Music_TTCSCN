@@ -151,15 +151,19 @@ public class MediaPlaybackFragment extends Fragment {
         btImgLike.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mMediaPlaybackService.loadFavoriteStatus(mMediaPlaybackService.getId()) == 2) {
-                    setDefaultFavoriteStatus(mMediaPlaybackService.getId());
-                    btImgLike.setImageResource(R.drawable.ic_like);
-                    btImgDislike.setImageResource(R.drawable.ic_dislike);
-                    Toast.makeText(getActivity(), "Unliked Song", Toast.LENGTH_SHORT).show();
+                if (mMediaPlaybackService.mIsPlayOnline){
+                    Toast.makeText(getContext(), "Cần download bài hát để sử dụng tính năng này !", Toast.LENGTH_SHORT).show();
                 } else {
-                    likeSong(mMediaPlaybackService.getId());
-                    btImgLike.setImageResource(R.drawable.ic_liked_black_24dp);
-                    btImgDislike.setImageResource(R.drawable.ic_dislike);
+                    if (mMediaPlaybackService.loadFavoriteStatus(mMediaPlaybackService.getId()) == 2) {
+                        setDefaultFavoriteStatus(mMediaPlaybackService.getId());
+                        btImgLike.setImageResource(R.drawable.ic_like);
+                        btImgDislike.setImageResource(R.drawable.ic_dislike);
+                        Toast.makeText(getActivity(), "Unliked Song", Toast.LENGTH_SHORT).show();
+                    } else {
+                        likeSong(mMediaPlaybackService.getId());
+                        btImgLike.setImageResource(R.drawable.ic_liked_black_24dp);
+                        btImgDislike.setImageResource(R.drawable.ic_dislike);
+                    }
                 }
             }
         });
@@ -167,15 +171,19 @@ public class MediaPlaybackFragment extends Fragment {
         btImgDislike.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mMediaPlaybackService.loadFavoriteStatus(mMediaPlaybackService.getId()) == 1) {
-                    setDefaultFavoriteStatus(mMediaPlaybackService.getId());
-                    btImgLike.setImageResource(R.drawable.ic_like);
-                    btImgDislike.setImageResource(R.drawable.ic_dislike);
-                    Toast.makeText(getActivity(), "Undisliked Song", Toast.LENGTH_SHORT).show();
+                if (mMediaPlaybackService.mIsPlayOnline){
+                    Toast.makeText(getContext(), "Cần download bài hát để sử dụng tính năng này !", Toast.LENGTH_SHORT).show();
                 } else {
-                    dislikeSong(mMediaPlaybackService.getId());
-                    btImgDislike.setImageResource(R.drawable.ic_disliked_black_24dp);
-                    btImgLike.setImageResource(R.drawable.ic_like);
+                    if (mMediaPlaybackService.loadFavoriteStatus(mMediaPlaybackService.getId()) == 1) {
+                        setDefaultFavoriteStatus(mMediaPlaybackService.getId());
+                        btImgLike.setImageResource(R.drawable.ic_like);
+                        btImgDislike.setImageResource(R.drawable.ic_dislike);
+                        Toast.makeText(getActivity(), "Undisliked Song", Toast.LENGTH_SHORT).show();
+                    } else {
+                        dislikeSong(mMediaPlaybackService.getId());
+                        btImgDislike.setImageResource(R.drawable.ic_disliked_black_24dp);
+                        btImgLike.setImageResource(R.drawable.ic_like);
+                    }
                 }
             }
         });

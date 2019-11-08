@@ -90,7 +90,7 @@ public class JobSchedulerService extends JobService {
 
                             }
 
-                            Log.d(TAG, "onResponse: " + notifications.get(0).getDATE());
+//                            Log.d(TAG, "onResponse: " + notifications.get(0).getDATE());
                         }
 
                         @Override
