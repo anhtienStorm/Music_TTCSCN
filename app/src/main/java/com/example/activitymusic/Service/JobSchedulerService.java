@@ -113,7 +113,7 @@ public class JobSchedulerService extends JobService {
 
     @Override
     public boolean onStopJob(JobParameters jobParameters) {
-        jobCancelled = true;
+        jobCancelled = false;
         return true;
     }
 
@@ -127,7 +127,7 @@ public class JobSchedulerService extends JobService {
                 .setContentText(notification.getTITLE())
                 .setAutoCancel(true)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(notification.getCONTENT())
-                        .setBigContentTitle("News").setSummaryText("Notification Music Online")
+                        .setBigContentTitle(notification.getCONTENT()).setSummaryText("Notification Music Online")
                 )
                 .setContentIntent(pendingIntent)
                 .setSmallIcon(R.drawable.icon_notification)

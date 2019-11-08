@@ -120,7 +120,7 @@
                         <FrameLayout
                             android:id="@+id/top_10_song_fragment"
                             android:layout_marginLeft="10dp"
-                            android:paddingLeft="20dp"
+                            android:paddingLeft="15dp"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
                     </LinearLayout>
